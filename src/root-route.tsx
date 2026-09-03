@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from "react-router";
-import { Button } from "./components/ui/button";
+import IndexPage from "./pages/index-page";
 
 export default function RootRoute() {
   return (
     <Routes>
-      <Route path="/" element={<Button variant={"destructive"}>버튼</Button>} />
+      <Route path="/" element={<IndexPage />} />
       <Route path="/test" element={"테스트"} />
 
       {/* 잘 못 된 경로 */}
