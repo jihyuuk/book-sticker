@@ -28,7 +28,7 @@ export default function ChartList() {
       className="z-10 mt-4 min-h-0 flex-1 overflow-x-auto px-2 py-4"
     >
       {/* 차트 */}
-      <div className="relative flex h-full gap-3 pl-6">
+      <div className="relative flex h-full w-max min-w-full gap-3 pl-6">
         {kids.map((kid, index) => (
           <ChartItem
             key={kid.id}
