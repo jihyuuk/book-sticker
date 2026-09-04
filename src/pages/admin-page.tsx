@@ -9,9 +9,11 @@ import {
   ChevronRight,
   ChartColumnIncreasing,
 } from "lucide-react";
+import { useNavigate } from "react-router";
 
 export default function AdminPage() {
   const { data } = useKids();
+  const navigate = useNavigate();
   const openCreateKidModal = useOpenCreateKidModal();
   const openUpdateKidModal = useOpenUpdateKidModal();
 
@@ -30,7 +32,12 @@ export default function AdminPage() {
               </h1>
               <div className="mt-0.5 flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
                 <ChartColumnIncreasing className="h-3.5 w-3.5" />
-                <span>독서 기록 차트</span>
+                <span
+                  className="cursor-pointer underline"
+                  onClick={() => navigate("/")}
+                >
+                  독서 차트 보기
+                </span>
               </div>
             </div>
           </div>
