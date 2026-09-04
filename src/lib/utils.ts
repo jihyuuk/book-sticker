@@ -1,17 +1,39 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { DEFAULT_GAP, STICKER_SIZE } from "./constants";
+import { DEFAULT_GAP, INFO_HEIGHT, STICKER_SIZE } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function getChartScale(maxBookCount: number) {
+  const bookCount = Math.max(20, maxBookCount);
+  const scaleStep = bookCount >= 100 ? 20 : 10;
+
+  const chartMaxBookCount =
+    Math.floor(bookCount / scaleStep) * scaleStep + scaleStep;
+
+  const scaleCount = Math.floor(chartMaxBookCount / scaleStep);
+
+  const scaleValues = Array.from(
+    { length: scaleCount },
+    (_, index) => (index + 1) * scaleStep,
+  );
+
+  return {
+    chartMaxBookCount,
+    scaleValues,
+  };
+}
+
 export function getStickerGap(bookCount: number, chartHeight: number) {
   if (bookCount <= 1) return 0;
 
+  const stickerAreaHeight = Math.max(chartHeight - INFO_HEIGHT, 0);
+
   return Math.min(
     STICKER_SIZE + DEFAULT_GAP,
-    (chartHeight - STICKER_SIZE) / (bookCount - 1),
+    (stickerAreaHeight - STICKER_SIZE) / (bookCount - 1),
   );
 }
 

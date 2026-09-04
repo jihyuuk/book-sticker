@@ -6,7 +6,7 @@ export default function FooterImage() {
     <picture>
       <source media="(min-width: 1024px)" srcSet={footerPc} />
 
-      <img src={footerTablet} className="w-full" />
+      <img src={footerTablet} className="absolute bottom-0 w-full" />
     </picture>
   );
 }
