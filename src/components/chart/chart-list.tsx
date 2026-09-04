@@ -1,17 +1,18 @@
 import ChartScaleLine from "./chart-scale-line";
 import ChartItem from "./chart-item";
-import { useKids } from "@/hooks/queries/use-kids";
 import {
   getChartScale,
   getRainbowBackground,
   getStickerGap,
 } from "@/lib/utils";
 import { useCharttHeight } from "@/hooks/use-chart-height";
+import type { Kid } from "@/types";
 
-export default function ChartList() {
-  //kid 데이터
-  const { data: kids = [] } = useKids();
+type Props = {
+  kids: Kid[];
+};
 
+export default function ChartList({ kids }: Props) {
   //차트 동적 높이 측정
   const { chartRef, chartHeight } = useCharttHeight();
 
