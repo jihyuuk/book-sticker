@@ -1,5 +1,6 @@
 import { INFO_HEIGHT } from "@/lib/constants";
 import type { Kid } from "@/types";
+import stickerImage from "@/assets/sticker.png";
 
 type Props = {
   kid: Kid;
@@ -8,7 +9,7 @@ type Props = {
   backgroundColor: string;
 };
 
-export default function ChartBar({
+export default function ChartItem({
   kid,
   stickerAreaHeight,
   stickerGap,
@@ -30,7 +31,7 @@ export default function ChartBar({
           {Array.from({ length: kid.bookCount }).map((_, stickerIndex) => (
             <img
               key={stickerIndex}
-              src="/sticker.png"
+              src={stickerImage}
               alt=""
               className="absolute left-1/2 size-10 -translate-x-1/2 object-contain"
               style={{

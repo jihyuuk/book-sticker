@@ -1,12 +1,11 @@
-import ChartBar from "@/components/ChartBar";
-import ChartScaleLine from "@/components/ChartScaleLine";
-import IndexHeader from "@/components/IndexHeader";
-import { useKids } from "@/hooks/queries/use-kids";
-import { INFO_HEIGHT } from "@/lib/constants";
-import { getRainbowBackground, getStickerGap } from "@/lib/utils";
+import ChartScaleLine from "./chart-scale-line";
+import ChartItem from "./chart-item";
 import { useEffect, useRef, useState } from "react";
+import { useKids } from "@/hooks/queries/use-kids";
+import { getRainbowBackground, getStickerGap } from "@/lib/utils";
+import { INFO_HEIGHT } from "@/lib/constants";
 
-export default function IndexPage() {
+export default function ChartList() {
   const { data = [] } = useKids();
 
   //차트 동적 높이 측정
@@ -37,37 +36,28 @@ export default function IndexPage() {
   const stickerGap = getStickerGap(chartMaxBookCount, stickerAreaHeight);
 
   return (
-    <div className="flex h-dvh flex-col">
-      {/* 헤더 영역 */}
-      <IndexHeader />
-
-      {/* 차트 컨테이너 */}
-      <div
-        ref={chartContainerRef}
-        className="z-10 mt-4 mb-15 min-h-0 flex-1 overflow-x-auto"
-      >
-        {/* 차트 */}
-        <div className="relative flex w-max min-w-full gap-3 px-11">
-          {data.map((kid, index) => (
-            <ChartBar
-              key={kid.id}
-              kid={kid}
-              stickerAreaHeight={stickerAreaHeight}
-              stickerGap={stickerGap}
-              backgroundColor={getRainbowBackground(index, data.length)}
-            />
-          ))}
-
-          {/* 차트 눈금 */}
-          <ChartScaleLine
-            chartMaxBookCount={chartMaxBookCount}
+    <div
+      ref={chartContainerRef}
+      className="z-10 mt-4 mb-15 min-h-0 flex-1 overflow-x-auto"
+    >
+      {/* 차트 */}
+      <div className="relative flex w-max min-w-full gap-3 px-11">
+        {data.map((kid, index) => (
+          <ChartItem
+            key={kid.id}
+            kid={kid}
+            stickerAreaHeight={stickerAreaHeight}
             stickerGap={stickerGap}
+            backgroundColor={getRainbowBackground(index, data.length)}
           />
-        </div>
-      </div>
+        ))}
 
-      {/* 푸터 이미지 */}
-      <img src="green-grass-pc.png" className="absolute bottom-0 w-full" />
+        {/* 차트 눈금 */}
+        <ChartScaleLine
+          chartMaxBookCount={chartMaxBookCount}
+          stickerGap={stickerGap}
+        />
+      </div>
     </div>
   );
 }
