@@ -1,6 +1,6 @@
 import { INFO_HEIGHT } from "@/lib/constants";
 import type { Kid } from "@/types";
-import stickerImage from "@/assets/sticker.png";
+import stickerImage from "@/assets/sticker.webp";
 
 type Props = {
   kid: Kid;

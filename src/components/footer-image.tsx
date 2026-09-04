@@ -1,5 +1,5 @@
-import footerTablet from "@/assets/footer-tablet.png";
-import footerPc from "@/assets/footer-pc.png";
+import footerTablet from "@/assets/footer-tablet.webp";
+import footerPc from "@/assets/footer-pc.webp";
 
 export default function FooterImage() {
   return (
