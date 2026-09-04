@@ -1,66 +1,61 @@
-import { API_URL } from "@/lib/constants";
+import { supabase } from "@/lib/supabse";
 import type { Kid } from "@/types";
 
 //모든 아이 조회
-export async function fetchKids(): Promise<Kid[]> {
-  const response = await fetch(`${API_URL}/kids`);
+export async function fetchKids() {
+  const { data, error } = await supabase.from("kid").select("*").order("name");
 
-  if (!response.ok) throw new Error("아이 목록 조회 실패");
+  if (error) throw error;
 
-  return await response.json();
+  return data.map((kid) => ({
+    id: kid.id,
+    name: kid.name,
+    bookCount: kid.book_count,
+  }));
 }
 
-//생성
-export async function createKid(request: Omit<Kid, "id">): Promise<Kid> {
-  const response = await fetch(`${API_URL}/kids`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  });
+// 생성
+export async function createKid(request: Omit<Kid, "id">) {
+  const { data, error } = await supabase
+    .from("kid")
+    .insert({
+      name: request.name,
+      book_count: request.bookCount,
+    })
+    .select()
+    .single();
 
-  if (!response.ok) throw new Error("아이 생성 실패");
-
-  return await response.json();
-}
-
-//이름 수정
-export async function updateKidNameById({
-  id,
-  name,
-}: Omit<Kid, "bookCount">): Promise<void> {
-  const response = await fetch(`${API_URL}/kids/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name }),
-  });
-  if (!response.ok) throw new Error("아이 수정 실패 id:" + id);
+  if (error) throw error;
+  return data;
 }
 
 //수정
 export async function updateKid(
   request: Partial<Kid> & Pick<Kid, "id">,
 ): Promise<void> {
-  const { id, ...updates } = request;
+  const { id, name, bookCount } = request;
 
-  const response = await fetch(`${API_URL}/kids/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updates),
-  });
+  const updates: {
+    name?: string;
+    book_count?: number;
+  } = {};
 
-  if (!response.ok) {
-    throw new Error("아이 수정 실패 id:" + id);
+  if (name !== undefined) {
+    updates.name = name;
   }
+
+  if (bookCount !== undefined) {
+    updates.book_count = bookCount;
+  }
+
+  const { error } = await supabase.from("kid").update(updates).eq("id", id);
+
+  if (error) throw error;
 }
 
 //삭제
 export async function deleteKidById(id: Kid["id"]): Promise<void> {
-  const response = await fetch(`${API_URL}/kids/${id}`, { method: "DELETE" });
-  if (!response.ok) throw new Error("아이 삭제 실패 id:" + id);
+  const { error } = await supabase.from("kid").delete().eq("id", id);
+
+  if (error) throw error;
 }
