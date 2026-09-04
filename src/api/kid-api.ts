@@ -11,16 +11,13 @@ export async function fetchKids(): Promise<Kid[]> {
 }
 
 //생성
-export async function createKid(name: string): Promise<Kid> {
+export async function createKid(request: Omit<Kid, "id">): Promise<Kid> {
   const response = await fetch(`${API_URL}/kids`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      name,
-      bookCount: 0,
-    }),
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) throw new Error("아이 생성 실패");

@@ -46,15 +46,21 @@ export default function CreateKidModal() {
     }
 
     // 필요시 bookCount도 mutate 파라미터에 추가하세요.
-    createKid.mutate(name.trim(), {
-      onSuccess: () => {
-        alert("성공");
-        modal.actions.close();
+    createKid.mutate(
+      {
+        name: name.trim(),
+        bookCount,
       },
-      onError: (error) => {
-        alert(error);
+      {
+        onSuccess: () => {
+          alert("성공");
+          modal.actions.close();
+        },
+        onError: (error) => {
+          alert(error);
+        },
       },
-    });
+    );
   };
 
   const handleBookCountChange = (e: ChangeEvent<HTMLInputElement>) => {
