@@ -7,11 +7,13 @@ import { useUpdateKid } from "@/hooks/mutations/use-update-kid";
 import { useUpdateKidModal } from "@/store/update-kid-modal";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
+import { useDeleteKid } from "@/hooks/mutations/use-delete-kid";
 
 export default function UpdateKidModal() {
   const modal = useUpdateKidModal();
   const openAlertModal = useOpenAlertModal();
   const updateKid = useUpdateKid();
+  const deleteKid = useDeleteKid();
 
   const [newName, setNewName] = useState("");
   const [newBookCount, setNewBookCount] = useState(0);
@@ -78,6 +80,26 @@ export default function UpdateKidModal() {
     const end = input.value.length;
 
     input.setSelectionRange(end, end);
+  };
+
+  const handleDelete = () => {
+    if (!modal.isOpen) return;
+
+    openAlertModal({
+      title: "아이를 삭제할까요?",
+      description: "삭제한 아이의 정보는 다시 복구할 수 없습니다.",
+      onAction: () => {
+        deleteKid.mutate(modal.kid.id, {
+          onSuccess: () => {
+            toast.success("삭제 완료");
+            modal.actions.close();
+          },
+          onError: () => {
+            toast.error("에러 발생");
+          },
+        });
+      },
+    });
   };
 
   return (
@@ -158,22 +180,34 @@ export default function UpdateKidModal() {
           </FieldGroup>
         </div>
 
-        <div className="mt-8 flex justify-end gap-3">
+        <div className="mt-8 flex justify-end gap-8">
           <Button
-            variant={"outline"}
-            onClick={handleClose}
+            type="button"
+            variant="outline"
+            onClick={handleDelete}
             disabled={updateKid.isPending}
-            className="h-14 flex-1 rounded-2xl border-2 border-gray-200 text-lg font-bold text-gray-600 transition-colors hover:bg-gray-100"
+            className="h-14 w-20 rounded-2xl border-2 border-rose-200 bg-rose-50 px-4 text-lg font-bold text-rose-600 transition-all hover:bg-rose-100 hover:text-rose-700 active:translate-y-0.5 md:w-24"
           >
-            취소
+            삭제
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={updateKid.isPending}
-            className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
-          >
-            저장
-          </Button>
+
+          <div className="flex flex-1 gap-2">
+            <Button
+              variant={"outline"}
+              onClick={handleClose}
+              disabled={updateKid.isPending}
+              className="h-14 w-20 rounded-2xl border-2 border-gray-200 text-lg font-bold text-gray-600 transition-colors hover:bg-gray-100 md:w-24"
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={updateKid.isPending}
+              className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
+            >
+              저장
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
