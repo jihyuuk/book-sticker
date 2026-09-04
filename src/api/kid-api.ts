@@ -43,6 +43,25 @@ export async function updateKidNameById({
   if (!response.ok) throw new Error("아이 수정 실패 id:" + id);
 }
 
+//수정
+export async function updateKid(
+  request: Partial<Kid> & Pick<Kid, "id">,
+): Promise<void> {
+  const { id, ...updates } = request;
+
+  const response = await fetch(`${API_URL}/kids/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    throw new Error("아이 수정 실패 id:" + id);
+  }
+}
+
 //삭제
 export async function deleteKidById(id: Kid["id"]): Promise<void> {
   const response = await fetch(`${API_URL}/kids/${id}`, { method: "DELETE" });

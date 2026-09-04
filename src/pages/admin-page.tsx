@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useKids } from "@/hooks/queries/use-kids";
 import { useOpenCreateKidModal } from "@/store/create-kid-modal-store";
+import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
 
 export default function AdminPage() {
   const { data } = useKids();
   const openCreateKidModal = useOpenCreateKidModal();
+  const openUdpateKidModal = useOpenUpdateKidModal();
 
   return (
     <div className="h-dvh">
@@ -14,7 +16,7 @@ export default function AdminPage() {
         <div className="text-xl font-bold">아이들</div>
         <div>
           {data?.map((kid) => (
-            <div>
+            <div key={kid.id} onClick={() => openUdpateKidModal(kid)}>
               {kid.name} / {kid.bookCount}권
             </div>
           ))}
