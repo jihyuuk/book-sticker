@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { useCreateKid } from "@/hooks/mutations/use-create-kid";
 import { useCreateKidModalStore } from "@/store/create-kid-modal-store";
 import { useOpenAlertModal } from "@/store/alert-modal";
+import { toast } from "sonner";
 
 export default function CreateKidModal() {
   const modal = useCreateKidModalStore();
@@ -40,7 +41,7 @@ export default function CreateKidModal() {
 
   const handleSubmit = () => {
     if (!name.trim()) {
-      alert("이름 필수");
+      toast.warning("이름은 필수 입니다.");
       setName(name.trim());
       return;
     }
@@ -53,11 +54,11 @@ export default function CreateKidModal() {
       },
       {
         onSuccess: () => {
-          alert("성공");
+          toast.success("추가를 성공했어요");
           modal.actions.close();
         },
-        onError: (error) => {
-          alert(error);
+        onError: () => {
+          toast.error("오류 발생");
         },
       },
     );

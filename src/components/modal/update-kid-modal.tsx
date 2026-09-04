@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { useUpdateKid } from "@/hooks/mutations/use-update-kid";
 import { useUpdateKidModal } from "@/store/update-kid-modal";
 import { useOpenAlertModal } from "@/store/alert-modal";
+import { toast } from "sonner";
 
 export default function UpdateKidModal() {
   const modal = useUpdateKidModal();
@@ -34,11 +35,11 @@ export default function UpdateKidModal() {
       { id: modal.kid.id, name: newName, bookCount: newBookCount },
       {
         onSuccess: () => {
-          alert("수정 성공");
+          toast.success("수정을 성공했어요");
           modal.actions.close();
         },
-        onError: (error) => {
-          alert(error);
+        onError: () => {
+          toast.error("에러 발생");
         },
       },
     );
