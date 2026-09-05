@@ -1,11 +1,9 @@
-export type Kid = {
-  id: string;
-  classroomId: string;
-  name: string;
-  bookCount: number;
-};
+import type { Tables, TablesInsert, TablesUpdate } from "@/database.types";
 
-export type AuthParam = {
-  email: string;
-  password: string;
-};
+export type Classroom = Tables<"classroom">;
+export type ClassroomInsert = TablesInsert<"classroom">;
+export type ClassroomUpdate = TablesUpdate<"classroom">;
+
+export type Kid = Tables<"kid">;
+export type KidInsert = TablesInsert<"kid">;
+export type KidUpdate = TablesUpdate<"kid">;
