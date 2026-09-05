@@ -31,7 +31,7 @@ export default function ChartList({ kids }: Props) {
     <div
       ref={chartRef}
       {...dragScroll}
-      className="z-10 mt-4 min-h-0 flex-1 cursor-grab overflow-x-auto px-2 py-4 active:cursor-grabbing"
+      className="z-10 mt-4 min-h-0 flex-1 cursor-grab overflow-x-auto px-2 py-4 select-none active:cursor-grabbing"
     >
       {/* 차트 */}
       <div className="relative mx-auto flex h-full w-max gap-3 pr-2 pl-6">
