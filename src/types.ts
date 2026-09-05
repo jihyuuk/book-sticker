@@ -3,3 +3,8 @@ export type Kid = {
   name: string;
   bookCount: number;
 };
+
+export type AuthParam = {
+  email: string;
+  password: string;
+};
