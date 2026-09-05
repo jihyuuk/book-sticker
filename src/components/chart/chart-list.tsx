@@ -7,6 +7,7 @@ import {
 } from "@/lib/utils";
 import { useChartHeight } from "@/hooks/use-chart-height";
 import type { Kid } from "@/types";
+import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 type Props = {
   kids: Kid[];
@@ -15,6 +16,7 @@ type Props = {
 export default function ChartList({ kids }: Props) {
   //차트 동적 높이 측정
   const { chartRef, chartHeight } = useChartHeight();
+  const dragScroll = useDragScroll();
 
   //차트의 최대 권 수
   const kidMaxBookCount = Math.max(...kids.map((kid) => kid.bookCount), 0); //현재 아이들 중 최대 권 수
@@ -28,7 +30,8 @@ export default function ChartList({ kids }: Props) {
   return (
     <div
       ref={chartRef}
-      className="z-10 mt-4 min-h-0 flex-1 overflow-x-auto px-2 py-4"
+      {...dragScroll}
+      className="z-10 mt-4 min-h-0 flex-1 cursor-grab overflow-x-auto px-2 py-4 active:cursor-grabbing"
     >
       {/* 차트 */}
       <div className="relative mx-auto flex h-full w-max gap-3 pr-2 pl-6">
