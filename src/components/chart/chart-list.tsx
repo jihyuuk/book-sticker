@@ -25,7 +25,13 @@ export default function ChartList({ kids }: Props) {
   //스티커 갭
   const stickerGap = getStickerGap(chartMaxBookCount, chartHeight);
 
-  if (kids.length <= 0) return null;
+  if (kids.length === 0) {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-center text-stone-400">
+        아직 등록된 어린이가 없어요.
+      </div>
+    );
+  }
 
   return (
     <div
