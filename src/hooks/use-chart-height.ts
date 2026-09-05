@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 //동적으로 변하는 차트의 높이를 감지하는 커스텀 훅
-export function useCharttHeight() {
+export function useChartHeight() {
   const chartRef = useRef<HTMLDivElement>(null);
   const [chartHeight, setChartHeight] = useState(0);
 
