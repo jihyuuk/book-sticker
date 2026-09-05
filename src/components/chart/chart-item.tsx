@@ -34,8 +34,10 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
           className="flex shrink-0 flex-col items-center justify-center"
           style={{ height: INFO_HEIGHT }}
         >
-          <p className="text-lg font-semibold">{kid.name}</p>
-          <p className="text-sm font-medium text-stone-600">
+          <p className="w-full truncate text-center text-lg font-semibold">
+            {kid.name}
+          </p>
+          <p className="w-full truncate text-center text-sm font-medium text-stone-600">
             {kid.bookCount}권
           </p>
         </div>
