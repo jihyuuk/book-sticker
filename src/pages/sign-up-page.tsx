@@ -10,10 +10,10 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signIn, isPending, isError } = useSignUp();
+  const { mutate: signUp, isPending, isError } = useSignUp();
 
   const handleSubmit = () => {
-    signIn(
+    signUp(
       {
         email,
         password,
