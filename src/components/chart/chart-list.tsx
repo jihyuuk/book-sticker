@@ -23,6 +23,8 @@ export default function ChartList({ kids }: Props) {
   //스티커 갭
   const stickerGap = getStickerGap(chartMaxBookCount, chartHeight);
 
+  if (kids.length <= 0) return null;
+
   return (
     <div
       ref={chartRef}
