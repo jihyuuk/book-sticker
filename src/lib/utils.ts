@@ -1,13 +1,22 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { DEFAULT_GAP, INFO_HEIGHT, STICKER_SIZE } from "./constants";
+import {
+  DEFALUT_CHART_SCALE,
+  DEFAULT_GAP,
+  INFO_HEIGHT,
+  STICKER_SIZE,
+} from "./constants";
+import redBook from "@/assets/book/red-book.webp";
+import yellowBook from "@/assets/book/yellow-book.webp";
+import greenBook from "@/assets/book/green-book.webp";
+import blueBook from "@/assets/book/blue-book.webp";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function getChartScale(maxBookCount: number) {
-  const bookCount = Math.max(20, maxBookCount);
+  const bookCount = Math.max(DEFALUT_CHART_SCALE - 10, maxBookCount);
   const scaleStep = bookCount >= 100 ? 20 : 10;
 
   const chartMaxBookCount =
@@ -49,4 +58,18 @@ export function getRainbowBackground(index: number, total: number) {
   // )`;
 
   return `hsla(${hue}, 70%, 88%, 0.45)`;
+}
+
+//랜덤 책
+const bookImages = [redBook, yellowBook, greenBook, blueBook];
+export function getBookImage(kidId: string, stickerIndex: number) {
+  const seed = `${kidId}-${stickerIndex}`;
+
+  let hash = 0;
+
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+
+  return bookImages[hash % bookImages.length];
 }

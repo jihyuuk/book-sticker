@@ -1,6 +1,6 @@
 import { INFO_HEIGHT } from "@/lib/constants";
+import { getBookImage } from "@/lib/utils";
 import type { Kid } from "@/types";
-import stickerImage from "@/assets/sticker.webp";
 
 type Props = {
   kid: Kid;
@@ -20,7 +20,7 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
           {Array.from({ length: kid.bookCount }).map((_, stickerIndex) => (
             <img
               key={stickerIndex}
-              src={stickerImage}
+              src={getBookImage(kid.id, stickerIndex)}
               className="absolute left-1/2 size-10 -translate-x-1/2 object-contain"
               style={{
                 bottom: stickerIndex * stickerGap,
