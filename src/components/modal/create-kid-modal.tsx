@@ -3,13 +3,15 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { useCreateKid } from "@/hooks/mutations/use-create-kid";
+import { useCreateKid } from "@/hooks/mutations/kid/use-create-kid";
 import { useCreateKidModalStore } from "@/store/create-kid-modal-store";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
+import { useClassroom } from "@/hooks/queries/use-classroom";
 
 export default function CreateKidModal() {
   const modal = useCreateKidModalStore();
+  const { data: classroom } = useClassroom();
   const openAlertModal = useOpenAlertModal();
 
   const createKid = useCreateKid();
@@ -46,11 +48,17 @@ export default function CreateKidModal() {
       return;
     }
 
+    if (!classroom) {
+      toast.warning("잠시 후 다시 시도해주세요.");
+      return;
+    }
+
     // 필요시 bookCount도 mutate 파라미터에 추가하세요.
     createKid.mutate(
       {
+        classroom_id: classroom.id,
         name: name.trim(),
-        bookCount,
+        book_count: bookCount,
       },
       {
         onSuccess: () => {

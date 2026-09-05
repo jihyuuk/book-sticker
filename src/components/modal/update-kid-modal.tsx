@@ -3,11 +3,11 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { useUpdateKid } from "@/hooks/mutations/use-update-kid";
+import { useUpdateKid } from "@/hooks/mutations/kid/use-update-kid";
 import { useUpdateKidModal } from "@/store/update-kid-modal";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
-import { useDeleteKid } from "@/hooks/mutations/use-delete-kid";
+import { useDeleteKid } from "@/hooks/mutations/kid/use-delete-kid";
 
 export default function UpdateKidModal() {
   const modal = useUpdateKidModal();
@@ -23,7 +23,7 @@ export default function UpdateKidModal() {
     if (!modal.isOpen) return;
 
     setNewName(modal.kid.name);
-    setNewBookCount(modal.kid.bookCount);
+    setNewBookCount(modal.kid.book_count);
   }, [modal.isOpen]);
 
   //저장
@@ -34,7 +34,7 @@ export default function UpdateKidModal() {
     if (!newName.trim()) return;
 
     updateKid.mutate(
-      { id: modal.kid.id, name: newName, bookCount: newBookCount },
+      { id: modal.kid.id, name: newName, book_count: newBookCount },
       {
         onSuccess: () => {
           toast.success("수정을 성공했어요");
@@ -52,7 +52,7 @@ export default function UpdateKidModal() {
     //입력값 다를떄 물어봐야함
     if (!modal.isOpen) return;
 
-    if (modal.kid.name !== newName || modal.kid.bookCount !== newBookCount) {
+    if (modal.kid.name !== newName || modal.kid.book_count !== newBookCount) {
       openAlertModal({
         title: "수정이 완료되지 않았습니다",
         description: "이 화면에서 나가면 입력 중이던 내용이 사라집니다.",

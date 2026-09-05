@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSignIn } from "@/hooks/mutations/use-sign-in";
+import { useSignIn } from "@/hooks/mutations/auth/use-sign-in";
 import { generateErrorMessage } from "@/lib/supabse-error";
 import { useState } from "react";
 import { Link } from "react-router";

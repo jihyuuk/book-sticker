@@ -17,7 +17,7 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
       >
         {/* 스티커 영역 */}
         <div className="relative min-h-0 w-full flex-1">
-          {Array.from({ length: kid.bookCount }).map((_, stickerIndex) => (
+          {Array.from({ length: kid.book_count }).map((_, stickerIndex) => (
             <img
               key={stickerIndex}
               src={getBookImage(kid.id, stickerIndex)}
@@ -38,7 +38,7 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
             {kid.name}
           </p>
           <p className="w-full truncate text-center text-xs text-stone-600 md:text-sm">
-            {kid.bookCount}권
+            {kid.book_count}권
           </p>
         </div>
       </div>

@@ -19,7 +19,7 @@ export default function ChartList({ kids }: Props) {
   const dragScroll = useDragScroll();
 
   //차트의 최대 권 수
-  const kidMaxBookCount = Math.max(...kids.map((kid) => kid.bookCount), 0); //현재 아이들 중 최대 권 수
+  const kidMaxBookCount = Math.max(...kids.map((kid) => kid.book_count), 0); //현재 아이들 중 최대 권 수
   const { chartMaxBookCount, scaleValues } = getChartScale(kidMaxBookCount);
 
   //스티커 갭

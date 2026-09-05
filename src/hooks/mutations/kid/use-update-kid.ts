@@ -7,8 +7,11 @@ export function useUpdateKid() {
 
   return useMutation({
     mutationFn: updateKid,
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.kid.list });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.kid.list,
+      });
     },
   });
 }

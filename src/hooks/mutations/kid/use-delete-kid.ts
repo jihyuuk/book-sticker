@@ -7,8 +7,11 @@ export function useDeleteKid() {
 
   return useMutation({
     mutationFn: deleteKidById,
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.kid.list });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.kid.list,
+      });
     },
   });
 }

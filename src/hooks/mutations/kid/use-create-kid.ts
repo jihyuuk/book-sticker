@@ -8,7 +8,9 @@ export function useCreateKid() {
   return useMutation({
     mutationFn: createKid,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.kid.list });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.kid.list,
+      });
     },
   });
 }

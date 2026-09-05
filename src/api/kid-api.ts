@@ -1,58 +1,37 @@
 import { supabase } from "@/lib/supabse";
-import type { Kid } from "@/types";
+import type { Kid, KidInsert, KidUpdate } from "@/types";
 
 //모든 아이 조회
-export async function fetchKids(classroomId: string) {
+export async function fetchKids(classroom_id: string) {
   const { data, error } = await supabase
     .from("kid")
     .select("*")
-    .eq("classroom_id", classroomId)
+    .eq("classroom_id", classroom_id)
     .order("name");
 
   if (error) throw error;
 
-  return data.map((kid) => ({
-    id: kid.id,
-    name: kid.name,
-    classroomid: kid.classroom_id,
-    bookCount: kid.book_count,
-  }));
+  return data;
 }
 
 // 생성
-export async function createKid(request: Omit<Kid, "id">) {
+export async function createKid(request: KidInsert) {
   const { data, error } = await supabase
     .from("kid")
-    .insert({
-      classroom_id: request.classroomId,
-      name: request.name,
-      book_count: request.bookCount,
-    })
+    .insert(request)
     .select()
     .single();
 
   if (error) throw error;
+
   return data;
 }
 
 //수정
 export async function updateKid(
-  request: Partial<Kid> & Pick<Kid, "id">,
+  request: Pick<Kid, "id"> & KidUpdate,
 ): Promise<void> {
-  const { id, name, bookCount } = request;
-
-  const updates: {
-    name?: string;
-    book_count?: number;
-  } = {};
-
-  if (name !== undefined) {
-    updates.name = name;
-  }
-
-  if (bookCount !== undefined) {
-    updates.book_count = bookCount;
-  }
+  const { id, ...updates } = request;
 
   const { error } = await supabase.from("kid").update(updates).eq("id", id);
 

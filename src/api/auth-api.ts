@@ -1,5 +1,9 @@
 import { supabase } from "@/lib/supabse";
-import type { AuthParam } from "@/types";
+
+export type AuthParam = {
+  email: string;
+  password: string;
+};
 
 export async function singUp({ email, password }: AuthParam) {
   const { data, error } = await supabase.auth.signUp({ email, password });

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useClassroom } from "@/hooks/queries/use-classroom";
 import { useKids } from "@/hooks/queries/use-kids";
 import { useOpenCreateKidModal } from "@/store/create-kid-modal-store";
 import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
@@ -12,7 +13,9 @@ import {
 import { useNavigate } from "react-router";
 
 export default function AdminPage() {
-  const { data } = useKids();
+  const { data: classroom } = useClassroom();
+  const { data: kids } = useKids(classroom?.id);
+
   const navigate = useNavigate();
   const openCreateKidModal = useOpenCreateKidModal();
   const openUpdateKidModal = useOpenUpdateKidModal();
@@ -57,14 +60,14 @@ export default function AdminPage() {
             <h2 className="flex items-center gap-2 text-base font-bold text-slate-800 sm:text-lg">
               아이들 목록
               <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600">
-                총 {data?.length || 0}명
+                총 {kids?.length || 0}명
               </span>
             </h2>
           </div>
 
           {/* 목록 grid */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {data?.map((kid) => (
+            {kids?.map((kid) => (
               <div
                 key={kid.id}
                 onClick={() => openUpdateKidModal(kid)}
@@ -81,7 +84,7 @@ export default function AdminPage() {
 
                 <div className="flex shrink-0 items-center gap-2">
                   <div className="rounded-lg border border-indigo-100/50 bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-700">
-                    {kid.bookCount}{" "}
+                    {kid.book_count}{" "}
                     <span className="text-xs font-normal text-indigo-600">
                       권
                     </span>
@@ -92,7 +95,7 @@ export default function AdminPage() {
             ))}
 
             {/* 데이터가 없을 때 */}
-            {(!data || data.length === 0) && (
+            {(!kids || kids.length === 0) && (
               <div className="col-span-full py-10 text-center text-sm text-slate-400 sm:py-12">
                 등록된 어린이 정보가 없습니다. 상단의 '어린이 추가' 버튼을
                 눌러주세요.
