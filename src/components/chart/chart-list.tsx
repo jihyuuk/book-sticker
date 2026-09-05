@@ -6,11 +6,11 @@ import {
   getStickerGap,
 } from "@/lib/utils";
 import { useChartHeight } from "@/hooks/use-chart-height";
-import type { Kid } from "@/types";
+import type { KidSummary } from "@/types";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 type Props = {
-  kids: Kid[];
+  kids: KidSummary[];
 };
 
 export default function ChartList({ kids }: Props) {

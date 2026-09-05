@@ -1,9 +1,9 @@
 import { INFO_HEIGHT } from "@/lib/constants";
 import { getBookImage } from "@/lib/utils";
-import type { Kid } from "@/types";
+import type { KidSummary } from "@/types";
 
 type Props = {
-  kid: Kid;
+  kid: KidSummary;
   stickerGap: number;
   background: string;
 };

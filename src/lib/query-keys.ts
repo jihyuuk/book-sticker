@@ -9,4 +9,6 @@ export const QUERY_KEYS = {
     list: ["kid", "list"] as const,
     byId: (kidId: string) => ["kid", "byId", kidId] as const,
   },
+
+  publicChart: (publicId: string) => ["public-chart", publicId] as const,
 };
