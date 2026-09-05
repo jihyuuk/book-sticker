@@ -10,7 +10,7 @@ type Props = {
 
 export default function ChartItem({ kid, stickerGap, background }: Props) {
   return (
-    <section className="h-full w-20 shrink-0 overflow-hidden rounded-xl bg-[rgb(254,247,233)] shadow-sm">
+    <section className="h-full w-16 shrink-0 overflow-hidden rounded-xl bg-[rgb(254,247,233)] shadow-sm md:w-19">
       <div
         className="relative flex h-full w-full flex-col"
         style={{ background }}
@@ -34,10 +34,10 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
           className="flex shrink-0 flex-col items-center justify-center"
           style={{ height: INFO_HEIGHT }}
         >
-          <p className="w-full truncate text-center text-lg font-semibold">
+          <p className="w-full truncate text-center text-base font-medium md:text-lg">
             {kid.name}
           </p>
-          <p className="w-full truncate text-center text-sm font-medium text-stone-600">
+          <p className="w-full truncate text-center text-xs text-stone-600 md:text-sm">
             {kid.bookCount}권
           </p>
         </div>
