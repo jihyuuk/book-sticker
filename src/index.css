@@ -132,3 +132,12 @@
 #root {
   background-color: rgb(254, 247, 233);
 }
+
+img {
+  -webkit-user-drag: none;
+  /* 이미지 드래그 방지 */
+  -webkit-tap-highlight-color: transparent;
+  /* 클릭 시 하이라이트 제거 */
+  -webkit-touch-callout: none;
+  /* (추천) 꾹 누르기 메뉴 방지 */
+}
