@@ -2,20 +2,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSignUp } from "@/hooks/mutations/auth/use-sign-up";
 import { generateErrorMessage } from "@/lib/supabse-error";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
 
+type InvalidType = "EMAIL" | "PASSWORD" | "PASSWORD_CONFIRM" | null;
+
 export default function SignUpPage() {
+  const { mutate: signUp, isPending } = useSignUp();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [invalidType, setInvalidType] = useState<InvalidType>(null);
 
-  const { mutate: signUp, isPending, isError } = useSignUp();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleSubmit = () => {
+    setInvalidType(null);
+
+    if (!email.trim()) {
+      toast.error("이메일을 입력해주세요.");
+      setInvalidType("EMAIL");
+      return;
+    }
+
+    if (!password) {
+      toast.error("비밀번호를 입력해주세요.");
+      setInvalidType("PASSWORD");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("비밀번호는 6자 이상 입력해주세요.");
+      setInvalidType("PASSWORD");
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      toast.error("비밀번호가 다릅니다.");
+      setInvalidType("PASSWORD_CONFIRM");
+      return;
+    }
+
+    //api 호출
     signUp(
       {
-        email,
+        email: email.trim(),
         password,
       },
       {
@@ -23,49 +57,78 @@ export default function SignUpPage() {
           const message = generateErrorMessage(error);
           toast.error(message);
           setPassword("");
+          setPasswordConfirm("");
         },
       },
     );
   };
 
   return (
-    <main className="flex min-h-dvh items-center justify-center p-4">
-      <div className="flex w-full max-w-sm flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">회원가입</h1>
+    <div className="flex min-h-dvh items-center justify-center p-4">
+      {/* 카드 */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-white p-6 shadow-md"
+      >
+        <div className="mb-4">
+          <h1 className="text-2xl font-semibold">회원 가입</h1>
           <p className="mt-1 text-sm text-stone-500">
-            우리 반 독서 기록을 관리해보세요.
+            독서 기록을 시작해보세요.
           </p>
         </div>
 
         <Input
           type="email"
+          className="h-12 px-4"
           placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          disabled={isPending}
+          aria-invalid={invalidType === "EMAIL"}
         />
 
         <Input
           type="password"
+          className="h-12 px-4"
           placeholder="비밀번호"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
+          disabled={isPending}
+          aria-invalid={invalidType === "PASSWORD"}
         />
 
-        {isError && (
-          <p className="text-sm text-red-500">
-            이메일 또는 비밀번호를 확인해주세요.
-          </p>
-        )}
+        <Input
+          type="password"
+          className="h-12 px-4"
+          placeholder="비밀번호 확인"
+          value={passwordConfirm}
+          onChange={(e) => setPasswordConfirm(e.target.value)}
+          disabled={isPending}
+          aria-invalid={invalidType === "PASSWORD_CONFIRM"}
+        />
 
-        <Button onClick={handleSubmit} disabled={isPending}>
-          {isPending ? "회원 가입 중..." : "회원가입"}
+        <Button
+          type="submit"
+          className="mt-4 h-12 font-semibold"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            "가입하기"
+          )}
         </Button>
 
-        <Link to={"/sign-in"}>회원가입 이동</Link>
-      </div>
-    </main>
+        <div className="text-muted-foreground text-sm">
+          계정이 이미 있다면?
+          <Link
+            className="text-muted-foreground ml-2 underline hover:text-sky-600"
+            to={"/sign-in"}
+          >
+            로그인
+          </Link>
+        </div>
+      </form>
+    </div>
   );
 }

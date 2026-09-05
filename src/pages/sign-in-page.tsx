@@ -10,13 +10,15 @@ import { toast } from "sonner";
 type InvalidType = "EMAIL" | "PASSWORD" | null;
 
 export default function SignInPage() {
+  const { mutate: signIn, isPending } = useSignIn();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [invalidType, setInvalidType] = useState<InvalidType>(null);
 
-  const { mutate: signIn, isPending } = useSignIn();
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleSubmit = () => {
     setInvalidType(null);
 
     if (!email.trim()) {
@@ -50,7 +52,10 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center p-4">
       {/* 카드 */}
-      <div className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-white p-6 shadow-md">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-white p-6 shadow-md"
+      >
         <div className="mb-4">
           <h1 className="text-2xl font-semibold">로그인</h1>
           <p className="mt-1 text-sm text-stone-500">
@@ -79,8 +84,8 @@ export default function SignInPage() {
         />
 
         <Button
+          type="submit"
           className="mt-4 h-12 font-semibold"
-          onClick={handleSubmit}
           disabled={isPending}
         >
           {isPending ? (
@@ -91,7 +96,7 @@ export default function SignInPage() {
         </Button>
 
         <div className="text-muted-foreground text-sm">
-          계정이 없으시다면?
+          계정이 없다면?
           <Link
             className="text-muted-foreground ml-2 underline hover:text-sky-600"
             to={"/sign-up"}
@@ -99,7 +104,7 @@ export default function SignInPage() {
             회원가입
           </Link>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
