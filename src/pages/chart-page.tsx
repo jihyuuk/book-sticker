@@ -1,4 +1,5 @@
 import ChartList from "@/components/chart/chart-list";
+import ChartToolbar from "@/components/chart/chart-toolbar";
 import FooterImage from "@/components/footer-image";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
@@ -29,6 +30,9 @@ export default function ChartPage() {
     <div className="flex h-dvh flex-col">
       {/* 헤더 이미지 */}
       <HeaderImage />
+
+      {/* 툴바 */}
+      <ChartToolbar />
 
       {/* 차트 영역 */}
       <ChartList kids={kids} />

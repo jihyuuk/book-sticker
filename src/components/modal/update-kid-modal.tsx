@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useUpdateKid } from "@/hooks/mutations/kid/use-update-kid";
@@ -17,21 +17,28 @@ export default function UpdateKidModal() {
 
   const [newName, setNewName] = useState("");
   const [newBookCount, setNewBookCount] = useState(0);
+  const [invalidName, setInvalidName] = useState(false);
 
   //초기화
   useEffect(() => {
     if (!modal.isOpen) return;
-
     setNewName(modal.kid.name);
     setNewBookCount(modal.kid.book_count);
+    setInvalidName(false);
   }, [modal.isOpen]);
 
   //저장
   const handleSubmit = () => {
     if (updateKid.isPending || !modal.isOpen) return;
 
-    //이름 필수
-    if (!newName.trim()) return;
+    setInvalidName(false);
+
+    if (!newName.trim()) {
+      toast.warning("이름은 필수 입니다.");
+      setNewName(newName.trim());
+      setInvalidName(true);
+      return;
+    }
 
     updateKid.mutate(
       { id: modal.kid.id, name: newName, book_count: newBookCount },
@@ -110,12 +117,6 @@ export default function UpdateKidModal() {
           e.preventDefault();
         }}
       >
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-800 md:text-2xl">
-            어린이 수정
-          </DialogTitle>
-        </DialogHeader>
-
         <div className="mt-2 space-y-6">
           <FieldGroup className="space-y-2 md:space-y-5">
             <Field className="flex flex-col gap-2">
@@ -133,6 +134,7 @@ export default function UpdateKidModal() {
                 onChange={(e) => setNewName(e.target.value)}
                 disabled={updateKid.isPending}
                 className="h-12 rounded-2xl border-2 border-gray-200 px-4 text-base transition-all focus-visible:border-sky-400 focus-visible:ring-sky-200 md:h-14 md:text-lg"
+                aria-invalid={invalidName}
               />
             </Field>
 
@@ -180,7 +182,7 @@ export default function UpdateKidModal() {
           </FieldGroup>
         </div>
 
-        <div className="mt-8 flex justify-end gap-8">
+        <div className="mt-8 flex justify-end gap-2">
           <Button
             type="button"
             variant="outline"
@@ -191,23 +193,13 @@ export default function UpdateKidModal() {
             삭제
           </Button>
 
-          <div className="flex flex-1 gap-2">
-            <Button
-              variant={"outline"}
-              onClick={handleClose}
-              disabled={updateKid.isPending}
-              className="h-14 w-20 rounded-2xl border-2 border-gray-200 text-lg font-bold text-gray-600 transition-colors hover:bg-gray-100 md:w-24"
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={updateKid.isPending}
-              className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
-            >
-              저장
-            </Button>
-          </div>
+          <Button
+            onClick={handleSubmit}
+            disabled={updateKid.isPending}
+            className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
+          >
+            저장하기
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

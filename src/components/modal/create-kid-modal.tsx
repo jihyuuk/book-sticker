@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useCreateKid } from "@/hooks/mutations/kid/use-create-kid";
@@ -18,10 +18,13 @@ export default function CreateKidModal() {
   const [name, setName] = useState("");
   const [bookCount, setBookCount] = useState(0);
 
+  const [invalidName, setInvalidName] = useState(false);
+
   useEffect(() => {
     if (!modal.isOpen) return;
     setName("");
     setBookCount(0);
+    setInvalidName(false);
   }, [modal.isOpen]);
 
   const handleClose = () => {
@@ -42,9 +45,12 @@ export default function CreateKidModal() {
   };
 
   const handleSubmit = () => {
+    setInvalidName(false);
+
     if (!name.trim()) {
       toast.warning("이름은 필수 입니다.");
       setName(name.trim());
+      setInvalidName(true);
       return;
     }
 
@@ -53,7 +59,6 @@ export default function CreateKidModal() {
       return;
     }
 
-    // 필요시 bookCount도 mutate 파라미터에 추가하세요.
     createKid.mutate(
       {
         classroom_id: classroom.id,
@@ -96,12 +101,6 @@ export default function CreateKidModal() {
           e.preventDefault();
         }}
       >
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-800 md:text-2xl">
-            어린이 추가
-          </DialogTitle>
-        </DialogHeader>
-
         <div className="mt-2 space-y-6">
           <FieldGroup className="space-y-2 md:space-y-5">
             <Field className="flex flex-col gap-2">
@@ -119,6 +118,7 @@ export default function CreateKidModal() {
                 onChange={(e) => setName(e.target.value)}
                 disabled={createKid.isPending}
                 className="h-12 rounded-2xl border-2 border-gray-200 px-4 text-base transition-all focus-visible:border-sky-400 focus-visible:ring-sky-200 md:h-14 md:text-lg"
+                aria-invalid={invalidName}
               />
             </Field>
 
@@ -157,7 +157,7 @@ export default function CreateKidModal() {
                   type="button"
                   onClick={handleIncrement}
                   disabled={createKid.isPending}
-                  className="flex h-full w-20 shrink-0 items-center justify-center rounded-lg border-2 border-gray-200 bg-white text-2xl font-black text-gray-500 shadow-sm transition-all hover:bg-gray-50 active:scale-95 active:bg-gray-100 disabled:opacity-30 disabled:active:scale-100"
+                  className="flex h-full w-20 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-gray-200 bg-white text-2xl font-black text-gray-500 shadow-sm transition-all hover:bg-gray-50 active:scale-95 active:bg-gray-100 disabled:opacity-30 disabled:active:scale-100"
                 >
                   +
                 </button>
@@ -166,23 +166,13 @@ export default function CreateKidModal() {
           </FieldGroup>
         </div>
 
-        <div className="mt-8 flex justify-end gap-3">
-          <Button
-            variant={"outline"}
-            onClick={handleClose}
-            disabled={createKid.isPending}
-            className="h-14 flex-1 rounded-2xl border-2 border-gray-200 text-lg font-bold text-gray-600 transition-colors hover:bg-gray-100"
-          >
-            취소
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={createKid.isPending}
-            className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
-          >
-            저장
-          </Button>
-        </div>
+        <Button
+          onClick={handleSubmit}
+          disabled={createKid.isPending}
+          className="mt-8 h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
+        >
+          어린이 추가하기
+        </Button>
       </DialogContent>
     </Dialog>
   );

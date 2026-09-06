@@ -141,3 +141,8 @@ img {
   -webkit-touch-callout: none;
   /* (추천) 꾹 누르기 메뉴 방지 */
 }
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
