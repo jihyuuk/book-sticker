@@ -15,7 +15,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-dvh">
-      <header className="bg-white shadow-sm">
+      <header className="sticky top-0 bg-white shadow-sm">
         <div className="mx-auto flex h-16 w-full max-w-3xl items-center justify-between px-5">
           <div className="flex items-center gap-2">
             <ChevronLeft
