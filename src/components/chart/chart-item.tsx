@@ -1,5 +1,5 @@
 import { INFO_HEIGHT } from "@/lib/constants";
-import { getBookImage } from "@/lib/utils";
+import { getBookImage } from "@/lib/random-book";
 import type { KidSummary } from "@/types";
 
 type Props = {
