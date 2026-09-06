@@ -6,7 +6,7 @@ import GlobalLoading from "@/components/global-loading";
 import HeaderImage from "@/components/header-image";
 import { useClassroom } from "@/hooks/queries/use-classroom";
 import { useKids } from "@/hooks/queries/use-kids";
-import { useBookImagesLoaded } from "@/hooks/use-book-images-loaded";
+import { usePreloadImages } from "@/hooks/use-preload-images";
 
 export default function ChartPage() {
   // 1. classroom 조회
@@ -20,14 +20,14 @@ export default function ChartPage() {
   const {
     data: kids = [],
     isPending: isKidsPending,
-    error: isKidsError,
+    isError: isKidsError,
   } = useKids(classroom?.id);
 
-  //책 이미지 로딩 완료 여부
-  const isBookImagesLoaded = useBookImagesLoaded();
+  // 이미지 로딩 완료 여부
+  const isImagesLoaded = usePreloadImages();
 
   //로딩 처리
-  if (isClassroomPending || isKidsPending || !isBookImagesLoaded) {
+  if (isClassroomPending || isKidsPending || !isImagesLoaded) {
     return <GlobalLoading />;
   }
 

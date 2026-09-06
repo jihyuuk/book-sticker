@@ -1,10 +1,6 @@
-import redBook from "@/assets/book/red-book.webp";
-import yellowBook from "@/assets/book/yellow-book.webp";
-import greenBook from "@/assets/book/green-book.webp";
-import blueBook from "@/assets/book/blue-book.webp";
+import { bookImages } from "./chart-images";
 
 //랜덤 책
-export const bookImages = [redBook, yellowBook, greenBook, blueBook];
 export function getBookImage(kidId: string, stickerIndex: number) {
   const seed = `${kidId}-${stickerIndex}`;
 

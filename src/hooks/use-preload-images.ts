@@ -1,12 +1,12 @@
-import { bookImages } from "@/lib/random-book";
+import { preloadImages } from "@/lib/chart-images";
 import { useEffect, useState } from "react";
 
-export function useBookImagesLoaded() {
+export function usePreloadImages() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     Promise.all(
-      bookImages.map(
+      preloadImages.map(
         (src) =>
           new Promise<void>((resolve) => {
             const image = new Image();

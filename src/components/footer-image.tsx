@@ -1,5 +1,4 @@
-import footerTablet from "@/assets/footer/footer-tablet.webp";
-import footerPc from "@/assets/footer/footer-pc.webp";
+import { footerPc, footerTablet } from "@/lib/chart-images";
 
 export default function FooterImage() {
   return (

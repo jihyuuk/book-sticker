@@ -1,4 +1,4 @@
-import titleImage from "@/assets/title.webp";
+import { titleImage } from "@/lib/chart-images";
 
 export default function HeaderImage() {
   return (
