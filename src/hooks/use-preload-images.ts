@@ -5,21 +5,24 @@ export function usePreloadImages() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    Promise.all(
-      preloadImages.map(
-        (src) =>
-          new Promise<void>((resolve) => {
-            const image = new Image();
+    const loadImages = async () => {
+      await Promise.all(
+        preloadImages.map(async (src) => {
+          const image = new Image();
+          image.src = src;
 
-            image.onload = () => resolve();
-            image.onerror = () => resolve();
+          try {
+            await image.decode();
+          } catch {
+            // 이미지 하나 실패해도 전체 로딩이 멈추지 않도록
+          }
+        }),
+      );
 
-            image.src = src;
-          }),
-      ),
-    ).then(() => {
       setIsLoaded(true);
-    });
+    };
+
+    loadImages();
   }, []);
 
   return isLoaded;
