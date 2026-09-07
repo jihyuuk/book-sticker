@@ -19,6 +19,11 @@ export default function UpdateKidModal() {
   const [newBookCount, setNewBookCount] = useState(0);
   const [invalidName, setInvalidName] = useState(false);
 
+  const isChanged =
+    modal.isOpen &&
+    (modal.kid.name !== newName.trim() ||
+      modal.kid.book_count !== newBookCount);
+
   //초기화
   useEffect(() => {
     if (!modal.isOpen) return;
@@ -29,7 +34,7 @@ export default function UpdateKidModal() {
 
   //저장
   const handleSubmit = () => {
-    if (updateKid.isPending || !modal.isOpen) return;
+    if (updateKid.isPending || !modal.isOpen || !isChanged) return;
 
     setInvalidName(false);
 
@@ -59,7 +64,7 @@ export default function UpdateKidModal() {
     //입력값 다를떄 물어봐야함
     if (!modal.isOpen) return;
 
-    if (modal.kid.name !== newName || modal.kid.book_count !== newBookCount) {
+    if (isChanged) {
       openAlertModal({
         title: "수정이 완료되지 않았습니다",
         description: "이 화면에서 나가면 입력 중이던 내용이 사라집니다.",
@@ -195,7 +200,7 @@ export default function UpdateKidModal() {
 
           <Button
             onClick={handleSubmit}
-            disabled={updateKid.isPending}
+            disabled={!isChanged || updateKid.isPending}
             className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
           >
             저장하기
