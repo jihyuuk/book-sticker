@@ -7,6 +7,8 @@ import SignInPage from "./pages/sign-in-page";
 import SignUpPage from "./pages/sign-up-page";
 import PublicChartPage from "./pages/public-chart-page";
 import VerifyEmailPage from "./pages/verify-email-page";
+import PostCreatePage from "./pages/post-create-page";
+import PublicClassroomRoute from "./routes/public-classroom-route";
 
 export default function RootRoute() {
   return (
@@ -24,6 +26,11 @@ export default function RootRoute() {
 
       {/* 공유 공개 페이지 */}
       <Route path="/share/:publicId" element={<PublicChartPage />} />
+
+      {/* 임시 개발용 포스트 생성 페이지 */}
+      <Route path="/classroom/:publicId" element={<PublicClassroomRoute />}>
+        <Route path="posts/new" element={<PostCreatePage />} />
+      </Route>
 
       {/* 잘 못 된 경로 */}
       <Route path="*" element={<Navigate to={"/"} />} />
