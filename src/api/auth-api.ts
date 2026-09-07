@@ -29,3 +29,12 @@ export async function signOut() {
 
   if (error) throw error;
 }
+
+export async function resendVerificationEmail(email: string) {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+  });
+
+  if (error) throw error;
+}

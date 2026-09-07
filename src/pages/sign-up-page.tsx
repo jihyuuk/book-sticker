@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSignUp } from "@/hooks/mutations/auth/use-sign-up";
+import { VERIFICATION_EMAIL } from "@/lib/session-storage";
 import { generateErrorMessage } from "@/lib/supabse-error";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 
 type InvalidType = "EMAIL" | "PASSWORD" | "PASSWORD_CONFIRM" | null;
 
 export default function SignUpPage() {
+  const navigate = useNavigate();
   const { mutate: signUp, isPending } = useSignUp();
 
   const [email, setEmail] = useState("");
@@ -53,6 +55,11 @@ export default function SignUpPage() {
         password,
       },
       {
+        onSuccess: () => {
+          sessionStorage.setItem(VERIFICATION_EMAIL, email.trim());
+          toast.success("인증 이메일을 보냈습니다.");
+          navigate("/verify-email", { replace: true });
+        },
         onError: (error) => {
           const message = generateErrorMessage(error);
           toast.error(message);

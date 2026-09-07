@@ -6,13 +6,15 @@ import UserOnlyRoute from "./routes/user-only-route";
 import SignInPage from "./pages/sign-in-page";
 import SignUpPage from "./pages/sign-up-page";
 import PublicChartPage from "./pages/public-chart-page";
+import VerifyEmailPage from "./pages/verify-email-page";
 
 export default function RootRoute() {
   return (
     <Routes>
       <Route element={<GuestOnlyRoute />}>
-        <Route path="sign-in" element={<SignInPage />} />
-        <Route path="sign-up" element={<SignUpPage />} />
+        <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Route>
 
       <Route element={<UserOnlyRoute />}>
