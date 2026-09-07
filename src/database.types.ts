@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      book: {
+        Row: {
+          author: string | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          isbn: string | null
+          publisher: string | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          publisher?: string | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          publisher?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       classroom: {
         Row: {
           created_at: string
@@ -69,6 +99,61 @@ export type Database = {
             columns: ["classroom_id"]
             isOneToOne: false
             referencedRelation: "classroom"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post: {
+        Row: {
+          book_id: string
+          classroom_id: string
+          content: string | null
+          created_at: string
+          id: string
+          kid_id: string
+          password_hash: string
+          updated_at: string
+        }
+        Insert: {
+          book_id: string
+          classroom_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          kid_id: string
+          password_hash: string
+          updated_at?: string
+        }
+        Update: {
+          book_id?: string
+          classroom_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          kid_id?: string
+          password_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "book"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classroom"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_kid_id_fkey"
+            columns: ["kid_id"]
+            isOneToOne: false
+            referencedRelation: "kid"
             referencedColumns: ["id"]
           },
         ]

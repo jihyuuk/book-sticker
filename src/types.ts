@@ -12,3 +12,11 @@ export type KidSummary = Pick<Kid, "id" | "name" | "book_count">;
 export type PublicChartData = Pick<Classroom, "id" | "name" | "public_id"> & {
   kids: KidSummary[];
 };
+
+export type Book = Tables<"book">;
+export type BookInsert = TablesInsert<"book">;
+export type BookUpdate = TablesUpdate<"book">;
+
+export type Post = Tables<"post">;
+export type PostInsert = TablesInsert<"post">;
+export type PostUpdate = TablesUpdate<"post">;
