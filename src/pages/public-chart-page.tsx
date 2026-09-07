@@ -6,13 +6,17 @@ import HeaderImage from "@/components/header-image";
 import ChartList from "@/components/chart/chart-list";
 import FooterImage from "@/components/footer-image";
 import PublicNotFound from "@/components/Public-not-fount";
+import { usePreloadImages } from "@/hooks/use-preload-images";
 
 export default function PublicChartPage() {
   const { publicId } = useParams();
 
   const { data, isPending, isError } = usePublicChartData(publicId);
 
-  if (isPending) return <GlobalLoading />;
+  // 이미지 로딩 완료 여부
+  const isImagesLoaded = usePreloadImages();
+
+  if (isPending || !isImagesLoaded) return <GlobalLoading />;
   if (isError) return <GlobalError />;
 
   //is_public = false면 발동 || 존재하지 않는 publicId
