@@ -6,7 +6,13 @@ export type AuthParam = {
 };
 
 export async function singUp({ email, password }: AuthParam) {
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: import.meta.env.VITE_DOMAIN_URL,
+    },
+  });
 
   if (error) throw error;
 
