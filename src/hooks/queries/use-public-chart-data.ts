@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function usePublicChartData(publicId?: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.publicChart(publicId!),
+    queryKey: QUERY_KEYS.publicChart(publicId ?? ""),
     queryFn: () => fetchPublicChartData(publicId!),
     enabled: !!publicId,
   });

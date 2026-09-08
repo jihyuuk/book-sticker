@@ -16,4 +16,11 @@ export const QUERY_KEYS = {
   },
 
   publicChart: (publicId: string) => ["public-chart", publicId] as const,
+
+  publicKids: (publicId: string) => ["public-kids", publicId] as const,
+
+  publicPosts: (publicId: string) => ["public-posts", publicId] as const,
+
+  publicPostDetail: (publicId: string, postId: string) =>
+    ["public-post-detail", publicId, postId] as const,
 };
