@@ -10,5 +10,10 @@ export const QUERY_KEYS = {
     byId: (kidId: string) => ["kid", "byId", kidId] as const,
   },
 
+  book: {
+    all: ["book"] as const,
+    searchByTitle: (title: string) => ["book", "searchByTitle", title] as const,
+  },
+
   publicChart: (publicId: string) => ["public-chart", publicId] as const,
 };
