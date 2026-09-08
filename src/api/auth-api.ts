@@ -5,7 +5,7 @@ export type AuthParam = {
   password: string;
 };
 
-export async function singUp({ email, password }: AuthParam) {
+export async function signUp({ email, password }: AuthParam) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
