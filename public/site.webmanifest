@@ -1,6 +1,6 @@
 {
-  "name": "우리 반 독서 기록",
-  "short_name": "독서기록",
+  "name": "북메이트",
+  "short_name": "북메이트",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

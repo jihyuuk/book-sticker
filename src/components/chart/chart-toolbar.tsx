@@ -12,11 +12,11 @@ export default function ChartToolbar() {
   const handleSare = async () => {
     if (!classroom) return;
 
-    const url = `${DOMAIN_URL}/share/${classroom!.data?.public_id}`;
+    const url = `${DOMAIN_URL}/classroom/${classroom!.data?.public_id}/chart`;
 
     const shareData = {
-      title: "우리 반 독서 기록",
-      text: "우리 반 독서 기록을 확인해보세요.",
+      // title: "우리 반 독서 기록",
+      // text: "우리 반 독서 기록을 확인해보세요.",
       url,
     };
 
