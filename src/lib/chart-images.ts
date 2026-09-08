@@ -9,13 +9,16 @@ import titleImage from "@/assets/title.webp";
 import footerTablet from "@/assets/footer/footer-tablet.webp";
 import footerPc from "@/assets/footer/footer-pc.webp";
 
+import star from "@/assets/star.webp";
+
 export const bookImages = [redBook, yellowBook, greenBook, blueBook];
 
-export { titleImage, footerTablet, footerPc };
+export { titleImage, footerTablet, footerPc, star };
 
 export const preloadImages = [
   titleImage,
   footerTablet,
   footerPc,
-  ...bookImages,
+  star,
+  // ...bookImages,
 ];
