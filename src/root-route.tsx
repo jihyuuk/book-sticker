@@ -9,6 +9,7 @@ import PublicChartPage from "./pages/public-chart-page";
 import VerifyEmailPage from "./pages/verify-email-page";
 import PostCreatePage from "./pages/post-create-page";
 import PublicClassroomRoute from "./routes/public-classroom-route";
+import PostDetailPage from "./pages/post-detail-page";
 
 export default function RootRoute() {
   return (
@@ -30,6 +31,7 @@ export default function RootRoute() {
       {/* 임시 개발용 포스트 생성 페이지 */}
       <Route path="/classroom/:publicId" element={<PublicClassroomRoute />}>
         <Route path="posts/new" element={<PostCreatePage />} />
+        <Route path="posts/:postId" element={<PostDetailPage />} />
       </Route>
 
       {/* 잘 못 된 경로 */}
