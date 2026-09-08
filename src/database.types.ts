@@ -163,7 +163,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_post: {
+        Args: {
+          p_author: string
+          p_classroom_id: string
+          p_content: string
+          p_cover_url: string
+          p_isbn: string
+          p_kid_id: string
+          p_password_hash: string
+          p_publisher: string
+          p_title: string
+        }
+        Returns: string
+      }
+      get_public_chart_data: { Args: { p_public_id: string }; Returns: Json }
       get_public_classroom: { Args: { p_public_id: string }; Returns: Json }
+      get_public_kids: { Args: { p_public_id: string }; Returns: Json }
+      get_public_post_detail: {
+        Args: { p_post_id: string; p_public_id: string }
+        Returns: Json
+      }
+      get_public_posts: { Args: { p_public_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

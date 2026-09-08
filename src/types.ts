@@ -9,9 +9,6 @@ export type KidInsert = TablesInsert<"kid">;
 export type KidUpdate = TablesUpdate<"kid">;
 
 export type KidSummary = Pick<Kid, "id" | "name" | "book_count">;
-export type PublicChartData = Pick<Classroom, "id" | "name" | "public_id"> & {
-  kids: KidSummary[];
-};
 
 export type Book = Tables<"book">;
 export type BookInsert = TablesInsert<"book">;
