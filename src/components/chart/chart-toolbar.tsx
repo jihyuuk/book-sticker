@@ -7,12 +7,12 @@ import { DOMAIN_URL } from "@/lib/constants";
 
 export default function ChartToolbar() {
   const navigate = useNavigate();
-  const classroom = useClassroom();
+  const { data: classroom } = useClassroom();
 
-  const handleSare = async () => {
+  const handleShare = async () => {
     if (!classroom) return;
 
-    const url = `${DOMAIN_URL}/classroom/${classroom!.data?.public_id}/chart`;
+    const url = `${DOMAIN_URL}/classroom/${classroom.public_id}/chart`;
 
     const shareData = {
       // title: "우리 반 독서 기록",
@@ -40,7 +40,7 @@ export default function ChartToolbar() {
     <div className="mt-4 flex justify-center gap-2">
       <Button
         className="h-8 items-center gap-1 rounded-lg border border-gray-200 bg-white text-lg font-bold text-gray-700 shadow-[0_4px_0_0_rgba(209,213,219,1)] transition-all hover:bg-gray-50 active:translate-y-1 active:shadow-none"
-        onClick={handleSare}
+        onClick={handleShare}
       >
         <Share2 className="size-4" />
         <div className="text-sm font-medium">공유하기</div>
