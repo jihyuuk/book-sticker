@@ -1,30 +1,36 @@
 import type { BookSearchResult } from "@/api/book-api";
+import GlobalError from "@/components/global-error";
+import GlobalLoading from "@/components/global-loading";
 import SelectBook from "@/components/post/select-book";
 import SelectKid from "@/components/post/select-kid";
+import PublicNotFound from "@/components/Public-not-fount";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
-import type { PublicChartData } from "@/types";
+import { usePublicKids } from "@/hooks/queries/use-public-kids";
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 export default function PostCreatePage() {
   const navigate = useNavigate();
-  const data = useOutletContext<PublicChartData>();
+  const { publicId } = useParams();
+
+  const {
+    data,
+    isPending: isKidsPending,
+    isError: isKidsError,
+  } = usePublicKids(publicId);
 
   const { mutate: createPost, isPending: isCreating } = useCreatePost();
 
   //아이 선택
-  const kidStorageKey = `selected-kid:${data.public_id}`;
+  const kidStorageKey = `selected-kid:${publicId ?? ""}`;
 
-  const [kidId, setKidId] = useState(() => {
-    const savedKidId = localStorage.getItem(kidStorageKey);
-
-    const exists = data.kids.some((kid) => kid.id === savedKidId);
-
-    return exists ? savedKidId! : "";
-  });
+  //리팩토링
+  const [kidId, setKidId] = useState(
+    () => localStorage.getItem(kidStorageKey) ?? "",
+  );
 
   const handleKidChange = (kidId: string) => {
     setKidId(kidId);
@@ -45,7 +51,9 @@ export default function PostCreatePage() {
   const handleSubmit = () => {
     //invalid처리 + 해당 위치로 이동 구현해야함
 
-    console.log(selectedBook);
+    if (!data) return;
+
+    const { classroom } = data;
 
     if (!kidId) {
       toast.error("아이를 선택해주세요.");
@@ -69,7 +77,7 @@ export default function PostCreatePage() {
 
     createPost(
       {
-        classroomId: data.id,
+        classroomId: classroom.id,
         kidId,
         book: selectedBook,
         content: content.trim(),
@@ -78,7 +86,7 @@ export default function PostCreatePage() {
       {
         onSuccess: ({ postId }) => {
           toast.success("독서 기록이 등록되었습니다.");
-          navigate(`/classroom/${data.public_id}/posts/${postId}`, {
+          navigate(`/classroom/${classroom.public_id}/posts/${postId}`, {
             replace: true,
           });
         },
@@ -88,6 +96,12 @@ export default function PostCreatePage() {
       },
     );
   };
+
+  if (isKidsPending) return <GlobalLoading />;
+  if (isKidsError) return <GlobalError />;
+  if (!data) return <PublicNotFound />;
+
+  const { kids } = data;
 
   return (
     <main className="min-h-dvh bg-gray-50">
@@ -105,7 +119,7 @@ export default function PostCreatePage() {
         <div className="space-y-5">
           {/* 아이 선택 */}
           <SelectKid
-            kids={data.kids}
+            kids={kids}
             value={kidId}
             onValueChange={handleKidChange}
           />

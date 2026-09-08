@@ -1,4 +1,4 @@
-import type { KidSummary } from "@/types";
+import type { PublicKid } from "@/public-types";
 import {
   Select,
   SelectContent,
@@ -8,7 +8,7 @@ import {
 } from "../ui/select";
 
 type Props = {
-  kids: KidSummary[];
+  kids: PublicKid[];
   value: string;
   onValueChange: (kidId: string) => void;
 };

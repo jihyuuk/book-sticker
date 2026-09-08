@@ -11,7 +11,11 @@ import { usePreloadImages } from "@/hooks/use-preload-images";
 export default function PublicChartPage() {
   const { publicId } = useParams();
 
-  const { data, isPending, isError } = usePublicChartData(publicId);
+  const {
+    data: publicChartData,
+    isPending,
+    isError,
+  } = usePublicChartData(publicId);
 
   // 이미지 로딩 완료 여부
   const isImagesLoaded = usePreloadImages();
@@ -22,14 +26,14 @@ export default function PublicChartPage() {
   //is_public = false면 발동 || 존재하지 않는 publicId
   //선생님이 공개 여부 설정가능
   //나중에 만들거라 일단 기본값 true
-  if (!data) {
+  if (!publicChartData) {
     return <PublicNotFound />;
   }
 
   return (
     <div className="flex h-dvh flex-col">
       <HeaderImage />
-      <ChartList kids={data.kids} />
+      <ChartList kids={publicChartData.kids} />
       <FooterImage />
     </div>
   );
