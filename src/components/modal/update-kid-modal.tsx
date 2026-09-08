@@ -19,6 +19,8 @@ export default function UpdateKidModal() {
   const [newBookCount, setNewBookCount] = useState(0);
   const [invalidName, setInvalidName] = useState(false);
 
+  const isPending = updateKid.isPending || deleteKid.isPending;
+
   const isChanged =
     modal.isOpen &&
     (modal.kid.name !== newName.trim() ||
@@ -34,7 +36,7 @@ export default function UpdateKidModal() {
 
   //저장
   const handleSubmit = () => {
-    if (updateKid.isPending || !modal.isOpen || !isChanged) return;
+    if (isPending || !modal.isOpen || !isChanged) return;
 
     setInvalidName(false);
 
@@ -46,7 +48,7 @@ export default function UpdateKidModal() {
     }
 
     updateKid.mutate(
-      { id: modal.kid.id, name: newName, book_count: newBookCount },
+      { id: modal.kid.id, name: newName.trim(), book_count: newBookCount },
       {
         onSuccess: () => {
           toast.success("수정을 성공했어요");
@@ -62,7 +64,7 @@ export default function UpdateKidModal() {
   //닫기
   const handleClose = () => {
     //입력값 다를떄 물어봐야함
-    if (!modal.isOpen) return;
+    if (isPending || !modal.isOpen) return;
 
     if (isChanged) {
       openAlertModal({
@@ -95,7 +97,7 @@ export default function UpdateKidModal() {
   };
 
   const handleDelete = () => {
-    if (!modal.isOpen) return;
+    if (isPending || !modal.isOpen) return;
 
     openAlertModal({
       title: "아이를 삭제할까요?",
@@ -137,7 +139,7 @@ export default function UpdateKidModal() {
                 placeholder="이름을 입력해주세요"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                disabled={updateKid.isPending}
+                disabled={isPending}
                 className="h-12 rounded-2xl border-2 border-gray-200 px-4 text-base transition-all focus-visible:border-sky-400 focus-visible:ring-sky-200 md:h-14 md:text-lg"
                 aria-invalid={invalidName}
               />
@@ -156,7 +158,7 @@ export default function UpdateKidModal() {
                 <button
                   type="button"
                   onClick={handleDecrement}
-                  disabled={updateKid.isPending || newBookCount <= 0}
+                  disabled={isPending || newBookCount <= 0}
                   className="flex h-full w-20 shrink-0 items-center justify-center rounded-lg border-2 border-gray-200 bg-white text-2xl font-black text-gray-500 shadow-sm transition-all hover:bg-gray-50 active:scale-95 active:bg-gray-100 disabled:opacity-30 disabled:active:scale-100"
                 >
                   -
@@ -171,13 +173,13 @@ export default function UpdateKidModal() {
                   onChange={handleBookCountChange}
                   onFocus={moveCursorToEnd}
                   onClick={moveCursorToEnd}
-                  disabled={updateKid.isPending}
+                  disabled={isPending}
                 />
 
                 <button
                   type="button"
                   onClick={handleIncrement}
-                  disabled={updateKid.isPending}
+                  disabled={isPending}
                   className="flex h-full w-20 shrink-0 items-center justify-center rounded-lg border-2 border-gray-200 bg-white text-2xl font-black text-gray-500 shadow-sm transition-all hover:bg-gray-50 active:scale-95 active:bg-gray-100 disabled:opacity-30 disabled:active:scale-100"
                 >
                   +
@@ -192,7 +194,7 @@ export default function UpdateKidModal() {
             type="button"
             variant="outline"
             onClick={handleDelete}
-            disabled={updateKid.isPending}
+            disabled={isPending}
             className="h-14 w-20 rounded-2xl border-2 border-rose-200 bg-rose-50 px-4 text-lg font-bold text-rose-600 transition-all hover:bg-rose-100 hover:text-rose-700 active:translate-y-0.5 md:w-24"
           >
             삭제
@@ -200,7 +202,7 @@ export default function UpdateKidModal() {
 
           <Button
             onClick={handleSubmit}
-            disabled={!isChanged || updateKid.isPending}
+            disabled={!isChanged || isPending}
             className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
           >
             저장하기
