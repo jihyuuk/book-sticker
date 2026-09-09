@@ -47,3 +47,22 @@ export async function verifyPostPassword({
 
   if (error) throw error;
 }
+
+export type DeletePostParam = {
+  postId: string;
+  password: string;
+};
+
+export async function deletePost({
+  postId,
+  password,
+}: DeletePostParam): Promise<void> {
+  const { error } = await supabase.functions.invoke("delete-post", {
+    body: {
+      postId,
+      password,
+    },
+  });
+
+  if (error) throw error;
+}
