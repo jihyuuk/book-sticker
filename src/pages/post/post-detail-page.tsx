@@ -1,5 +1,6 @@
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
+import PostPasswordModal from "@/components/modal/post-password-modal";
 import PostImageCarousel from "@/components/post/image-carousel";
 import PublicNotFound from "@/components/Public-not-fount";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePublicPostDetail } from "@/hooks/queries/use-public-post-detail";
+import { useOpenAlertModal } from "@/store/alert-modal";
 import { ChevronLeft, Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 const book_info = {
@@ -30,9 +33,14 @@ const book_info = {
   url: "https://search.daum.net/search?w=bookpage&bookId=1591451&q=%EC%86%8C%EA%B0%80+%EB%90%9C+%EA%B2%8C%EC%9C%BC%EB%A6%84%EB%B1%85%EC%9D%B4",
 };
 
+export type ModalActionType = "EDIT" | "DELETE" | null;
+
 export default function PostDetailPage() {
   const { publicId, postId } = useParams();
+  const openAlertModal = useOpenAlertModal();
   const navigate = useNavigate();
+
+  const [modalAction, setModalAction] = useState<ModalActionType>(null);
 
   const { data, isPending, isError } = usePublicPostDetail(publicId, postId);
 
@@ -81,12 +89,15 @@ export default function PostDetailPage() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setModalAction("EDIT")}>
               <Pencil className="size-4" />
               수정
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="text-red-500 hover:text-red-500 focus:text-red-500">
+            <DropdownMenuItem
+              onClick={() => setModalAction("DELETE")}
+              className="text-red-500 hover:text-red-500 focus:text-red-500"
+            >
               <Trash2 className="size-4" />
               삭제
             </DropdownMenuItem>
@@ -154,6 +165,34 @@ export default function PostDetailPage() {
           ]}
         />
       </div>
+
+      <PostPasswordModal
+        open={modalAction !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setModalAction(null);
+          }
+        }}
+        postId={post.id}
+        onVerified={(password) => {
+          if (modalAction === "EDIT") {
+            // 수정
+            alert("수정페이지 이동 / 비번: " + password);
+          }
+
+          if (modalAction === "DELETE") {
+            // 삭제
+            openAlertModal({
+              title: "게시물을 삭제할까요?",
+              description: "삭제한 게시물은 다시 복구할 수 없습니다.",
+              onAction: () => {
+                //대충충삭제 구현
+                alert("삭제");
+              },
+            });
+          }
+        }}
+      />
     </main>
   );
 }

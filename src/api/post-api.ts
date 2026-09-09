@@ -28,3 +28,22 @@ export async function createPost(
 
   return data;
 }
+
+type VerifyPostPasswordParam = {
+  postId: string;
+  password: string;
+};
+
+export async function verifyPostPassword({
+  postId,
+  password,
+}: VerifyPostPasswordParam): Promise<void> {
+  const { error } = await supabase.functions.invoke("verify-post-password", {
+    body: {
+      postId,
+      password,
+    },
+  });
+
+  if (error) throw error;
+}
