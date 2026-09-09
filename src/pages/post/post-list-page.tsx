@@ -20,7 +20,7 @@ export default function PostListPage() {
   const { classroom, posts } = data;
 
   return (
-    <main className="relative mx-auto min-h-dvh w-full max-w-2xl bg-white">
+    <main className="mx-auto min-h-dvh w-full max-w-2xl bg-white">
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between bg-white px-6 md:h-20">
         <div className="flex items-center gap-2">
           {/* <img src={redBook} alt="북메이트" className="size-8 object-contain" /> */}
