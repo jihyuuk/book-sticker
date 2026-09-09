@@ -1,12 +1,15 @@
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
 import PublicNotFound from "@/components/Public-not-fount";
-import { Button } from "@/components/ui/button";
 import { usePublicPosts } from "@/hooks/queries/use-public-posts";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
+import redBook from "@/assets/book/red-book.webp";
+import { formatRelativeTime } from "@/lib/utils";
+import { ChartColumn, Pencil, Search } from "lucide-react";
 
 export default function PostListPage() {
   const { publicId } = useParams();
+  const navigate = useNavigate();
 
   const { data, isPending, isError } = usePublicPosts(publicId);
 
@@ -17,25 +20,31 @@ export default function PostListPage() {
   const { classroom, posts } = data;
 
   return (
-    <main className="min-h-dvh bg-gray-50">
-      <div className="mx-auto w-full max-w-2xl px-4 py-8">
-        {/* 헤더 */}
-        <header className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {classroom.name}
-            </h1>
+    <main className="relative mx-auto min-h-dvh w-full max-w-2xl bg-white">
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between bg-white px-6 md:h-20">
+        <div className="flex items-center gap-2">
+          {/* <img src={redBook} alt="북메이트" className="size-8 object-contain" /> */}
+          <span className="text-lg font-medium">햇살반 독서장</span>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <button
+            type="button"
+            className="flex size-10 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
+            <Search className="size-5" strokeWidth={2} />
+          </button>
 
-            <p className="mt-1 text-sm text-gray-500">우리 반 독서 기록</p>
-          </div>
+          <button
+            type="button"
+            onClick={() => navigate(`/classroom/${classroom.public_id}/chart`)}
+            className="flex size-10 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
+            <ChartColumn className="size-5" strokeWidth={2} />
+          </button>
+        </div>
+      </header>
 
-          <Button asChild>
-            <Link to={`/classroom/${classroom.public_id}/posts/new`}>
-              글쓰기
-            </Link>
-          </Button>
-        </header>
-
+      <div className="mb-8 px-4">
         {/* 게시글 없음 */}
         {posts.length === 0 && (
           <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
@@ -47,56 +56,61 @@ export default function PostListPage() {
 
         {/* 게시글 목록 */}
         {posts.length > 0 && (
-          <div className="space-y-3">
+          <div className="pb-4">
             {posts.map((post) => (
               <Link
                 key={post.id}
                 to={`/classroom/${classroom.public_id}/posts/${post.id}`}
-                className="block rounded-2xl bg-white p-5 shadow-sm transition hover:bg-gray-50"
+                className="block border-b bg-white px-2 py-4 last:border-0"
               >
-                <div className="flex gap-4">
-                  {/* 책 표지 */}
-                  {post.book.cover_url ? (
-                    <img
-                      src={post.book.cover_url}
-                      alt={post.book.title}
-                      className="h-24 w-18 shrink-0 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-24 w-18 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">
-                      표지 없음
-                    </div>
-                  )}
-
+                {/* 상단: 글 내용 + 이미지 */}
+                <div className="flex justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    {/* 책 제목 */}
-                    <h2 className="truncate font-bold text-gray-900">
+                    <h2 className="truncate text-base font-bold text-gray-900">
                       {post.book.title}
                     </h2>
 
-                    {/* 아이 / 저자 */}
-                    <p className="mt-1 text-sm text-gray-500">
-                      {post.kid.name}
-                      {post.book.author && ` · ${post.book.author}`}
-                    </p>
-
-                    {/* 내용 */}
-                    {post.content && (
-                      <p className="mt-3 line-clamp-2 text-sm text-gray-600">
-                        {post.content}
-                      </p>
-                    )}
-
-                    {/* 작성일 */}
-                    <p className="mt-3 text-xs text-gray-400">
-                      {new Date(post.created_at).toLocaleDateString()}
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-500">
+                      {post.content}
                     </p>
                   </div>
+
+                  <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                    <img src={redBook} className="h-full w-full object-cover" />
+                  </div>
+                </div>
+
+                {/* 하단: 작성자 / 시간 / 조회수 */}
+                <div className="mt-2 flex items-center justify-between gap-2 text-sm text-gray-400">
+                  <div className="flex min-w-0 items-center gap-1">
+                    <span className="truncate font-medium text-sky-600">
+                      {post.kid.name}
+                    </span>
+                    <span className="shrink-0">·</span>
+                    <span className="shrink-0">
+                      {formatRelativeTime(post.created_at)}
+                    </span>
+                  </div>
+
+                  <div className="shrink-0">조회 12</div>
                 </div>
               </Link>
             ))}
           </div>
         )}
+      </div>
+
+      {/* 플로팅 버튼 */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-8 z-50">
+        <div className="mx-auto flex w-full max-w-2xl justify-end px-8">
+          <Link
+            to={`/classroom/${classroom.public_id}/posts/new`}
+            className="pointer-events-auto flex size-14 items-center justify-center rounded-full bg-sky-400 text-white shadow-lg transition hover:bg-sky-500 active:scale-95"
+          >
+            {/* <Plus className="size-6" /> */}
+            <Pencil className="size-6" />
+          </Link>
+        </div>
       </div>
     </main>
   );

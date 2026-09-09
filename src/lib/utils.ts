@@ -55,3 +55,38 @@ export function getRainbowBackground(index: number, total: number) {
 
   return `hsla(${hue}, 70%, 88%, 0.45)`;
 }
+
+export function formatRelativeTime(dateString: string) {
+  const now = new Date();
+  const date = new Date(dateString);
+
+  const diffMs = now.getTime() - date.getTime();
+
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const month = 30 * day;
+  const year = 365 * day;
+
+  if (diffMs < minute) {
+    return "방금 전";
+  }
+
+  if (diffMs < hour) {
+    return `${Math.floor(diffMs / minute)}분 전`;
+  }
+
+  if (diffMs < day) {
+    return `${Math.floor(diffMs / hour)}시간 전`;
+  }
+
+  if (diffMs < month) {
+    return `${Math.floor(diffMs / day)}일 전`;
+  }
+
+  if (diffMs < year) {
+    return `${Math.floor(diffMs / month)}개월 전`;
+  }
+
+  return `${Math.floor(diffMs / year)}년 전`;
+}
