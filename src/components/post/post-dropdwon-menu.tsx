@@ -35,7 +35,7 @@ export default function PostDropdownMenu({ publicId, postId }: Props) {
   };
 
   const handleEdit = (password: string) => {
-    alert("성공");
+    alert("성공 " + password);
     // navigate(`/classroom/${publicId}/posts/${postId}/edit`, {
     //   state: { password },
     // });
