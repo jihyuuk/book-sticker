@@ -3,7 +3,6 @@ import GlobalLoading from "@/components/global-loading";
 import PublicNotFound from "@/components/Public-not-fount";
 import { usePublicPosts } from "@/hooks/queries/use-public-posts";
 import { Link, useNavigate, useParams } from "react-router";
-import redBook from "@/assets/book/red-book.webp";
 import { formatRelativeTime } from "@/lib/utils";
 import { ChartColumn, Pencil, Search } from "lucide-react";
 
@@ -63,36 +62,42 @@ export default function PostListPage() {
                 to={`/classroom/${classroom.public_id}/posts/${post.id}`}
                 className="block border-b bg-white px-2 py-4 last:border-0"
               >
-                {/* 상단: 글 내용 + 이미지 */}
-                <div className="flex justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="truncate text-base font-bold text-gray-900">
+                <div className="flex gap-4">
+                  {/* 책 표지 */}
+                  <div className="aspect-20/29 w-16 shrink-0 overflow-hidden rounded-md bg-gray-100 bg-red-500">
+                    <img
+                      //src={post.book.cover_url ?? redBook}
+                      src={
+                        "https://search1.kakaocdn.net/thumb/R120x174.q85/?fname=http%3A%2F%2Ft1.daumcdn.net%2Flbook%2Fimage%2F677642%3Ftimestamp%3D20220524160759"
+                      }
+                      alt={post.book.title}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+
+                  {/* 게시글 정보 */}
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <h2 className="truncate text-lg font-bold text-gray-900">
                       {post.book.title}
                     </h2>
 
-                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-500">
+                    <p className="mt-1 line-clamp-2 text-sm text-gray-500">
                       {post.content}
+                      ㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹ
                     </p>
-                  </div>
 
-                  <div className="size-20 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                    <img src={redBook} className="h-full w-full object-cover" />
-                  </div>
-                </div>
+                    <div className="mt-auto flex min-w-0 items-center gap-1 pt-1 text-sm text-gray-400">
+                      <span className="truncate font-medium text-sky-600">
+                        {post.kid.name}
+                      </span>
 
-                {/* 하단: 작성자 / 시간 / 조회수 */}
-                <div className="mt-2 flex items-center justify-between gap-2 text-sm text-gray-400">
-                  <div className="flex min-w-0 items-center gap-1">
-                    <span className="truncate font-medium text-sky-600">
-                      {post.kid.name}
-                    </span>
-                    <span className="shrink-0">·</span>
-                    <span className="shrink-0">
-                      {formatRelativeTime(post.created_at)}
-                    </span>
-                  </div>
+                      <span className="shrink-0">·</span>
 
-                  <div className="shrink-0">조회 12</div>
+                      <span className="shrink-0">
+                        {formatRelativeTime(post.created_at)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </Link>
             ))}

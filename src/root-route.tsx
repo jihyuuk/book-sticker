@@ -10,6 +10,7 @@ import VerifyEmailPage from "./pages/auth/verify-email-page";
 import PostCreatePage from "./pages/post/post-create-page";
 import PostDetailPage from "./pages/post/post-detail-page";
 import PostListPage from "./pages/post/post-list-page";
+import ListTestPage from "./pages/post/list-test-page";
 
 export default function RootRoute() {
   return (
@@ -42,6 +43,9 @@ export default function RootRoute() {
 
       {/* 잘 못 된 경로 */}
       <Route path="*" element={<Navigate to={"/"} />} />
+
+      {/* 테스트 */}
+      <Route path="/list-test" element={<ListTestPage />} />
     </Routes>
   );
 }

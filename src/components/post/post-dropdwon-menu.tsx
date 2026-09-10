@@ -1,4 +1,4 @@
-import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,7 +76,7 @@ export default function PostDropdownMenu({ publicId, postId }: Props) {
             type="button"
             className="flex size-10 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
           >
-            <Ellipsis className="size-5" />
+            <EllipsisVertical className="size-5" />
           </button>
         </DropdownMenuTrigger>
 
