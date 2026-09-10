@@ -1,5 +1,6 @@
+import PostListFAB from "@/components/post-list/post-list-floating-button";
 import { posts } from "./mock-post";
-import PostListHeader from "@/components/post-list/post-list-header";
+import PostListHeader from "@/components/post-list/header/post-list-header";
 import PostListIntro from "@/components/post-list/post-list-intro";
 import PostCard from "@/components/post/post-card";
 
@@ -18,6 +19,9 @@ export default function ListTestPage() {
           <PostCard key={post.id} post={post} />
         ))}
       </div>
+
+      {/* 플로팅 버튼 */}
+      <PostListFAB />
     </main>
   );
 }
