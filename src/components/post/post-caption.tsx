@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import type { TempProps } from "./post-card";
 
-export default function PostCaption({ post }: TempProps) {
-  return (
-    <div className="px-4">
-      <ExpandableText>{post.content}</ExpandableText>
-    </div>
-  );
-}
+type Props = {
+  caption: string | null;
+};
 
-function ExpandableText({ children }: { children: string }) {
+export default function PostCaption({ caption }: Props) {
   const ref = useRef<HTMLParagraphElement>(null);
 
   const [expanded, setExpanded] = useState(false);
@@ -20,17 +15,19 @@ function ExpandableText({ children }: { children: string }) {
     if (!element) return;
 
     setIsOverflowing(element.scrollHeight > element.clientHeight);
-  }, [children]);
+  }, [caption]);
+
+  if (!caption?.trim()) return null;
 
   return (
-    <div>
+    <div className="px-4">
       <p
         ref={ref}
         className={`text-sm leading-6 text-gray-700 ${
           expanded ? "" : "line-clamp-4"
         }`}
       >
-        {children}
+        {caption}
       </p>
 
       {isOverflowing && (

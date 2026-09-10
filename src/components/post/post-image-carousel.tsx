@@ -35,7 +35,7 @@ export default function PostImageCarousel({ images }: Props) {
 
   if (images.length === 1) {
     return (
-      <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
+      <div className="aspect-[1/1] w-full overflow-hidden bg-gray-100">
         <img
           src={images[0]}
           alt="게시글 이미지"
@@ -58,7 +58,7 @@ export default function PostImageCarousel({ images }: Props) {
         <CarouselContent className="ml-0">
           {images.map((src, index) => (
             <CarouselItem key={src} className="pl-0">
-              <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
+              <div className="aspect-[1/1] w-full overflow-hidden bg-gray-100">
                 <img
                   src={src}
                   alt={`게시글 이미지 ${index + 1}`}
@@ -69,8 +69,8 @@ export default function PostImageCarousel({ images }: Props) {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="left-3 bg-white/80" />
-        <CarouselNext className="right-3 bg-white/80" />
+        <CarouselPrevious className="left-3 hidden bg-white/80 md:flex" />
+        <CarouselNext className="right-3 hidden bg-white/80 md:flex" />
       </Carousel>
 
       <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">

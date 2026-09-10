@@ -78,6 +78,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          profile_image_url: string | null
         }
         Insert: {
           book_count?: number
@@ -85,6 +86,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          profile_image_url?: string | null
         }
         Update: {
           book_count?: number
@@ -92,6 +94,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          profile_image_url?: string | null
         }
         Relationships: [
           {
@@ -158,6 +161,38 @@ export type Database = {
           },
         ]
       }
+      post_image: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          post_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          post_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          post_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_image_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "post"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -180,10 +215,6 @@ export type Database = {
       get_public_chart_data: { Args: { p_public_id: string }; Returns: Json }
       get_public_classroom: { Args: { p_public_id: string }; Returns: Json }
       get_public_kids: { Args: { p_public_id: string }; Returns: Json }
-      get_public_post_detail: {
-        Args: { p_post_id: string; p_public_id: string }
-        Returns: Json
-      }
       get_public_posts: { Args: { p_public_id: string }; Returns: Json }
     }
     Enums: {

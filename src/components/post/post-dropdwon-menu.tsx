@@ -11,15 +11,18 @@ import { useOpenAlertModal } from "@/store/alert-modal";
 import { useNavigate } from "react-router";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { toast } from "sonner";
+import type { PublicPost } from "@/public-types";
 
 type Props = {
-  publicId: string;
-  postId: string;
+  post: PublicPost;
 };
 
 type ModalActionType = "EDIT" | "DELETE" | null;
 
-export default function PostDropdownMenu({ publicId, postId }: Props) {
+export default function PostDropdownMenu({ post }: Props) {
+  const publicId = "";
+  const postId = post.id;
+
   const [modalAction, setModalAction] = useState<ModalActionType>(null);
   const navigate = useNavigate();
   const openAlertModal = useOpenAlertModal();

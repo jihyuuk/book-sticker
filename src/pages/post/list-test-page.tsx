@@ -1,10 +1,21 @@
 import PostListFAB from "@/components/post-list/post-list-floating-button";
-import { posts } from "./mock-post";
 import PostListHeader from "@/components/post-list/header/post-list-header";
 import PostListIntro from "@/components/post-list/post-list-intro";
 import PostCard from "@/components/post/post-card";
+import { usePublicPosts } from "@/hooks/queries/use-public-posts";
+import GlobalLoading from "@/components/global-loading";
+import GlobalError from "@/components/global-error";
+import PublicNotFound from "@/components/Public-not-fount";
 
 export default function ListTestPage() {
+  const { data, isPending, isError } = usePublicPosts("6fEnJ_m-cTCw");
+
+  if (isPending) return <GlobalLoading />;
+  if (isError) return <GlobalError />;
+  if (!data) return <PublicNotFound />;
+
+  const { posts } = data;
+
   return (
     <main className="mx-auto min-h-dvh w-full max-w-2xl bg-gray-100">
       {/* 헤더 */}

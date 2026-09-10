@@ -2,7 +2,11 @@ import type { Book, Classroom, Kid, Post } from "./types";
 
 export type PublicClassroom = Pick<Classroom, "id" | "name" | "public_id">;
 
-export type PublicKid = Pick<Kid, "id" | "name" | "book_count">;
+export type PublicKid = Pick<Kid, "id" | "name" | "profile_image_url">;
+
+export type PublicChartKid = PublicKid & {
+  book_count: number;
+};
 
 export type PublicBook = Pick<
   Book,
@@ -13,22 +17,13 @@ export type PublicBook = Pick<
 // 공개 게시글 타입
 // ============================================================
 
-// 게시글 목록용
-export type PublicPostSummary = Pick<
+export type PublicPost = Pick<
   Post,
   "id" | "content" | "created_at" | "updated_at"
 > & {
   kid: PublicKid;
   book: PublicBook;
-};
-
-// 게시글 상세용
-export type PublicPostDetail = Pick<
-  Post,
-  "id" | "content" | "created_at" | "updated_at"
-> & {
-  kid: PublicKid;
-  book: PublicBook;
+  images: string[];
 };
 
 // ============================================================
@@ -38,7 +33,7 @@ export type PublicPostDetail = Pick<
 // /classroom/:publicId/chart
 export type PublicChartData = {
   classroom: PublicClassroom;
-  kids: PublicKid[];
+  kids: PublicChartKid[];
 };
 
 // /classroom/:publicId/posts/new
@@ -50,5 +45,5 @@ export type PublicKidListData = {
 // /classroom/:publicId/posts
 export type PublicPostListData = {
   classroom: PublicClassroom;
-  posts: PublicPostSummary[];
+  posts: PublicPost[];
 };

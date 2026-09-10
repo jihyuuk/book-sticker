@@ -2,39 +2,43 @@ import PostHeader from "./post-header";
 import PostBookInfo from "./post-book-info";
 import PostCaption from "./post-caption";
 import PostImageCarousel from "./post-image-carousel";
+import type { PublicPost } from "@/public-types";
 
-export type TempProps = {
-  post: {
-    id: string;
-    kidName: string;
-    profileImage: string | null;
-    createdAt: string;
-    content: string;
-    images: string[];
-    book: {
-      isbn: string | null;
-      title: string;
-      author: string | null;
-      publisher: string | null;
-      coverUrl: string | null;
-    };
-  };
+type Props = {
+  post: PublicPost;
 };
 
-export default function PostCard({ post }: TempProps) {
+const mockImages = [
+  // 가로 4:3
+  "https://picsum.photos/seed/mock-1/800/600",
+
+  // 세로 3:4
+  "https://picsum.photos/seed/mock-2/600/800",
+
+  // 정사각형
+  "https://picsum.photos/seed/mock-3/700/700",
+
+  // 가로 16:9
+  "https://picsum.photos/seed/mock-4/960/540",
+
+  // 세로형 긴 사진
+  "https://picsum.photos/seed/mock-5/600/1000",
+];
+
+export default function PostCard({ post }: Props) {
   return (
     <article key={post.id} className="bg-white pb-5 shadow-sm">
       {/* 헤더 */}
       <PostHeader post={post} />
 
       {/* 피드 이미지 */}
-      <PostImageCarousel images={post.images} />
+      <PostImageCarousel images={mockImages} />
 
       {/* 책 정보 */}
-      <PostBookInfo post={post} />
+      <PostBookInfo book={post.book} />
 
       {/* 독서 기록 */}
-      <PostCaption post={post} />
+      <PostCaption caption={post.content} />
     </article>
   );
 }
