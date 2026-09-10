@@ -20,7 +20,7 @@ export default function PostCaption({ caption }: Props) {
   if (!caption?.trim()) return null;
 
   return (
-    <div className="px-4">
+    <div className="px-4 pb-5">
       <p
         ref={ref}
         className={`text-sm leading-6 text-gray-700 ${

@@ -27,7 +27,7 @@ const mockImages = [
 
 export default function PostCard({ post }: Props) {
   return (
-    <article key={post.id} className="bg-white pb-5 shadow-sm">
+    <article key={post.id} className="bg-white shadow-sm">
       {/* 헤더 */}
       <PostHeader post={post} />
 
