@@ -93,7 +93,7 @@ export const posts = [
     images: [],
     book: {
       isbn: "9781234567866",
-      title: "소가 된 게으름뱅이",
+      title: "피드 이미지x",
       author: "푸른숲글방",
       publisher: "그린키즈",
       coverUrl: "https://picsum.photos/seed/book1/120/174",
@@ -105,7 +105,8 @@ export const posts = [
     kidName: "한지호",
     profileImage: null,
     createdAt: "5시간 전",
-    content: "책을 읽고 가장 기억에 남는 장면을 그림으로 표현해보았어요.",
+    content:
+      "책을 읽고 가장 기억에 남는 장면을 그림으로 표현해보았어요. 책이미지 x",
     images: ["https://picsum.photos/seed/feed2/800/600"],
     book: {
       isbn: "9781234567873",
