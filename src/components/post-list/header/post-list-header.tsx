@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import logo from "/android-chrome-512x512.png";
-import { ChartColumn, Search } from "lucide-react";
+import IconButtons from "./icon-buttons";
 
 export default function HeaderPostList() {
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
 
+  // 스크롤시 헤더 나타났다 사라졌다
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -32,25 +33,14 @@ export default function HeaderPostList() {
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
+      {/* 로고 영역 */}
       <div className="flex items-center gap-2">
         <img src={logo} alt="북메이트" className="size-8 object-contain" />
+
         <span className="text-lg font-semibold tracking-wide">북메이트</span>
       </div>
-      <div className="flex items-center gap-0.5">
-        <button
-          type="button"
-          className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-gray-100 hover:text-gray-900"
-        >
-          <Search className="size-5" strokeWidth={2} />
-        </button>
-
-        <button
-          type="button"
-          className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-gray-100 hover:text-gray-900"
-        >
-          <ChartColumn className="size-5" strokeWidth={2} />
-        </button>
-      </div>
+      {/* 아이콘 버튼 영역 */}
+      <IconButtons />
     </header>
   );
 }
