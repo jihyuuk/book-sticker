@@ -8,7 +8,6 @@ import SignUpPage from "./pages/auth/sign-up-page";
 import PublicChartPage from "./pages/public-chart-page";
 import VerifyEmailPage from "./pages/auth/verify-email-page";
 import PostCreatePage from "./pages/post/post-create-page";
-import PostDetailPage from "./pages/post/post-detail-page";
 import PostListPage from "./pages/post/post-list-page";
 import ListTestPage from "./pages/post/list-test-page";
 
@@ -37,7 +36,6 @@ export default function RootRoute() {
         <Route path="posts">
           <Route index element={<PostListPage />} />
           <Route path="new" element={<PostCreatePage />} />
-          <Route path=":postId" element={<PostDetailPage />} />
         </Route>
       </Route>
 

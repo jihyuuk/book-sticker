@@ -2,7 +2,6 @@ import { supabase } from "@/lib/supabse";
 import type {
   PublicChartData,
   PublicKidListData,
-  PublicPostDetailData,
   PublicPostListData,
 } from "@/public-types";
 
@@ -49,26 +48,4 @@ export async function fetchPublicPosts(
   if (error) throw error;
 
   return data as unknown as PublicPostListData | null;
-}
-
-// ============================================================
-// 게시글 상세
-// ============================================================
-type FetchPublicPostDetailParam = {
-  publicId: string;
-  postId: string;
-};
-
-export async function fetchPublicPostDetail({
-  publicId,
-  postId,
-}: FetchPublicPostDetailParam): Promise<PublicPostDetailData | null> {
-  const { data, error } = await supabase.rpc("get_public_post_detail", {
-    p_public_id: publicId,
-    p_post_id: postId,
-  });
-
-  if (error) throw error;
-
-  return data as unknown as PublicPostDetailData | null;
 }

@@ -52,9 +52,3 @@ export type PublicPostListData = {
   classroom: PublicClassroom;
   posts: PublicPostSummary[];
 };
-
-// /classroom/:publicId/posts/:postId
-export type PublicPostDetailData = {
-  classroom: PublicClassroom;
-  post: PublicPostDetail;
-};
