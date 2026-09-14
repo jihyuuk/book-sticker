@@ -9,6 +9,7 @@ import PublicChartPage from "./pages/public-chart-page";
 import VerifyEmailPage from "./pages/auth/verify-email-page";
 import PostCreatePage from "./pages/post/post-create-page";
 import PostListPage from "./pages/post/post-list-page";
+import PostEditPage from "./pages/post/post-edit-page";
 
 export default function RootRoute() {
   return (
@@ -35,6 +36,7 @@ export default function RootRoute() {
         <Route path="posts">
           <Route index element={<PostListPage />} />
           <Route path="new" element={<PostCreatePage />} />
+          <Route path=":postId/edit" element={<PostEditPage />} />
         </Route>
       </Route>
 

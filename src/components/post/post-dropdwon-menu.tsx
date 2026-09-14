@@ -8,7 +8,7 @@ import {
 import PostPasswordModal from "../modal/post-password-modal";
 import { useState } from "react";
 import { useOpenAlertModal } from "@/store/alert-modal";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { toast } from "sonner";
 import type { PublicPost } from "@/public-types";
@@ -20,6 +20,7 @@ type Props = {
 type ModalActionType = "EDIT" | "DELETE" | null;
 
 export default function PostDropdownMenu({ post }: Props) {
+  const navigate = useNavigate();
   const { publicId } = useParams();
   const postId = post.id;
 
@@ -37,10 +38,14 @@ export default function PostDropdownMenu({ post }: Props) {
   };
 
   const handleEdit = (password: string) => {
-    alert("성공 " + password);
-    // navigate(`/classroom/${publicId}/posts/${postId}/edit`, {
-    //   state: { password },
-    // });
+    if (!publicId) return;
+
+    navigate(`/classroom/${publicId}/posts/${postId}/edit`, {
+      state: {
+        post,
+        password,
+      },
+    });
   };
 
   const handleDelete = (password: string) => {
