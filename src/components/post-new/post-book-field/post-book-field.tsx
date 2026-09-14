@@ -1,9 +1,10 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { BookSearchResult } from "@/api/book-api";
-import PostBookManualTab from "./post-book-maual-tab";
-import PostBookIsbnTab from "./post-book-isbn-tab";
-import { POST_BOOK_TAB } from "@/lib/constants";
 import PostSelectedBook from "./post-selected-book";
+import { useState } from "react";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Barcode, PencilLine } from "lucide-react";
+import PostBookManualModal from "./post-book-manual-modal";
 
 type Props = {
   value: BookSearchResult | null;
@@ -11,35 +12,55 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function PostBookField({ value, onValueChange }: Props) {
+export default function PostBookField({
+  value,
+  onValueChange,
+  disabled,
+}: Props) {
+  const [open, setOpen] = useState(false);
+
   if (value) {
-    return <PostSelectedBook value={value} onValueChange={onValueChange} />;
+    return (
+      <PostSelectedBook
+        value={value}
+        onValueChange={onValueChange}
+        disabled={disabled}
+      />
+    );
   }
 
   return (
-    <section className="px-4 py-5">
-      <div className="mb-2">
-        <h2 className="text-sm font-semibold">책 조회하기</h2>
+    <Field className="w-full px-4 py-5">
+      <FieldLabel className="text-sm font-semibold">읽은 책</FieldLabel>
+
+      <div className="grid grid-cols-2 gap-2 md:gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-28 flex-col gap-2"
+          disabled={disabled}
+        >
+          <Barcode className="size-7 text-sky-500" strokeWidth={1.5} />
+          <span className="text-sm font-medium">바코드 스캔</span>
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="h-28 flex-col gap-2"
+          onClick={() => setOpen(true)}
+          disabled={disabled}
+        >
+          <PencilLine className="size-7 text-sky-500" strokeWidth={1.5} />
+          <span className="text-sm font-medium">직접 입력</span>
+        </Button>
       </div>
 
-      <Tabs defaultValue={POST_BOOK_TAB.MANUAL}>
-        {/* 입력 방식 */}
-        <TabsList className="mb-5 grid !h-12 w-full grid-cols-2">
-          <TabsTrigger value={POST_BOOK_TAB.ISBN} className="h-full">
-            ISBN으로 찾기
-          </TabsTrigger>
-
-          <TabsTrigger value={POST_BOOK_TAB.MANUAL} className="h-full">
-            직접 입력
-          </TabsTrigger>
-        </TabsList>
-
-        {/* ISBN 검색 */}
-        <PostBookIsbnTab onValueChange={onValueChange} />
-
-        {/* 직접 입력 */}
-        <PostBookManualTab onValueChange={onValueChange} />
-      </Tabs>
-    </section>
+      <PostBookManualModal
+        open={open}
+        onOpenChange={setOpen}
+        onValueChange={onValueChange}
+      />
+    </Field>
   );
 }

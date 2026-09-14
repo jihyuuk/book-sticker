@@ -3,11 +3,13 @@ import type { BookSearchResult } from "@/api/book-api";
 type Props = {
   value: BookSearchResult;
   onValueChange: (n: null) => void;
+  disabled?: boolean;
 };
 
 export default function PostSelectedBook({
   value: book,
   onValueChange: onBookChange,
+  disabled,
 }: Props) {
   return (
     <section className="px-4 py-5">
@@ -18,6 +20,7 @@ export default function PostSelectedBook({
           type="button"
           className="text-sm font-medium text-sky-500"
           onClick={() => onBookChange(null)}
+          disabled={disabled}
         >
           다른 책 선택
         </button>
