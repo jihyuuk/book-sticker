@@ -7,6 +7,7 @@ import type { PublicPost } from "@/public-types";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import PostCaptionField from "@/components/post-new/post-caption-field";
+import SubHeader from "@/components/common/sub-header";
 
 type PostEditState = {
   post: PublicPost;
@@ -57,9 +58,7 @@ export default function PostEditPage() {
   return (
     <main className="min-h-dvh bg-white">
       <div className="mx-auto w-full max-w-2xl pb-10">
-        <header className="flex h-14 items-center px-4">
-          <h1 className="text-lg font-semibold">게시글 수정</h1>
-        </header>
+        <SubHeader title="독후감 수정" />
 
         <div className="mt-2 space-y-2">
           {/* 작성자 */}

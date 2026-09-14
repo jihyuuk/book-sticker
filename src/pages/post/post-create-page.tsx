@@ -1,7 +1,7 @@
+import SubHeader from "@/components/common/sub-header";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
 import PostNewForm from "@/components/post-new/post-new-form";
-import PostNewHeader from "@/components/post-new/post-new-header";
 import PublicNotFound from "@/components/Public-not-fount";
 import { usePublicKids } from "@/hooks/queries/use-public-kids";
 import { useParams } from "react-router";
@@ -28,7 +28,7 @@ export default function PostCreatePage() {
     <main className="min-h-dvh bg-white">
       <div className="mx-auto w-full max-w-2xl pb-10">
         {/* 헤더 */}
-        <PostNewHeader />
+        <SubHeader title="독후감 작성" />
 
         {/* 입력 폼 */}
         <PostNewForm data={data} />

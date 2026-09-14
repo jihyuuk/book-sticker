@@ -1,7 +1,11 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 
-export default function PostNewHeader() {
+type Props = {
+  title: string;
+};
+
+export default function SubHeader({ title }: Props) {
   const navigate = useNavigate();
 
   return (
@@ -11,7 +15,7 @@ export default function PostNewHeader() {
       </button>
 
       <div className="min-w-0 truncate px-2 text-center text-xl font-semibold">
-        독후감 작성
+        {title}
       </div>
 
       <div />
