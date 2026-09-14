@@ -8,12 +8,15 @@ import type { PublicKidListData } from "@/public-types";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
 import PostKidField from "./post-kid-field";
 import PostBookField from "./post-book-field/post-book-field";
+import { useNavigate } from "react-router";
 
 type Props = {
   data: PublicKidListData;
 };
 
 export default function PostNewForm({ data }: Props) {
+  const navigate = useNavigate();
+
   const { classroom, kids } = data;
 
   const { mutate, isPending } = useCreatePost();
@@ -52,6 +55,9 @@ export default function PostNewForm({ data }: Props) {
       {
         onSuccess: () => {
           toast.success("성공");
+          navigate(`/classroom/${classroom.public_id}/posts`, {
+            replace: true,
+          });
         },
         onError: () => {
           toast.error("실패");
