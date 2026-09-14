@@ -8,7 +8,7 @@ import {
 import PostPasswordModal from "../modal/post-password-modal";
 import { useState } from "react";
 import { useOpenAlertModal } from "@/store/alert-modal";
-import { useNavigate } from "react-router";
+import { useParams } from "react-router";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { toast } from "sonner";
 import type { PublicPost } from "@/public-types";
@@ -20,14 +20,13 @@ type Props = {
 type ModalActionType = "EDIT" | "DELETE" | null;
 
 export default function PostDropdownMenu({ post }: Props) {
-  const publicId = "";
+  const { publicId } = useParams();
   const postId = post.id;
 
   const [modalAction, setModalAction] = useState<ModalActionType>(null);
-  const navigate = useNavigate();
   const openAlertModal = useOpenAlertModal();
 
-  const { mutate: deletePost } = useDeletePost();
+  const { mutate: deletePost } = useDeletePost(publicId);
 
   const handleVerified = (password: string) => {
     if (modalAction === "EDIT") {
@@ -57,10 +56,6 @@ export default function PostDropdownMenu({ post }: Props) {
           {
             onSuccess: () => {
               toast.success("게시물이 삭제되었습니다.");
-
-              navigate(`/classroom/${publicId}/posts`, {
-                replace: true,
-              });
             },
             onError: () => {
               toast.error("게시물 삭제에 실패했습니다.");
