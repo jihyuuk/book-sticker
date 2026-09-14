@@ -1,46 +1,65 @@
 import { useState } from "react";
-import PostCaptionField from "../post-new/post-caption-field";
+import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
+
 import type { PostEditState } from "@/pages/post/post-edit-page";
+import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
+
+import PostCaptionField from "../post-new/post-caption-field";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import type { PublicBook } from "@/public-types";
-import { toast } from "sonner";
 
 type Props = {
   state: PostEditState;
 };
 
 export default function PostEditForm({ state }: Props) {
-  const isPending = false;
+  const { publicId } = useParams();
+  const navigate = useNavigate();
+
+  const { mutate, isPending } = useUpdatePost(publicId);
 
   const { post, password } = state;
   const { book } = post;
 
-  //수정 가능
-  const [caption, setCaption] = useState(state.post.content ?? "");
+  const originalContent = post.content?.trim() ?? "";
+
+  // 수정 가능
+  const [caption, setCaption] = useState(post.content ?? "");
+
+  const trimmedCaption = caption.trim();
+
+  const canSubmit =
+    !!trimmedCaption && trimmedCaption !== originalContent && !isPending;
 
   const handleSubmit = () => {
-    const message = validatePostForm({
-      kidId: post.kid.id,
-      book,
-      caption,
-      password,
-    });
+    if (!publicId) return;
 
-    if (message) {
-      toast.error(message);
+    if (!trimmedCaption) {
+      toast.error("독후감을 작성해주세요.");
       return;
     }
 
-    // validatePostForm에서 이미 검사했지만
-    // TypeScript 타입 좁히기용
-    if (!book) return;
+    if (trimmedCaption === originalContent) return;
 
-    //수정 x
-    if (post.content === caption.trim()) return;
+    mutate(
+      {
+        postId: post.id,
+        password,
+        content: trimmedCaption,
+      },
+      {
+        onSuccess: () => {
+          toast.success("게시물이 수정되었습니다.");
+          navigate(-1);
+        },
+        onError: () => {
+          toast.error("게시물 수정에 실패했습니다.");
+        },
+      },
+    );
   };
-  const can = caption.trim() && post.content !== caption.trim();
 
   return (
     <div className="mt-2 space-y-2">
@@ -48,11 +67,7 @@ export default function PostEditForm({ state }: Props) {
       <Field className="w-full px-4 py-5">
         <FieldLabel className="text-sm font-semibold">작성자</FieldLabel>
 
-        <Input
-          className="h-12 px-4 text-sm"
-          value={post.kid.name}
-          disabled={true}
-        />
+        <Input className="h-12 px-4 text-sm" value={post.kid.name} disabled />
       </Field>
 
       {/* 책 */}
@@ -65,7 +80,7 @@ export default function PostEditForm({ state }: Props) {
           <div className="aspect-[20/29] w-16 shrink-0 overflow-hidden rounded-md bg-gray-100">
             {book.cover_url && (
               <img
-                src={book.cover_url ?? ""}
+                src={book.cover_url}
                 alt={book.title}
                 className="h-full w-full object-contain"
               />
@@ -102,37 +117,17 @@ export default function PostEditForm({ state }: Props) {
         disabled={isPending}
       />
 
-      {/* 작성 버튼 */}
+      {/* 수정 버튼 */}
       <section className="px-4 pt-5 pb-2">
         <Button
+          type="button"
           className="h-12 w-full bg-sky-500 text-base hover:bg-sky-600"
           onClick={handleSubmit}
-          disabled={!can}
+          disabled={!canSubmit}
         >
-          수정하기
+          {isPending ? "수정 중..." : "수정하기"}
         </Button>
       </section>
     </div>
   );
-}
-
-//검증
-function validatePostForm({
-  kidId,
-  book,
-  caption,
-  password,
-}: {
-  kidId: string;
-  book: PublicBook | null;
-  caption: string;
-  password: string;
-}) {
-  if (!kidId) return "작성자를 선택해주세요.";
-  if (!book) return "책을 선택해주세요.";
-  if (!caption.trim()) return "독후감을 작성해주세요.";
-  if (!password.trim()) return "비밀번호를 입력해주세요.";
-  if (password.length < 4) return "비밀번호는 4자리 이상 입력해주세요.";
-
-  return null;
 }

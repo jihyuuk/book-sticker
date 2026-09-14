@@ -66,3 +66,40 @@ export async function deletePost({
 
   if (error) throw error;
 }
+
+export type UpdatePostParam = {
+  postId: string;
+  password: string;
+  content: string;
+};
+
+type UpdatePostResponse = {
+  postId: string;
+};
+
+export async function updatePost({
+  postId,
+  password,
+  content,
+}: UpdatePostParam): Promise<UpdatePostResponse> {
+  const { data, error } = await supabase.functions.invoke<UpdatePostResponse>(
+    "update-post",
+    {
+      body: {
+        postId,
+        password,
+        content,
+      },
+    },
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("수정 응답이 없습니다.");
+  }
+
+  return data;
+}

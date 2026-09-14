@@ -216,6 +216,10 @@ export type Database = {
       get_public_classroom: { Args: { p_public_id: string }; Returns: Json }
       get_public_kids: { Args: { p_public_id: string }; Returns: Json }
       get_public_posts: { Args: { p_public_id: string }; Returns: Json }
+      update_post: {
+        Args: { p_content: string; p_post_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
