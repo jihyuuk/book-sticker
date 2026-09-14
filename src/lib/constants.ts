@@ -5,3 +5,8 @@ export const INFO_HEIGHT = 64;
 export const STICKER_SIZE = 40;
 export const DEFAULT_GAP = 8;
 export const DEFALUT_CHART_SCALE = 30; //10단위로
+
+export const POST_BOOK_TAB = {
+  ISBN: "isbn",
+  MANUAL: "manual",
+} as const;
