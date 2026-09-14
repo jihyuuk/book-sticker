@@ -1,8 +1,8 @@
 import type { BookSearchResult } from "@/api/book-api";
 import { supabase } from "@/lib/supabse";
 
-type CreatePostParam = {
-  classroomId: string;
+export type CreatePostParam = {
+  publicId: string;
   kidId: string;
   book: BookSearchResult;
   content: string;

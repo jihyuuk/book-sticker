@@ -201,12 +201,12 @@ export type Database = {
       create_post: {
         Args: {
           p_author: string
-          p_classroom_id: string
           p_content: string
           p_cover_url: string
           p_isbn: string
           p_kid_id: string
           p_password_hash: string
+          p_public_id: string
           p_publisher: string
           p_title: string
         }
