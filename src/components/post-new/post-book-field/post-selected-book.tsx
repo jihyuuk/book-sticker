@@ -16,14 +16,15 @@ export default function PostSelectedBook({
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold">책 정보</h2>
 
-        <button
-          type="button"
-          className="text-sm font-medium text-sky-500"
-          onClick={() => onBookChange(null)}
-          disabled={disabled}
-        >
-          다른 책 선택
-        </button>
+        {!disabled && (
+          <button
+            type="button"
+            className="text-sm font-medium text-sky-500"
+            onClick={() => onBookChange(null)}
+          >
+            다른 책 선택
+          </button>
+        )}
       </div>
 
       <div className="flex items-start gap-3 px-4 py-4">
