@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updatePost } from "@/api/post-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import type { PublicPostListData } from "@/public-types";
+import type { PostListData } from "@/types/data-types";
 
 export function useUpdatePost(publicId?: string) {
   const queryClient = useQueryClient();
@@ -13,7 +13,7 @@ export function useUpdatePost(publicId?: string) {
     onSuccess: (_, variables) => {
       if (!publicId) return;
 
-      queryClient.setQueryData<PublicPostListData>(
+      queryClient.setQueryData<PostListData>(
         QUERY_KEYS.publicPosts(publicId),
         (old) => {
           if (!old) return old;

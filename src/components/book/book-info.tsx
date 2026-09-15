@@ -1,10 +1,16 @@
-import type { PublicBook } from "@/public-types";
-
-type Props = {
-  book: PublicBook;
+export type BookInfoData = {
+  isbn: string | null;
+  title: string;
+  author: string | null;
+  publisher: string | null;
+  cover_url: string | null;
 };
 
-export default function PostBookInfo({ book }: Props) {
+type Props = {
+  book: BookInfoData;
+};
+
+export default function BookInfo({ book }: Props) {
   return (
     <div className="flex items-start gap-3 px-4 py-4">
       <div className="aspect-[20/29] w-16 shrink-0 overflow-hidden rounded-md bg-gray-100">

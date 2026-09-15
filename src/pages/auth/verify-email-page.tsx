@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useResendVerificationEmail } from "@/hooks/mutations/auth/use-resend-verification-email";
-import { VERIFICATION_EMAIL } from "@/lib/session-storage";
+import { VERIFICATION_EMAIL } from "@/lib/constants";
 import { MailCheckIcon } from "lucide-react";
 import { Navigate, useNavigate } from "react-router";
 import { toast } from "sonner";

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabse";
-import type { Kid, KidInsert, KidUpdate } from "@/types";
+import type { Kid, KidInsert, KidUpdate } from "@/types/entity-types";
 
 //모든 아이 조회
 export async function fetchKids(classroom_id: string) {

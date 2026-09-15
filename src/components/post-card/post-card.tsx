@@ -1,8 +1,8 @@
 import PostHeader from "./post-header";
-import PostBookInfo from "./post-book-info";
+import BookInfo from "../book/book-info";
 import PostCaption from "./post-caption";
 import PostImageCarousel from "./post-image-carousel";
-import type { PublicPost } from "@/public-types";
+import type { PublicPost } from "@/types/public-types";
 
 type Props = {
   post: PublicPost;
@@ -27,7 +27,7 @@ const mockImages = [
 
 export default function PostCard({ post }: Props) {
   return (
-    <article key={post.id} className="bg-white shadow-sm">
+    <article className="bg-white shadow-sm">
       {/* 헤더 */}
       <PostHeader post={post} />
 
@@ -35,7 +35,7 @@ export default function PostCard({ post }: Props) {
       <PostImageCarousel images={mockImages} />
 
       {/* 책 정보 */}
-      <PostBookInfo book={post.book} />
+      <BookInfo book={post.book} />
 
       {/* 독서 기록 */}
       <PostCaption caption={post.content} />

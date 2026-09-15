@@ -1,14 +1,14 @@
-import SubHeader from "@/components/common/sub-header";
+import SubHeader from "@/components/header/sub-header";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
-import PostNewForm from "@/components/post-new/post-new-form";
 import PublicNotFound from "@/components/Public-not-fount";
-import { usePublicKids } from "@/hooks/queries/use-public-kids";
+import { usePostCreateData } from "@/hooks/queries/use-post-create-data";
 import { useParams } from "react-router";
+import PostNewForm from "@/components/post-form/post-new-form";
 
 export default function PostCreatePage() {
   const { publicId } = useParams();
-  const { data, isPending, isError } = usePublicKids(publicId);
+  const { data, isPending, isError } = usePostCreateData(publicId);
 
   if (isPending) return <GlobalLoading />;
   if (isError) return <GlobalError />;

@@ -1,3 +1,4 @@
+import type { PublicKid } from "@/types/public-types";
 import { Field, FieldLabel } from "../ui/field";
 import {
   Select,
@@ -7,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import type { PublicKid } from "@/public-types";
 
 type Props = {
   kids: PublicKid[];

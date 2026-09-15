@@ -1,5 +1,5 @@
 import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
-import type { Kid } from "@/types";
+import type { Kid } from "@/types/entity-types";
 
 type Props = {
   kid: Kid;

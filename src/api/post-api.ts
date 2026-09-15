@@ -1,10 +1,10 @@
-import type { BookSearchResult } from "@/api/book-api";
+import type { BookInfoData } from "@/components/book/book-info";
 import { supabase } from "@/lib/supabse";
 
 export type CreatePostParam = {
   publicId: string;
   kidId: string;
-  book: BookSearchResult;
+  book: BookInfoData;
   content: string;
   password: string;
 };

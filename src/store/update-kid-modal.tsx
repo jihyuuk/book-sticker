@@ -1,4 +1,4 @@
-import type { Kid } from "@/types";
+import type { Kid } from "@/types/entity-types";
 import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 

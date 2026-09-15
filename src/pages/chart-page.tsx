@@ -1,12 +1,12 @@
 import ChartList from "@/components/chart/chart-list";
 import ChartToolbar from "@/components/chart/chart-toolbar";
-import FooterImage from "@/components/footer-image";
+import FooterImage from "@/components/chart/footer-image";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
-import HeaderImage from "@/components/header-image";
+import HeaderImage from "@/components/chart/header-image";
 import { useClassroom } from "@/hooks/queries/use-classroom";
 import { useKids } from "@/hooks/queries/use-kids";
-import { usePreloadImages } from "@/hooks/use-preload-images";
+import { usePreloadImages } from "@/hooks/utils/use-preload-images";
 
 export default function ChartPage() {
   // 1. classroom 조회

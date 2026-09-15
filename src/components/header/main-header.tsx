@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import logo from "/android-chrome-512x512.png";
 import IconButtons from "./icon-buttons";
 
-export default function HeaderPostList() {
+export default function MainHeader() {
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
 

@@ -5,9 +5,9 @@ import {
   getRainbowBackground,
   getStickerGap,
 } from "@/lib/utils";
-import { useChartHeight } from "@/hooks/use-chart-height";
-import type { KidSummary } from "@/types";
-import { useDragScroll } from "@/hooks/use-drag-scroll";
+import { useChartHeight } from "@/hooks/utils/use-chart-height";
+import type { KidSummary } from "@/types/entity-types";
+import { useDragScroll } from "@/hooks/utils/use-drag-scroll";
 
 type Props = {
   kids: KidSummary[];

@@ -1,17 +1,17 @@
 import { useState } from "react";
-import PostCaptionField from "./post-caption-field";
-import PostPasswordField from "./post-password-field";
-import PostSubmitButton from "./post-submit-button";
-import type { BookSearchResult } from "@/api/book-api";
+import PostCaptionField from "../post-field/post-caption-field";
 import { toast } from "sonner";
-import type { PublicKidListData } from "@/public-types";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
-import PostKidField from "./post-kid-field";
-import PostBookField from "./post-book-field/post-book-field";
+import PostBookField from "../post-field/post-book-field";
 import { useNavigate } from "react-router";
+import type { PostCreateData } from "@/types/data-types";
+import PostKidField from "../post-field/post-kid-field";
+import type { BookInfoData } from "../book/book-info";
+import PostPasswordField from "../post-field/post-password-field";
+import PostSubmitButton from "../post-field/post-submit-button";
 
 type Props = {
-  data: PublicKidListData;
+  data: PostCreateData;
 };
 
 export default function PostNewForm({ data }: Props) {
@@ -23,7 +23,7 @@ export default function PostNewForm({ data }: Props) {
 
   //입력 정보
   const [kidId, setKidId] = useState("");
-  const [book, setBook] = useState<BookSearchResult | null>(null);
+  const [book, setBook] = useState<BookInfoData | null>(null);
   const [caption, setCaption] = useState("");
   const [password, setPassword] = useState("");
 
@@ -98,7 +98,9 @@ export default function PostNewForm({ data }: Props) {
       />
 
       {/* 작성 버튼 */}
-      <PostSubmitButton onClick={handleSubmit} disabled={isPending} />
+      <PostSubmitButton onClick={handleSubmit} disabled={isPending}>
+        {isPending ? "작성 중..." : "작성하기"}
+      </PostSubmitButton>
     </div>
   );
 }
@@ -111,7 +113,7 @@ function validatePostForm({
   password,
 }: {
   kidId: string;
-  book: BookSearchResult | null;
+  book: BookInfoData | null;
   caption: string;
   password: string;
 }) {

@@ -6,6 +6,7 @@ import {
   INFO_HEIGHT,
   STICKER_SIZE,
 } from "./constants";
+import { bookImages } from "./chart-images";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -54,6 +55,19 @@ export function getRainbowBackground(index: number, total: number) {
   // )`;
 
   return `hsla(${hue}, 70%, 88%, 0.45)`;
+}
+
+//랜덤 책
+export function getBookImage(kidId: string, stickerIndex: number) {
+  const seed = `${kidId}-${stickerIndex}`;
+
+  let hash = 0;
+
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+
+  return bookImages[hash % bookImages.length];
 }
 
 export function formatRelativeTime(dateString: string) {

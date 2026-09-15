@@ -1,6 +1,6 @@
-import type { PublicPost } from "@/public-types";
-import PostDropdownMenu from "./post-dropdwon-menu";
+import type { PublicPost } from "@/types/public-types";
 import { formatRelativeTime } from "@/lib/utils";
+import PostDropdownMenu from "./post-dropdown-menu";
 
 type Props = {
   post: PublicPost;

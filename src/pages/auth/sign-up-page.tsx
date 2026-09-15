@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSignUp } from "@/hooks/mutations/auth/use-sign-up";
-import { VERIFICATION_EMAIL } from "@/lib/session-storage";
+import { VERIFICATION_EMAIL } from "@/lib/constants";
 import { generateErrorMessage } from "@/lib/supabse-error";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";

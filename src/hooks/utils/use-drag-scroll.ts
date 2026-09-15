@@ -1,5 +1,6 @@
 import { useRef } from "react";
 
+//마우스 드래그(클릭) 스크롤 가능하게 해주는 커스텀 훅
 export function useDragScroll() {
   const isDragging = useRef(false);
   const startX = useRef(0);

@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
-import type { PublicPost } from "@/public-types";
-import SubHeader from "@/components/common/sub-header";
-import PostEditForm from "@/components/post-edit/post-edit-form";
+import SubHeader from "@/components/header/sub-header";
+import type { PublicPost } from "@/types/public-types";
+import PostEditForm from "@/components/post-form/post-edit-form";
 
 export type PostEditState = {
   post: PublicPost;
@@ -46,7 +46,7 @@ export default function PostEditPage() {
         <SubHeader title="독후감 수정" />
 
         {/* 수정 폼 */}
-        <PostEditForm state={state} />
+        <PostEditForm post={post} password={password} />
       </div>
     </main>
   );

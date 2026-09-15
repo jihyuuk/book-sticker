@@ -1,11 +1,11 @@
-import { fetchPublicPosts } from "@/api/public-api";
+import { fetchPostListData } from "@/api/public-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
-export function usePublicPosts(publicId?: string) {
+export function usePostListData(publicId?: string) {
   return useQuery({
     queryKey: QUERY_KEYS.publicPosts(publicId ?? ""),
-    queryFn: () => fetchPublicPosts(publicId!),
+    queryFn: () => fetchPostListData(publicId!),
     enabled: !!publicId,
   });
 }

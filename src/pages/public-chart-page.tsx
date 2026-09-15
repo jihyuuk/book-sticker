@@ -1,21 +1,17 @@
 import { useParams } from "react-router";
-import { usePublicChartData } from "@/hooks/queries/use-public-chart-data";
+import { useChartData } from "@/hooks/queries/use-chart-data";
 import GlobalLoading from "@/components/global-loading";
 import GlobalError from "@/components/global-error";
-import HeaderImage from "@/components/header-image";
+import HeaderImage from "@/components/chart/header-image";
 import ChartList from "@/components/chart/chart-list";
-import FooterImage from "@/components/footer-image";
+import FooterImage from "@/components/chart/footer-image";
 import PublicNotFound from "@/components/Public-not-fount";
-import { usePreloadImages } from "@/hooks/use-preload-images";
+import { usePreloadImages } from "@/hooks/utils/use-preload-images";
 
 export default function PublicChartPage() {
   const { publicId } = useParams();
 
-  const {
-    data: publicChartData,
-    isPending,
-    isError,
-  } = usePublicChartData(publicId);
+  const { data: publicChartData, isPending, isError } = useChartData(publicId);
 
   // 이미지 로딩 완료 여부
   const isImagesLoaded = usePreloadImages();

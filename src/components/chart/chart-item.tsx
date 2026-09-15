@@ -1,7 +1,6 @@
 import { star } from "@/lib/chart-images";
 import { INFO_HEIGHT } from "@/lib/constants";
-// import { getBookImage } from "@/lib/random-book";
-import type { KidSummary } from "@/types";
+import type { KidSummary } from "@/types/entity-types";
 
 type Props = {
   kid: KidSummary;
@@ -21,8 +20,8 @@ export default function ChartItem({ kid, stickerGap, background }: Props) {
           {Array.from({ length: kid.book_count }).map((_, stickerIndex) => (
             <img
               key={stickerIndex}
-              // src={getBookImage(kid.id, stickerIndex)}
-              src={star}
+              // src={getBookImage(kid.id, stickerIndex)} 스티커가 책 <- 이게 더 좋은데 ㅜㅜ
+              src={star} // 스티커가 별
               className="absolute left-1/2 size-10 -translate-x-1/2 object-contain"
               style={{
                 bottom: stickerIndex * stickerGap,

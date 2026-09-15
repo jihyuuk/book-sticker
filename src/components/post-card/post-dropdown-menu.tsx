@@ -11,7 +11,7 @@ import { useOpenAlertModal } from "@/store/alert-modal";
 import { useNavigate, useParams } from "react-router";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { toast } from "sonner";
-import type { PublicPost } from "@/public-types";
+import type { PublicPost } from "@/types/public-types";
 
 type Props = {
   post: PublicPost;
