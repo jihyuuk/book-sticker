@@ -1,6 +1,7 @@
 import { useBookByIsbn } from "@/hooks/mutations/use-book-by-isbn";
 import BookInfo from "@/components/book/book-info";
 import { useState } from "react";
+import BookScannerModal from "@/components/modal/book-scanner-modal";
 
 export default function BookTestPage() {
   const [isbn, setIsbn] = useState("");
@@ -49,6 +50,8 @@ export default function BookTestPage() {
       )}
 
       {error && <p className="mt-5 text-red-500">{error.message}</p>}
+
+      <BookScannerModal open={true} onOpenChange={() => {}} />
     </div>
   );
 }
