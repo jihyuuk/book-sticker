@@ -1,6 +1,9 @@
-import { Barcode, ImageIcon, PencilLine, Search, X } from "lucide-react";
+import { useCallback, useRef } from "react";
+import { ImageIcon, PencilLine, Plus, Search, X } from "lucide-react";
+import { toast } from "sonner";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import BookBarcodeScanner from "../book/book-barcode-scanner";
 
 type Props = {
   open: boolean;
@@ -8,6 +11,33 @@ type Props = {
 };
 
 export default function BookScannerModal({ open, onOpenChange }: Props) {
+  const lastToastAtRef = useRef(0);
+
+  const handleDetected = useCallback((value: string) => {
+    const now = Date.now();
+
+    if (now - lastToastAtRef.current < 2000) {
+      return;
+    }
+
+    lastToastAtRef.current = now;
+
+    const isIsbn =
+      /^\d{13}$/.test(value) &&
+      (value.startsWith("978") || value.startsWith("979"));
+
+    if (!isIsbn) {
+      toast.warning("ISBN 바코드가 아니에요.", {
+        description: `인식된 바코드: ${value}`,
+      });
+      return;
+    }
+
+    toast.success("ISBN 바코드를 인식했어요.", {
+      description: value,
+    });
+  }, []);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -16,7 +46,7 @@ export default function BookScannerModal({ open, onOpenChange }: Props) {
       >
         <section className="relative flex h-full min-h-0 flex-col bg-neutral-950 text-white">
           {/* 헤더 */}
-          <header className="relative z-20 flex h-14 shrink-0 items-center justify-center bg-sky-500 px-4">
+          <header className="relative z-20 flex h-14 shrink-0 items-center justify-center bg-slate-900 px-4">
             <button
               type="button"
               onClick={() => onOpenChange(false)}
@@ -30,14 +60,13 @@ export default function BookScannerModal({ open, onOpenChange }: Props) {
           </header>
 
           {/* 카메라 영역 */}
-          <div className="relative flex min-h-0 flex-1 items-center justify-center">
-            {/* 실제 구현 시 이 부분을 video로 교체 */}
-            <div className="absolute inset-0 bg-neutral-900" />
+          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+            <BookBarcodeScanner active={open} onDetected={handleDetected} />
 
-            {/* 스캔 영역 */}
-            <div className="relative z-10 w-full px-8">
+            {/* 스캔 가이드 */}
+            <div className="pointer-events-none relative z-10 w-full px-8">
               <div className="mx-auto flex aspect-[2.4/1] max-w-sm items-center justify-center rounded-xl border-2 border-white/80">
-                <Barcode className="size-12 text-white/30" strokeWidth={1} />
+                <Plus className="size-12 text-white/30" strokeWidth={1} />
               </div>
 
               <p className="mt-5 text-center text-sm text-white/80">
@@ -47,9 +76,8 @@ export default function BookScannerModal({ open, onOpenChange }: Props) {
           </div>
 
           {/* 보조 기능 */}
-          <div className="relative z-20 shrink-0 bg-sky-500 px-6 pt-4 pb-[max(28px,env(safe-area-inset-bottom))]">
+          <div className="relative z-20 shrink-0 bg-slate-900 px-6 pt-4 pb-[max(28px,env(safe-area-inset-bottom))]">
             <div className="mx-auto flex max-w-sm items-start justify-around">
-              {/* 사진첩 */}
               <button
                 type="button"
                 className="flex w-20 flex-col items-center gap-2"
@@ -61,7 +89,6 @@ export default function BookScannerModal({ open, onOpenChange }: Props) {
                 <span className="text-xs text-white/80">사진첩</span>
               </button>
 
-              {/* ISBN 검색 */}
               <button
                 type="button"
                 className="flex w-20 flex-col items-center gap-2"
@@ -73,7 +100,6 @@ export default function BookScannerModal({ open, onOpenChange }: Props) {
                 <span className="text-xs text-white/80">ISBN 검색</span>
               </button>
 
-              {/* 직접 입력 */}
               <button
                 type="button"
                 className="flex w-20 flex-col items-center gap-2"
