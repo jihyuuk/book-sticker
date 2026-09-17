@@ -1,57 +1,33 @@
-import { useBookByIsbn } from "@/hooks/mutations/use-book-by-isbn";
-import BookInfo from "@/components/book/book-info";
 import { useState } from "react";
-import BookScannerModal from "@/components/modal/book-scanner-modal";
+
+import BookInfo, { type BookInfoData } from "@/components/book/book-info";
+import BookScannerModal from "@/components/modal/book-scanner-modal/book-scanner-modal";
 
 export default function BookTestPage() {
-  const [isbn, setIsbn] = useState("");
-
-  const { mutate, data, isPending, error } = useBookByIsbn();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const value = isbn.trim();
-    if (!value) return;
-
-    mutate(value);
-    setIsbn("");
-  };
+  const [open, setOpen] = useState(true);
+  const [book, setBook] = useState<BookInfoData | null>(null);
 
   return (
     <div className="p-10">
-      <form onSubmit={handleSubmit}>
-        <input
-          value={isbn}
-          onChange={(e) => setIsbn(e.target.value)}
-          placeholder="ISBN 입력"
-          className="border p-2"
-        />
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="border p-2"
+      >
+        책 조회
+      </button>
 
-        <button type="submit" disabled={isPending} className="ml-2 border p-2">
-          {isPending ? "조회 중..." : "조회"}
-        </button>
-      </form>
-
-      {data?.book && (
+      {book && (
         <div className="mt-5 max-w-md border">
-          <BookInfo book={data.book} />
+          <BookInfo book={book} />
         </div>
       )}
 
-      {data?.status === "BOOK_NOT_FOUND" && (
-        <p className="mt-5">검색 결과가 없습니다.</p>
-      )}
-
-      {data?.status === "FOUND_WITHOUT_COVER" && (
-        <p className="mt-2 text-sm text-gray-500">
-          책은 찾았지만 표지 이미지가 없습니다.
-        </p>
-      )}
-
-      {error && <p className="mt-5 text-red-500">{error.message}</p>}
-
-      <BookScannerModal open={true} onOpenChange={() => {}} />
+      <BookScannerModal
+        open={open}
+        onOpenChange={setOpen}
+        onValueChange={setBook}
+      />
     </div>
   );
 }

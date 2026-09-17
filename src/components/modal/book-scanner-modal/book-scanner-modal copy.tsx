@@ -3,7 +3,7 @@ import { ImageIcon, PencilLine, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import BookBarcodeScanner from "../book/book-barcode-scanner";
+import BookBarcodeScanner from "../../book/book-barcode-scanner";
 
 type Props = {
   open: boolean;
