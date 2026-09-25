@@ -1,10 +1,11 @@
 import { useCallback, useRef } from "react";
-import { ImageIcon, PencilLine, Plus, Search, X } from "lucide-react";
+import { PencilLine, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 import BookBarcodeScanner from "@/components/book/book-barcode-scanner";
 import { useBookByIsbn } from "@/hooks/mutations/use-book-by-isbn";
 import type { BookInfoData } from "@/components/book/book-info";
+import BookBarcodeImagePicker from "./book-barcode-image-picker";
 
 type Props = {
   onClose: () => void;
@@ -141,16 +142,7 @@ export default function BookScannerView({
       {/* 보조 기능 */}
       <div className="relative z-20 shrink-0 bg-slate-900 px-6 pt-4 pb-[max(28px,env(safe-area-inset-bottom))]">
         <div className="mx-auto flex max-w-sm items-start justify-around">
-          <button
-            type="button"
-            className="flex w-20 flex-col items-center gap-2"
-          >
-            <span className="flex size-12 items-center justify-center rounded-full bg-white/15">
-              <ImageIcon className="size-5" />
-            </span>
-
-            <span className="text-xs text-white/80">사진첩</span>
-          </button>
+          <BookBarcodeImagePicker onDetected={handleDetected} />
 
           <button
             type="button"

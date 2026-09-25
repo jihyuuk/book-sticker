@@ -4,6 +4,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { BookInfoData } from "@/components/book/book-info";
 import BookScannerView from "./book-scanner-view";
 import BookResultView from "./book-result-view";
+import BookIsbnSearchView from "./book-isbn-view";
+import BookManualInputView from "./book-manual-view";
 
 type Props = {
   open: boolean;
@@ -54,19 +56,19 @@ export default function BookScannerModal({
             />
           )}
 
-          {/* {view === "ISBN_SEARCH" && (
+          {view === "ISBN_SEARCH" && (
             <BookIsbnSearchView
               onBack={() => setView("SCANNER")}
               onFound={handleFound}
             />
-          )} */}
-          {/* 
+          )}
+
           {view === "MANUAL_INPUT" && (
             <BookManualInputView
               onBack={() => setView("SCANNER")}
               onConfirm={handleSelectBook}
             />
-          )} */}
+          )}
 
           {view === "RESULT" && foundBook && (
             <BookResultView
