@@ -19,5 +19,8 @@ export type PublicPost = Pick<
 > & {
   kid: PublicKid;
   book: PublicBook;
-  images: string[];
+  images: {
+    id: string;
+    imageUrl: string;
+  }[];
 };

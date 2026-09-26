@@ -12,6 +12,7 @@ import PostSubmitButton from "../post-field/post-submit-button";
 import PostImageField, {
   type PostImageData,
 } from "../post-field/post-image-field";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 
 type Props = {
   data: PostCreateData;
@@ -55,7 +56,9 @@ export default function PostNewForm({ data }: Props) {
         kidId,
         content: caption,
         password,
-        images: images.map((image) => image.file),
+        images: images
+          .filter((image) => image.type === "new")
+          .map((image) => image.file),
       },
       {
         onSuccess: () => {
@@ -65,7 +68,18 @@ export default function PostNewForm({ data }: Props) {
             replace: true,
           });
         },
-        onError: () => {
+        // onError: (error) => {
+        //   alert(error);
+        //   toast.error("실패");
+        // },
+        onError: async (error) => {
+          if (error instanceof FunctionsHttpError) {
+            const body = await error.context.json();
+            alert(JSON.stringify(body));
+          } else {
+            alert(error instanceof Error ? error.message : String(error));
+          }
+
           toast.error("실패");
         },
       },

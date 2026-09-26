@@ -32,7 +32,7 @@ export default function PostCard({ post }: Props) {
       <PostHeader post={post} />
 
       {/* 피드 이미지 */}
-      <PostImageCarousel images={post.images} />
+      <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />
 
       {/* 책 정보 */}
       <BookInfo book={post.book} />

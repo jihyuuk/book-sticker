@@ -87,29 +87,64 @@ export async function deletePost({
   if (error) throw error;
 }
 
+export type UpdatePostImage =
+  | {
+      type: "existing";
+      id: string;
+    }
+  | {
+      type: "new";
+      id: string;
+      file: File;
+    };
+
 export type UpdatePostParam = {
   postId: string;
   password: string;
   content: string;
+  images: UpdatePostImage[];
 };
 
-type UpdatePostResponse = {
+export type UpdatePostResponse = {
   postId: string;
+  content: string;
+  images: {
+    id: string;
+    imageUrl: string;
+  }[];
 };
 
 export async function updatePost({
   postId,
   password,
   content,
+  images,
 }: UpdatePostParam): Promise<UpdatePostResponse> {
+  const formData = new FormData();
+
+  formData.append(
+    "payload",
+    JSON.stringify({
+      postId,
+      password,
+      content,
+      images: images.map((image) => ({
+        type: image.type,
+        id: image.id,
+      })),
+    }),
+  );
+
+  images.forEach((image) => {
+    if (image.type === "new") {
+      formData.append("images", image.file);
+    }
+  });
+
   const { data, error } = await supabase.functions.invoke<UpdatePostResponse>(
     "update-post",
     {
-      body: {
-        postId,
-        password,
-        content,
-      },
+      body: formData,
     },
   );
 

@@ -10,6 +10,8 @@ import { Input } from "../ui/input";
 import PostBookField from "../post-field/post-book-field";
 import type { PublicPost } from "@/types/public-types";
 import PostSubmitButton from "../post-field/post-submit-button";
+import type { PostImageData } from "../post-field/post-image-field";
+import PostImageField from "../post-field/post-image-field";
 
 type Props = {
   post: PublicPost;
@@ -25,14 +27,33 @@ export default function PostEditForm({ post, password }: Props) {
   const { book } = post;
 
   const originalContent = post.content?.trim() ?? "";
+  const originalImageIds = post.images.map((image) => image.id);
 
   // 수정 가능
   const [caption, setCaption] = useState(post.content ?? "");
+  const [images, setImages] = useState<PostImageData[]>(
+    post.images.map((image) => ({
+      type: "existing",
+      id: image.id,
+      previewUrl: image.imageUrl,
+    })),
+  );
 
   const trimmedCaption = caption.trim();
 
+  const currentExistingIds = images
+    .filter((image) => image.type === "existing")
+    .map((image) => image.id);
+
+  const imageChanged =
+    images.some((image) => image.type === "new") ||
+    currentExistingIds.length !== originalImageIds.length ||
+    currentExistingIds.some((id, index) => id !== originalImageIds[index]);
+
+  const contentChanged = trimmedCaption !== originalContent;
+
   const canSubmit =
-    !!trimmedCaption && trimmedCaption !== originalContent && !isPending;
+    !!trimmedCaption && (contentChanged || imageChanged) && !isPending;
 
   const handleSubmit = () => {
     if (!publicId) return;
@@ -42,13 +63,12 @@ export default function PostEditForm({ post, password }: Props) {
       return;
     }
 
-    if (trimmedCaption === originalContent) return;
-
     mutate(
       {
         postId: post.id,
         password,
         content: trimmedCaption,
+        images,
       },
       {
         onSuccess: () => {
@@ -78,6 +98,13 @@ export default function PostEditForm({ post, password }: Props) {
       <PostCaptionField
         value={caption}
         onValueChange={setCaption}
+        disabled={isPending}
+      />
+
+      {/* 사진 */}
+      <PostImageField
+        value={images}
+        onValueChange={setImages}
         disabled={isPending}
       />
 

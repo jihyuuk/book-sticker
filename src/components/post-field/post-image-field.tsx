@@ -4,11 +4,18 @@ import { toast } from "sonner";
 
 import { Field, FieldLabel } from "@/components/ui/field";
 
-export type PostImageData = {
-  id: string;
-  file: File;
-  previewUrl: string;
-};
+export type PostImageData =
+  | {
+      type: "existing";
+      id: string; // post_image.id
+      previewUrl: string; // signed URL
+    }
+  | {
+      type: "new";
+      id: string; // 프론트 임시 id
+      file: File;
+      previewUrl: string; // blob URL
+    };
 
 type Props = {
   value: PostImageData[];
@@ -34,7 +41,9 @@ export default function PostImageField({
   useEffect(() => {
     return () => {
       imagesRef.current.forEach((image) => {
-        URL.revokeObjectURL(image.previewUrl);
+        if (image.type === "new") {
+          URL.revokeObjectURL(image.previewUrl);
+        }
       });
     };
   }, []);
@@ -60,7 +69,8 @@ export default function PostImageField({
 
     const selectedFiles = files.slice(0, remainingCount);
 
-    const newImages = selectedFiles.map((file) => ({
+    const newImages: PostImageData[] = selectedFiles.map((file) => ({
+      type: "new",
       id: crypto.randomUUID(),
       file,
       previewUrl: URL.createObjectURL(file),
@@ -75,7 +85,7 @@ export default function PostImageField({
   const handleRemove = (id: string) => {
     const target = value.find((image) => image.id === id);
 
-    if (target) {
+    if (target?.type === "new") {
       URL.revokeObjectURL(target.previewUrl);
     }
 
