@@ -26,13 +26,18 @@ export async function fetchChartData(
 export async function fetchPostListData(
   publicId: string,
 ): Promise<PostListData | null> {
-  const { data, error } = await supabase.rpc("get_public_posts", {
-    p_public_id: publicId,
-  });
+  const { data, error } = await supabase.functions.invoke<PostListData | null>(
+    "fetch-public-posts",
+    {
+      body: {
+        publicId,
+      },
+    },
+  );
 
   if (error) throw error;
 
-  return data as unknown as PostListData | null;
+  return data;
 }
 
 // ============================================================

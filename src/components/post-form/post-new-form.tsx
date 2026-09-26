@@ -9,6 +9,9 @@ import PostKidField from "../post-field/post-kid-field";
 import type { BookInfoData } from "../book/book-info";
 import PostPasswordField from "../post-field/post-password-field";
 import PostSubmitButton from "../post-field/post-submit-button";
+import PostImageField, {
+  type PostImageData,
+} from "../post-field/post-image-field";
 
 type Props = {
   data: PostCreateData;
@@ -25,6 +28,7 @@ export default function PostNewForm({ data }: Props) {
   const [kidId, setKidId] = useState("");
   const [book, setBook] = useState<BookInfoData | null>(null);
   const [caption, setCaption] = useState("");
+  const [images, setImages] = useState<PostImageData[]>([]);
   const [password, setPassword] = useState("");
 
   const handleSubmit = () => {
@@ -51,10 +55,12 @@ export default function PostNewForm({ data }: Props) {
         kidId,
         content: caption,
         password,
+        images: images.map((image) => image.file),
       },
       {
         onSuccess: () => {
           toast.success("성공");
+
           navigate(`/classroom/${classroom.public_id}/posts`, {
             replace: true,
           });
@@ -87,6 +93,13 @@ export default function PostNewForm({ data }: Props) {
       <PostCaptionField
         value={caption}
         onValueChange={setCaption}
+        disabled={isPending}
+      />
+
+      {/* 사진 */}
+      <PostImageField
+        value={images}
+        onValueChange={setImages}
         disabled={isPending}
       />
 

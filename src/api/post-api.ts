@@ -7,6 +7,7 @@ export type CreatePostParam = {
   book: BookInfoData;
   content: string;
   password: string;
+  images: File[];
 };
 
 type CreatePostResponse = {
@@ -16,10 +17,29 @@ type CreatePostResponse = {
 export async function createPost(
   params: CreatePostParam,
 ): Promise<CreatePostResponse> {
+  const { publicId, kidId, book, content, password, images } = params;
+
+  const formData = new FormData();
+
+  formData.append(
+    "payload",
+    JSON.stringify({
+      publicId,
+      kidId,
+      book,
+      content,
+      password,
+    }),
+  );
+
+  images.forEach((image) => {
+    formData.append("images", image);
+  });
+
   const { data, error } = await supabase.functions.invoke<CreatePostResponse>(
     "create-post",
     {
-      body: params,
+      body: formData,
     },
   );
 

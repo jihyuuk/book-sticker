@@ -8,22 +8,22 @@ type Props = {
   post: PublicPost;
 };
 
-const mockImages = [
-  // 가로 4:3
-  "https://picsum.photos/seed/mock-1/800/600",
+// const mockImages = [
+//   // 가로 4:3
+//   "https://picsum.photos/seed/mock-1/800/600",
 
-  // 세로 3:4
-  "https://picsum.photos/seed/mock-2/600/800",
+//   // 세로 3:4
+//   "https://picsum.photos/seed/mock-2/600/800",
 
-  // 정사각형
-  "https://picsum.photos/seed/mock-3/700/700",
+//   // 정사각형
+//   "https://picsum.photos/seed/mock-3/700/700",
 
-  // 가로 16:9
-  "https://picsum.photos/seed/mock-4/960/540",
+//   // 가로 16:9
+//   "https://picsum.photos/seed/mock-4/960/540",
 
-  // 세로형 긴 사진
-  "https://picsum.photos/seed/mock-5/600/1000",
-];
+//   // 세로형 긴 사진
+//   "https://picsum.photos/seed/mock-5/600/1000",
+// ];
 
 export default function PostCard({ post }: Props) {
   return (
@@ -32,7 +32,7 @@ export default function PostCard({ post }: Props) {
       <PostHeader post={post} />
 
       {/* 피드 이미지 */}
-      <PostImageCarousel images={mockImages} />
+      <PostImageCarousel images={post.images} />
 
       {/* 책 정보 */}
       <BookInfo book={post.book} />
