@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabse";
 import { nanoid } from "nanoid";
 
+// 레거시
 // 현재 로그인한 사용자의 classroom 조회
 export async function fetchClassroom(userId: string) {
   const { data, error } = await supabase
@@ -14,6 +15,7 @@ export async function fetchClassroom(userId: string) {
   return data;
 }
 
+// 레거시
 // classroom 생성
 export async function createClassroom() {
   const { data, error } = await supabase

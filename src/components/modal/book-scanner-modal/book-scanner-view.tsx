@@ -3,7 +3,7 @@ import { PencilLine, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 import BookBarcodeScanner from "@/components/book/book-barcode-scanner";
-import { useBookByIsbn } from "@/hooks/mutations/use-book-by-isbn";
+import { useBookByIsbn } from "@/hooks/mutations/book/use-book-by-isbn";
 import type { BookInfoData } from "@/components/book/book-info";
 import BookBarcodeImagePicker from "./book-barcode-image-picker";
 

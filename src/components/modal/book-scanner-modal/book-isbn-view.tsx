@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import type { BookInfoData } from "@/components/book/book-info";
-import { useBookByIsbn } from "@/hooks/mutations/use-book-by-isbn";
+import { useBookByIsbn } from "@/hooks/mutations/book/use-book-by-isbn";
 
 type Props = {
   onBack: () => void;

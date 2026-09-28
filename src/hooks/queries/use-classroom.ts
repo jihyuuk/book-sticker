@@ -3,6 +3,7 @@ import { QUERY_KEYS } from "@/lib/query-keys";
 import { useSession } from "@/store/session";
 import { useQuery } from "@tanstack/react-query";
 
+//레거시
 export function useClassroom() {
   const session = useSession();
   const userId = session?.user.id;

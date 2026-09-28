@@ -1,4 +1,4 @@
-import { fetchChartData } from "@/api/public-api";
+import { fetchChartData } from "@/api/chart-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
