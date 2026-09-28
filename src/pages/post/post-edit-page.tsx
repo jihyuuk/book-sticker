@@ -35,7 +35,7 @@ export default function PostEditPage() {
     }
   }, [isValidState, publicId, navigate]);
 
-  if (!isValidState || !post || !password) {
+  if (!isValidState) {
     return null;
   }
 
