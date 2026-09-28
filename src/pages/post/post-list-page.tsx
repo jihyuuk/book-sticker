@@ -4,7 +4,7 @@ import PostCard from "@/components/post-card/post-card";
 import { usePostListData } from "@/hooks/queries/use-post-list-data";
 import GlobalLoading from "@/components/global-loading";
 import GlobalError from "@/components/global-error";
-import PublicNotFound from "@/components/Public-not-fount";
+import PublicNotFound from "@/components/Public-not-found";
 import { useParams } from "react-router";
 import MainHeader from "@/components/header/main-header";
 

@@ -1,7 +1,7 @@
 import SubHeader from "@/components/header/sub-header";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
-import PublicNotFound from "@/components/Public-not-fount";
+import PublicNotFound from "@/components/Public-not-found";
 import { usePostCreateData } from "@/hooks/queries/use-post-create-data";
 import { useParams } from "react-router";
 import PostNewForm from "@/components/post-form/post-new-form";

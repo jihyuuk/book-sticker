@@ -5,7 +5,7 @@ import GlobalError from "@/components/global-error";
 import HeaderImage from "@/components/chart/header-image";
 import ChartList from "@/components/chart/chart-list";
 import FooterImage from "@/components/chart/footer-image";
-import PublicNotFound from "@/components/Public-not-fount";
+import PublicNotFound from "@/components/Public-not-found";
 import { usePreloadImages } from "@/hooks/utils/use-preload-images";
 
 export default function PublicChartPage() {
