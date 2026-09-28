@@ -1,5 +1,8 @@
 import { supabase } from "@/lib/supabse";
-import type { Kid, KidInsert, KidUpdate } from "@/types/entity-types";
+import type { Kid } from "@/types/entity-types";
+
+export type CreateKidParam = Pick<Kid, "classroom_id" | "name" | "book_count">;
+export type UpdateKidParam = Pick<Kid, "id" | "name" | "book_count">;
 
 //모든 아이 조회
 export async function fetchKids(classroom_id: string) {
@@ -15,7 +18,7 @@ export async function fetchKids(classroom_id: string) {
 }
 
 // 생성
-export async function createKid(request: KidInsert) {
+export async function createKid(request: CreateKidParam) {
   const { data, error } = await supabase
     .from("kid")
     .insert(request)
@@ -28,9 +31,7 @@ export async function createKid(request: KidInsert) {
 }
 
 //수정
-export async function updateKid(
-  request: Pick<Kid, "id"> & KidUpdate,
-): Promise<void> {
+export async function updateKid(request: UpdateKidParam): Promise<void> {
   const { id, ...updates } = request;
 
   const { error } = await supabase.from("kid").update(updates).eq("id", id);
@@ -39,6 +40,7 @@ export async function updateKid(
 }
 
 //삭제
+// 리팩토링 - 게시글 이미지, 프로필 이미지 Storage 정리를 위해 Edge Function으로 전환
 export async function deleteKidById(id: Kid["id"]): Promise<void> {
   const { error } = await supabase.from("kid").delete().eq("id", id);
 
