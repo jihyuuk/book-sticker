@@ -10,7 +10,7 @@ import VerifyEmailPage from "./pages/auth/verify-email-page";
 import PostCreatePage from "./pages/post/post-create-page";
 import PostListPage from "./pages/post/post-list-page";
 import PostEditPage from "./pages/post/post-edit-page";
-import BookTestPage from "./pages/book-test-page";
+import NotFoundPage from "./pages/not-found-page";
 
 export default function RootRoute() {
   return (
@@ -30,19 +30,25 @@ export default function RootRoute() {
 
       {/* 퍼블릭(공유 링크) 아무나 접근 */}
       <Route path="/classroom/:publicId">
-        <Route index element={<Navigate to="chart" replace />} />
+        {/* 기본 경로 - 독서 게시판 */}
+        <Route index element={<Navigate to="posts" replace />} />
 
-        <Route path="chart" element={<PublicChartPage />} />
-
+        {/* 독서 게시판 */}
         <Route path="posts">
           <Route index element={<PostListPage />} />
           <Route path="new" element={<PostCreatePage />} />
           <Route path=":postId/edit" element={<PostEditPage />} />
         </Route>
+
+        {/* 독서 현황 차트 */}
+        <Route path="chart" element={<PublicChartPage />} />
+
+        {/* 잘 못 된 경로 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
-      <Route path="/test/book" element={<BookTestPage />} />
+
       {/* 잘 못 된 경로 */}
-      <Route path="*" element={<Navigate to={"/"} />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
