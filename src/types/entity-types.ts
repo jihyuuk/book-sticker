@@ -7,3 +7,4 @@ export type KidSummary = Pick<Kid, "id" | "name" | "book_count">;
 
 export type Book = Tables<"book">;
 export type Post = Tables<"post">;
+export type AccountSetting = Tables<"account_setting">;

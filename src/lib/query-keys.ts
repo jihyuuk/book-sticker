@@ -7,6 +7,8 @@ export const QUERY_KEYS = {
     byUserId: (userId: string) => ["classroom", "byUserId", userId] as const,
   },
 
+  setting: ["setting"] as const,
+
   kid: {
     all: ["kid"] as const,
     list: ["kid", "list"] as const,

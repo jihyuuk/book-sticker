@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_setting: {
+        Row: {
+          created_at: string
+          daily_book_limit: number
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_book_limit?: number
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_book_limit?: number
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       book: {
         Row: {
           author: string | null
@@ -165,23 +189,23 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          image_url: string
           post_id: string
           sort_order: number
+          storage_path: string
         }
         Insert: {
           created_at?: string
           id?: string
-          image_url: string
           post_id: string
           sort_order?: number
+          storage_path: string
         }
         Update: {
           created_at?: string
           id?: string
-          image_url?: string
           post_id?: string
           sort_order?: number
+          storage_path?: string
         }
         Relationships: [
           {
