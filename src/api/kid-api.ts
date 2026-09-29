@@ -5,7 +5,7 @@ export type CreateKidParam = Pick<Kid, "classroom_id" | "name" | "book_count">;
 export type UpdateKidParam = Pick<Kid, "id" | "name" | "book_count">;
 
 //모든 아이 조회
-export async function fetchKids(classroom_id: string) {
+export async function fetchKidsByClassroomId(classroom_id: string) {
   const { data, error } = await supabase
     .from("kid")
     .select("*")

@@ -10,5 +10,6 @@ export async function fetchChartData(
 
   if (error) throw error;
 
+  //리팩토링 - zod 도입 고려
   return data as unknown as ChartData | null;
 }
