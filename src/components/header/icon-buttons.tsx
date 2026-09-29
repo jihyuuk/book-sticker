@@ -1,4 +1,9 @@
-import { ChartColumn, Search, type LucideIcon } from "lucide-react";
+import { ChartColumn, Search, Settings, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router";
+
+type Props = {
+  isAdmin?: boolean;
+};
 
 type IconButtonProps = {
   label: string;
@@ -6,7 +11,9 @@ type IconButtonProps = {
   onClick: () => void;
 };
 
-export default function IconButtons() {
+export default function IconButtons({ isAdmin = false }: Props) {
+  const navigate = useNavigate();
+
   const iconButtons: IconButtonProps[] = [
     {
       label: "검색",
@@ -22,19 +29,30 @@ export default function IconButtons() {
         console.log("차트");
       },
     },
+    ...(isAdmin
+      ? [
+          {
+            label: "설정",
+            icon: Settings,
+            onClick: () => {
+              navigate("/setting");
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
     <div className="flex items-center gap-0.5">
-      {iconButtons.map((b) => (
+      {iconButtons.map((button) => (
         <button
-          key={b.label}
+          key={button.label}
           type="button"
-          aria-label={b.label}
-          onClick={b.onClick}
+          aria-label={button.label}
+          onClick={button.onClick}
           className="flex size-8 items-center justify-center rounded-full transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
-          <b.icon className="size-5" strokeWidth={2} />
+          <button.icon className="size-5" strokeWidth={2} />
         </button>
       ))}
     </div>

@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import logo from "/android-chrome-512x512.png";
 import IconButtons from "./icon-buttons";
 
-export default function MainHeader() {
+type Props = {
+  isAdmin?: boolean;
+};
+
+export default function MainHeader({ isAdmin = false }: Props) {
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -40,7 +44,7 @@ export default function MainHeader() {
         <span className="text-lg font-semibold tracking-wide">북메이트</span>
       </div>
       {/* 아이콘 버튼 영역 */}
-      <IconButtons />
+      <IconButtons isAdmin={isAdmin} />
     </header>
   );
 }

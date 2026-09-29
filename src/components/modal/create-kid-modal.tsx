@@ -127,7 +127,7 @@ export default function CreateKidModal() {
                 htmlFor="bookCount"
                 className="ml-1 text-base font-bold text-gray-700 md:text-lg"
               >
-                도서 수량
+                패들렛 게시글
               </FieldLabel>
 
               {/* - [ input ] + 스타일 컨트롤러 */}

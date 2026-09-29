@@ -1,6 +1,9 @@
 export const QUERY_KEYS = {
   classroom: {
     all: ["classroom"] as const,
+    list: ["classroom", "list"] as const,
+
+    //리팩토링 - 레거시
     byUserId: (userId: string) => ["classroom", "byUserId", userId] as const,
   },
 
