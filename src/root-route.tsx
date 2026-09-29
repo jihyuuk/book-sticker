@@ -12,7 +12,7 @@ import PostEditPage from "./pages/post/post-edit-page";
 import NotFoundPage from "./pages/not-found-page";
 import AdminPostListPage from "./pages/post/admin-post-list-page";
 import SettingPage from "./pages/setting/setting-page";
-import ClassroomSettingPage from "./pages/setting/classroom-setting-page";
+import SettingClassroomPage from "./pages/setting/setting-classroom-page";
 
 export default function RootRoute() {
   return (
@@ -32,7 +32,7 @@ export default function RootRoute() {
         <Route path="/setting" element={<SettingPage />} />
         <Route
           path="/setting/classroom/:classroomId"
-          element={<ClassroomSettingPage />}
+          element={<SettingClassroomPage />}
         />
       </Route>
 

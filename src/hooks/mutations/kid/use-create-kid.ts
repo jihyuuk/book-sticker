@@ -7,9 +7,9 @@ export function useCreateKid() {
 
   return useMutation({
     mutationFn: createKid,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.kid.list,
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.settingClassroom(variables.classroom_id),
       });
     },
   });

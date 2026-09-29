@@ -48,7 +48,12 @@ export default function UpdateKidModal() {
     }
 
     updateKid.mutate(
-      { id: modal.kid.id, name: newName.trim(), book_count: newBookCount },
+      {
+        id: modal.kid.id,
+        classroomId: modal.kid.classroom_id,
+        name: newName.trim(),
+        book_count: newBookCount,
+      },
       {
         onSuccess: () => {
           toast.success("수정을 성공했어요");

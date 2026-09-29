@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabse";
-import type { AccountSetting, Classroom } from "@/types/entity-types";
+import type { AccountSetting, Classroom, Kid } from "@/types/entity-types";
 
 export type SettingData = {
   name: string;
@@ -10,6 +10,15 @@ export type SettingData = {
 export type UpdateAccountSettingParam = Partial<
   Pick<AccountSetting, "name" | "daily_book_limit">
 >;
+
+export type ClassroomData = {
+  classroom: Classroom;
+  kids: Kid[];
+};
+
+export type UpdateClassroomParam = {
+  id: Classroom["id"];
+} & Partial<Pick<Classroom, "name" | "is_public">>;
 
 export async function fetchSettingData(): Promise<SettingData> {
   const [settingResult, classroomResult] = await Promise.all([
@@ -41,6 +50,41 @@ export async function updateAccountSetting(
     .from("account_setting")
     .update(request)
     .eq("user_id", user.id);
+
+  if (error) throw error;
+}
+
+export async function fetchSettingClassroomData(
+  classroomId: string,
+): Promise<ClassroomData> {
+  const [classroomResult, kidsResult] = await Promise.all([
+    supabase.from("classroom").select("*").eq("id", classroomId).single(),
+
+    supabase
+      .from("kid")
+      .select("*")
+      .eq("classroom_id", classroomId)
+      .order("name"),
+  ]);
+
+  if (classroomResult.error) throw classroomResult.error;
+  if (kidsResult.error) throw kidsResult.error;
+
+  return {
+    classroom: classroomResult.data,
+    kids: kidsResult.data,
+  };
+}
+
+export async function updateClassroom(
+  request: UpdateClassroomParam,
+): Promise<void> {
+  const { id, ...updates } = request;
+
+  const { error } = await supabase
+    .from("classroom")
+    .update(updates)
+    .eq("id", id);
 
   if (error) throw error;
 }

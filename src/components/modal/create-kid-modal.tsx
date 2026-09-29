@@ -7,11 +7,9 @@ import { useCreateKid } from "@/hooks/mutations/kid/use-create-kid";
 import { useCreateKidModalStore } from "@/store/create-kid-modal-store";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
-import { useClassroom } from "@/hooks/queries/use-classroom";
 
 export default function CreateKidModal() {
   const modal = useCreateKidModalStore();
-  const { data: classroom } = useClassroom();
   const openAlertModal = useOpenAlertModal();
 
   const createKid = useCreateKid();
@@ -54,14 +52,14 @@ export default function CreateKidModal() {
       return;
     }
 
-    if (!classroom) {
-      toast.warning("잠시 후 다시 시도해주세요.");
+    if (!modal.classroomId) {
+      toast.error("반 정보를 찾을 수 없습니다.");
       return;
     }
 
     createKid.mutate(
       {
-        classroom_id: classroom.id,
+        classroom_id: modal.classroomId,
         name: name.trim(),
         book_count: bookCount,
       },

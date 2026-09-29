@@ -8,6 +8,8 @@ export const QUERY_KEYS = {
   },
 
   setting: ["setting"] as const,
+  settingClassroom: (classroomId: string) =>
+    ["setting-classroom", classroomId] as const,
 
   kid: {
     all: ["kid"] as const,

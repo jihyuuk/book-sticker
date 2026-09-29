@@ -3,21 +3,30 @@ import { combine, devtools } from "zustand/middleware";
 
 type State = {
   isOpen: boolean;
+  classroomId: string | null;
 };
 
-const initialState = {
+const initialState: State = {
   isOpen: false,
-} as State;
+  classroomId: null,
+};
 
 export const useCreateKidModalStore = create(
   devtools(
     combine(initialState, (set) => ({
       actions: {
-        open: () => {
-          set({ isOpen: true });
+        open: (classroomId: string) => {
+          set({
+            isOpen: true,
+            classroomId,
+          });
         },
+
         close: () => {
-          set({ isOpen: false });
+          set({
+            isOpen: false,
+            classroomId: null,
+          });
         },
       },
     })),
