@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useAdminPosts(classroomId: string | null | undefined) {
   return useQuery({
-    queryKey: QUERY_KEYS.adminPosts(classroomId ?? null),
+    queryKey: QUERY_KEYS.adminPosts.list(classroomId ?? null),
     queryFn: () => fetchAdminPosts(classroomId ?? null),
     enabled: classroomId !== undefined,
   });

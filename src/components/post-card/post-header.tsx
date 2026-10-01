@@ -1,13 +1,15 @@
 import type { PublicPost } from "@/types/public-types";
 import { formatRelativeTime } from "@/lib/utils";
 import PostDropdownMenu from "./post-dropdown-menu";
+import PostDropdownAdminMenu from "./post-dropdown-admin-menu";
 
 type Props = {
   post: PublicPost;
   classroomName?: string | null;
+  isAdmin?: boolean;
 };
 
-export default function PostHeader({ post, classroomName }: Props) {
+export default function PostHeader({ post, classroomName, isAdmin }: Props) {
   const kid = post.kid;
 
   return (
@@ -47,7 +49,11 @@ export default function PostHeader({ post, classroomName }: Props) {
         </div>
       </div>
 
-      <PostDropdownMenu post={post} />
+      {isAdmin ? (
+        <PostDropdownAdminMenu post={post} />
+      ) : (
+        <PostDropdownMenu post={post} />
+      )}
     </div>
   );
 }

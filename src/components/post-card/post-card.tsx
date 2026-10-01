@@ -8,6 +8,7 @@ type Props = {
   post: PublicPost;
   //리팩토링- classroom name = not null
   classroomName?: string | null;
+  isAdmin?: boolean;
 };
 
 // const mockImages = [
@@ -27,11 +28,11 @@ type Props = {
 //   "https://picsum.photos/seed/mock-5/600/1000",
 // ];
 
-export default function PostCard({ post, classroomName }: Props) {
+export default function PostCard({ post, classroomName, isAdmin }: Props) {
   return (
     <article className="bg-white shadow-sm">
       {/* 헤더 */}
-      <PostHeader post={post} classroomName={classroomName} />
+      <PostHeader post={post} classroomName={classroomName} isAdmin={isAdmin} />
 
       {/* 피드 이미지 */}
       <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />

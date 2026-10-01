@@ -31,6 +31,10 @@ export const QUERY_KEYS = {
   publicPostDetail: (publicId: string, postId: string) =>
     ["public-post-detail", publicId, postId] as const,
 
-  adminPosts: (classroomId: string | null) =>
-    ["admin-posts", classroomId ?? "all"] as const,
+  adminPosts: {
+    all: ["admin-posts"] as const,
+
+    list: (classroomId: string | null) =>
+      ["admin-posts", classroomId ?? "all"] as const,
+  },
 };

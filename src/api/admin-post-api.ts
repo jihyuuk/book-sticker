@@ -19,3 +19,13 @@ export async function fetchAdminPosts(
 
   return data;
 }
+
+export async function deletePostByAdmin(postId: string): Promise<void> {
+  const { error } = await supabase.functions.invoke("delete-post-by-admin", {
+    body: {
+      postId,
+    },
+  });
+
+  if (error) throw error;
+}

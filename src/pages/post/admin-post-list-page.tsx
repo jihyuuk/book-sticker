@@ -65,6 +65,7 @@ export default function AdminPostListPage() {
         {posts.map((post) => (
           <PostCard
             key={post.id}
+            isAdmin
             post={post}
             classroomName={
               selectedClassroomId === null
