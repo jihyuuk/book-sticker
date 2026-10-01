@@ -4,9 +4,10 @@ import PostDropdownMenu from "./post-dropdown-menu";
 
 type Props = {
   post: PublicPost;
+  classroomName?: string | null;
 };
 
-export default function PostHeader({ post }: Props) {
+export default function PostHeader({ post, classroomName }: Props) {
   const kid = post.kid;
 
   return (
@@ -34,6 +35,13 @@ export default function PostHeader({ post }: Props) {
           </p>
 
           <p className="text-xs text-gray-400">
+            {classroomName && (
+              <>
+                <span className="text-gray-500">{classroomName}</span>
+                <span className="mx-1">·</span>
+              </>
+            )}
+
             {formatRelativeTime(post.created_at)}
           </p>
         </div>

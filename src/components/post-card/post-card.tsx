@@ -6,6 +6,8 @@ import type { PublicPost } from "@/types/public-types";
 
 type Props = {
   post: PublicPost;
+  //리팩토링- classroom name = not null
+  classroomName?: string | null;
 };
 
 // const mockImages = [
@@ -25,11 +27,11 @@ type Props = {
 //   "https://picsum.photos/seed/mock-5/600/1000",
 // ];
 
-export default function PostCard({ post }: Props) {
+export default function PostCard({ post, classroomName }: Props) {
   return (
     <article className="bg-white shadow-sm">
       {/* 헤더 */}
-      <PostHeader post={post} />
+      <PostHeader post={post} classroomName={classroomName} />
 
       {/* 피드 이미지 */}
       <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />
