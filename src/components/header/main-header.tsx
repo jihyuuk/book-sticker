@@ -39,9 +39,13 @@ export default function MainHeader({ isAdmin = false }: Props) {
     >
       {/* 로고 영역 */}
       <div className="flex items-center gap-2">
-        <img src={logo} alt="북메이트" className="size-8 object-contain" />
+        {/* <img src={logo} alt="북메이트" className="size-8 object-contain" /> */}
 
         <span className="text-lg font-semibold tracking-wide">북메이트</span>
+
+        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
+          BETA
+        </span>
       </div>
       {/* 아이콘 버튼 영역 */}
       <IconButtons isAdmin={isAdmin} />
