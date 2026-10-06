@@ -1,0 +1,249 @@
+/* ========================================
+   Font Color
+======================================== */
+
+@theme {
+  --color-sub-1: #505050;
+  --color-sub-2: #767676;
+  --color-disabled: #999999;
+}
+
+/* ========================================
+   Korean Typography
+======================================== */
+
+@theme {
+  /* Display */
+  --text-display-1: 56px;
+  --text-display-1--line-height: 72px;
+  --text-display-1--letter-spacing: -0.025em;
+
+  --text-display-2: 48px;
+  --text-display-2--line-height: 62px;
+  --text-display-2--letter-spacing: -0.025em;
+
+  --text-display-3: 40px;
+  --text-display-3--line-height: 52px;
+  --text-display-3--letter-spacing: -0.025em;
+
+  --text-display-4: 36px;
+  --text-display-4--line-height: 44px;
+  --text-display-4--letter-spacing: -0.025em;
+
+  --text-display-5: 32px;
+  --text-display-5--line-height: 42px;
+  --text-display-5--letter-spacing: -0.025em;
+
+  --text-display-6: 28px;
+  --text-display-6--line-height: 38px;
+  --text-display-6--letter-spacing: -0.025em;
+
+  /* Headline */
+  --text-headline-1: 32px;
+  --text-headline-1--line-height: 42px;
+  --text-headline-1--letter-spacing: -0.025em;
+
+  --text-headline-2: 28px;
+  --text-headline-2--line-height: 38px;
+  --text-headline-2--letter-spacing: -0.025em;
+
+  --text-headline-3: 24px;
+  --text-headline-3--line-height: 34px;
+  --text-headline-3--letter-spacing: -0.025em;
+
+  --text-headline-4: 20px;
+  --text-headline-4--line-height: 28px;
+  --text-headline-4--letter-spacing: -0.025em;
+
+  --text-headline-5: 18px;
+  --text-headline-5--line-height: 26px;
+  --text-headline-5--letter-spacing: -0.025em;
+
+  --text-headline-6: 16px;
+  --text-headline-6--line-height: 24px;
+  --text-headline-6--letter-spacing: -0.025em;
+
+  /* Title */
+  --text-title-1: 24px;
+  --text-title-1--line-height: 34px;
+  --text-title-1--letter-spacing: -0.025em;
+
+  --text-title-2: 20px;
+  --text-title-2--line-height: 28px;
+  --text-title-2--letter-spacing: -0.025em;
+
+  --text-title-3: 18px;
+  --text-title-3--line-height: 26px;
+  --text-title-3--letter-spacing: -0.025em;
+
+  --text-title-4: 16px;
+  --text-title-4--line-height: 24px;
+  --text-title-4--letter-spacing: -0.025em;
+
+  /* Body */
+  --text-body-1: 15px;
+  --text-body-1--line-height: 22px;
+  --text-body-1--letter-spacing: -0.025em;
+
+  --text-body-2: 14px;
+  --text-body-2--line-height: 20px;
+  --text-body-2--letter-spacing: -0.025em;
+
+  --text-body-3: 13px;
+  --text-body-3--line-height: 18px;
+  --text-body-3--letter-spacing: -0.025em;
+
+  --text-body-4: 12px;
+  --text-body-4--line-height: 18px;
+  --text-body-4--letter-spacing: -0.025em;
+
+  /* Caption */
+  --text-caption-1: 13px;
+  --text-caption-1--line-height: 18px;
+  --text-caption-1--letter-spacing: -0.025em;
+
+  --text-caption-2: 12px;
+  --text-caption-2--line-height: 18px;
+  --text-caption-2--letter-spacing: -0.025em;
+
+  --text-caption-3: 11px;
+  --text-caption-3--line-height: 16px;
+  --text-caption-3--letter-spacing: -0.025em;
+
+  /* Button */
+  --text-button-1: 16px;
+  --text-button-1--line-height: 24px;
+  --text-button-1--letter-spacing: -0.025em;
+
+  --text-button-2: 14px;
+  --text-button-2--line-height: 20px;
+  --text-button-2--letter-spacing: -0.025em;
+
+  --text-button-3: 13px;
+  --text-button-3--line-height: 18px;
+  --text-button-3--letter-spacing: -0.025em;
+
+  --text-button-4: 12px;
+  --text-button-4--line-height: 18px;
+  --text-button-4--letter-spacing: -0.025em;
+}
+
+/* ========================================
+   English / Number Typography
+======================================== */
+
+@theme {
+  /* Display */
+  --text-en-display-1: 80px;
+  --text-en-display-1--line-height: 100px;
+  --text-en-display-1--letter-spacing: 0;
+
+  --text-en-display-2: 72px;
+  --text-en-display-2--line-height: 90px;
+  --text-en-display-2--letter-spacing: 0;
+
+  --text-en-display-3: 64px;
+  --text-en-display-3--line-height: 80px;
+  --text-en-display-3--letter-spacing: 0;
+
+  --text-en-display-4: 56px;
+  --text-en-display-4--line-height: 72px;
+  --text-en-display-4--letter-spacing: 0;
+
+  --text-en-display-5: 48px;
+  --text-en-display-5--line-height: 62px;
+  --text-en-display-5--letter-spacing: 0;
+
+  --text-en-display-6: 40px;
+  --text-en-display-6--line-height: 52px;
+  --text-en-display-6--letter-spacing: 0;
+
+  /* Headline */
+  --text-en-headline-1: 32px;
+  --text-en-headline-1--line-height: 42px;
+  --text-en-headline-1--letter-spacing: 0;
+
+  --text-en-headline-2: 28px;
+  --text-en-headline-2--line-height: 38px;
+  --text-en-headline-2--letter-spacing: 0;
+
+  --text-en-headline-3: 24px;
+  --text-en-headline-3--line-height: 34px;
+  --text-en-headline-3--letter-spacing: 0;
+
+  --text-en-headline-4: 20px;
+  --text-en-headline-4--line-height: 28px;
+  --text-en-headline-4--letter-spacing: 0;
+
+  --text-en-headline-5: 18px;
+  --text-en-headline-5--line-height: 26px;
+  --text-en-headline-5--letter-spacing: 0;
+
+  --text-en-headline-6: 16px;
+  --text-en-headline-6--line-height: 24px;
+  --text-en-headline-6--letter-spacing: 0;
+
+  /* Title */
+  --text-en-title-1: 24px;
+  --text-en-title-1--line-height: 34px;
+  --text-en-title-1--letter-spacing: 0;
+
+  --text-en-title-2: 20px;
+  --text-en-title-2--line-height: 28px;
+  --text-en-title-2--letter-spacing: 0;
+
+  --text-en-title-3: 18px;
+  --text-en-title-3--line-height: 26px;
+  --text-en-title-3--letter-spacing: 0;
+
+  --text-en-title-4: 16px;
+  --text-en-title-4--line-height: 24px;
+  --text-en-title-4--letter-spacing: 0;
+
+  /* Body */
+  --text-en-body-1: 15px;
+  --text-en-body-1--line-height: 22px;
+  --text-en-body-1--letter-spacing: 0;
+
+  --text-en-body-2: 14px;
+  --text-en-body-2--line-height: 20px;
+  --text-en-body-2--letter-spacing: 0;
+
+  --text-en-body-3: 13px;
+  --text-en-body-3--line-height: 18px;
+  --text-en-body-3--letter-spacing: 0;
+
+  --text-en-body-4: 12px;
+  --text-en-body-4--line-height: 18px;
+  --text-en-body-4--letter-spacing: 0;
+
+  /* Caption */
+  --text-en-caption-1: 13px;
+  --text-en-caption-1--line-height: 18px;
+  --text-en-caption-1--letter-spacing: 0;
+
+  --text-en-caption-2: 12px;
+  --text-en-caption-2--line-height: 18px;
+  --text-en-caption-2--letter-spacing: 0;
+
+  --text-en-caption-3: 11px;
+  --text-en-caption-3--line-height: 16px;
+  --text-en-caption-3--letter-spacing: 0;
+
+  /* Button */
+  --text-en-button-1: 16px;
+  --text-en-button-1--line-height: 24px;
+  --text-en-button-1--letter-spacing: 0;
+
+  --text-en-button-2: 14px;
+  --text-en-button-2--line-height: 20px;
+  --text-en-button-2--letter-spacing: 0;
+
+  --text-en-button-3: 13px;
+  --text-en-button-3--line-height: 18px;
+  --text-en-button-3--letter-spacing: 0;
+
+  --text-en-button-4: 12px;
+  --text-en-button-4--line-height: 18px;
+  --text-en-button-4--letter-spacing: 0;
+}
