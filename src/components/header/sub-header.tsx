@@ -1,4 +1,4 @@
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 
 type Props = {
@@ -9,16 +9,22 @@ export default function SubHeader({ title }: Props) {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 grid h-14 grid-cols-[28px_1fr_28px] items-center bg-white px-5 md:h-16">
-      <button type="button" onClick={() => navigate(-1)} aria-label="뒤로가기">
-        <ChevronLeft className="size-7" strokeWidth={1.5} />
-      </button>
+    <header className="sticky top-0 flex h-14 items-center justify-center md:h-16">
+      <div className="px-page-x grid w-full max-w-2xl grid-cols-[24px_1fr_24px] items-center">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="뒤로가기"
+        >
+          <ArrowLeft className="size-6" strokeWidth={1.5} />
+        </button>
 
-      <div className="min-w-0 truncate px-2 text-center text-xl font-semibold">
-        {title}
+        <div className="text-headline-4 min-w-0 truncate px-2 text-center font-medium">
+          {title}
+        </div>
+
+        <div />
       </div>
-
-      <div />
     </header>
   );
 }
