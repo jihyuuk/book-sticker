@@ -1,0 +1,54 @@
+/* ========================================
+   Text Color
+======================================== */
+
+@theme {
+  --color-text-main: #ffffff;
+  --color-text-inverse: #ffffff;
+
+  --color-text-sub-1: #505050;
+  --color-text-sub-2: #767676;
+  --color-text-disabled: #999999;
+}
+
+/* ========================================
+   Icon Color
+======================================== */
+
+@theme {
+  --color-icon-main: #2a2a37;
+  --color-icon-inverse: #ffffff;
+
+  --color-icon-sub-1: #484858;
+  --color-icon-sub-2: #81818d;
+  --color-icon-disabled: #a5a5af;
+}
+
+/* ========================================
+   Line / Border Color
+======================================== */
+
+@theme {
+  --color-line-light: #f1f1f5;
+  --color-line-regular: #e5e5ec;
+  --color-line-strong: #111111;
+}
+
+/* ========================================
+   Background Color
+======================================== */
+
+@theme {
+  --color-bg-light: #f7f7fb;
+  --color-bg-regular: #f1f1f5;
+}
+
+/* ========================================
+   State Color
+======================================== */
+
+@theme {
+  --color-state-error: #d32f2f;
+  --color-state-success: #00c853;
+  --color-state-warning: #fbc02d;
+}
