@@ -1,5 +1,3 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import {
   DEFALUT_CHART_SCALE,
   DEFAULT_GAP,
@@ -7,6 +5,86 @@ import {
   STICKER_SIZE,
 } from "./constants";
 import { bookImages } from "./chart-images";
+import { clsx, type ClassValue } from "clsx";
+import { extendTailwindMerge } from "tailwind-merge";
+
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": [
+        {
+          text: [
+            "display-1",
+            "display-2",
+            "display-3",
+            "display-4",
+            "display-5",
+            "display-6",
+
+            "headline-1",
+            "headline-2",
+            "headline-3",
+            "headline-4",
+            "headline-5",
+            "headline-6",
+
+            "title-1",
+            "title-2",
+            "title-3",
+            "title-4",
+
+            "body-1",
+            "body-2",
+            "body-3",
+            "body-4",
+
+            "caption-1",
+            "caption-2",
+            "caption-3",
+
+            "button-1",
+            "button-2",
+            "button-3",
+            "button-4",
+
+            "en-display-1",
+            "en-display-2",
+            "en-display-3",
+            "en-display-4",
+            "en-display-5",
+            "en-display-6",
+
+            "en-headline-1",
+            "en-headline-2",
+            "en-headline-3",
+            "en-headline-4",
+            "en-headline-5",
+            "en-headline-6",
+
+            "en-title-1",
+            "en-title-2",
+            "en-title-3",
+            "en-title-4",
+
+            "en-body-1",
+            "en-body-2",
+            "en-body-3",
+            "en-body-4",
+
+            "en-caption-1",
+            "en-caption-2",
+            "en-caption-3",
+
+            "en-button-1",
+            "en-button-2",
+            "en-button-3",
+            "en-button-4",
+          ],
+        },
+      ],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
