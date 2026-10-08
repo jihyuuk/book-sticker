@@ -10,3 +10,6 @@ export const INFO_HEIGHT = 64;
 export const STICKER_SIZE = 40;
 export const DEFAULT_GAP = 8;
 export const DEFALUT_CHART_SCALE = 30; //10단위로
+
+//이메일 정규식
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

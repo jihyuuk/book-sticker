@@ -1,35 +1,66 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useSignIn } from "@/hooks/mutations/auth/use-sign-in";
 import { generateErrorMessage } from "@/lib/supabse-error";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
+import PasswordInput from "@/components/ui/password-input";
+import ClearableInput from "@/components/ui/clearable-input";
+import { EMAIL_REGEX } from "@/lib/constants";
 
-type InvalidType = "EMAIL" | "PASSWORD" | null;
+type LoginErrors = {
+  email?: string;
+  password?: string;
+};
 
 export default function SignInPage() {
   const { mutate: signIn, isPending } = useSignIn();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [invalidType, setInvalidType] = useState<InvalidType>(null);
+  const [loginError, setLoginError] = useState<LoginErrors | null>(null);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setLoginError((prev) => (prev ? { ...prev, email: undefined } : null));
+  };
+
+  const handleClear = () => {
+    setEmail("");
+    setLoginError((prev) => (prev ? { ...prev, email: undefined } : null));
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setLoginError((prev) => (prev ? { ...prev, password: undefined } : null));
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setInvalidType(null);
+    setLoginError(null);
 
-    if (!email.trim()) {
-      toast.error("이메일을 입력해주세요.");
-      setInvalidType("EMAIL");
-      return;
+    const isEmailEmpty = !email.trim();
+    const isPasswordEmpty = !password;
+
+    const nextErrors: LoginErrors = {};
+
+    //이메일 검증
+    if (isEmailEmpty) {
+      nextErrors.email = "이메일 주소를 입력해 주세요";
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      nextErrors.email = "올바른 이메일 형식을 입력해 주세요";
     }
 
-    if (!password) {
-      toast.error("비밀번호를 입력해주세요.");
-      setInvalidType("PASSWORD");
+    //비밀번호 검증
+    if (isPasswordEmpty) {
+      nextErrors.password = "비밀번호를 입력해 주세요";
+    }
+
+    if (nextErrors.email || nextErrors.password) {
+      setLoginError(nextErrors);
       return;
     }
 
@@ -50,61 +81,76 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4">
-      {/* 카드 */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-3 rounded-2xl bg-white p-6 shadow-md"
-      >
-        <div className="mb-4">
-          <h1 className="text-2xl font-semibold">로그인</h1>
-          <p className="mt-1 text-sm text-stone-500">
-            우리 반 독서 기록을 관리해보세요.
-          </p>
+    <main className="px-page-x mx-auto mt-5 w-full max-w-md py-5">
+      <form onSubmit={handleSubmit} className="w-full space-y-5">
+        {/* 로고 */}
+        <div className="flex items-center justify-center p-4">
+          <img
+            src={logo}
+            width={714}
+            height={256}
+            className="w-full max-w-50"
+          />
         </div>
 
-        <Input
-          type="email"
-          className="h-12 px-4"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isPending}
-          aria-invalid={invalidType === "EMAIL"}
-        />
+        {/* 아이디, 비번 인풋 */}
+        <div className="space-y-3 px-0.5">
+          <div>
+            <ClearableInput
+              variant="underline"
+              size="xl"
+              value={email}
+              onChange={handleEmailChange}
+              onClear={handleClear}
+              placeholder="이메일 주소"
+              startIcon={<Mail className="text-sky-600" />}
+              disabled={isPending}
+              aria-invalid={!!loginError?.email}
+            />
+            {loginError?.email && (
+              <p className="text-caption-1 text-destructive mt-2">
+                {loginError.email}
+              </p>
+            )}
+          </div>
 
-        <Input
-          type="password"
-          className="h-12 px-4"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isPending}
-          aria-invalid={invalidType === "PASSWORD"}
-        />
+          <div>
+            <PasswordInput
+              variant="underline"
+              size="xl"
+              placeholder="비밀번호"
+              value={password}
+              startIcon={<Lock className="text-sky-600" />}
+              onChange={handlePasswordChange}
+              disabled={isPending}
+              aria-invalid={!!loginError?.password}
+            />
+            {loginError?.password && (
+              <p className="text-caption-1 text-destructive mt-2">
+                {loginError.password}
+              </p>
+            )}
+          </div>
+        </div>
 
+        {/* 로그인 버튼 */}
         <Button
           type="submit"
-          className="mt-4 h-12 font-semibold"
+          size="xl"
+          className="mt-5 w-full"
           disabled={isPending}
         >
-          {isPending ? (
-            <Loader2 className="mr-2 size-4 animate-spin" />
-          ) : (
-            "로그인"
-          )}
+          {isPending ? <Loader2 className="animate-spin" /> : "로그인"}
         </Button>
 
-        <div className="text-muted-foreground text-sm">
-          계정이 없다면?
-          <Link
-            className="text-muted-foreground ml-2 underline hover:text-sky-600"
-            to={"/sign-up"}
-          >
+        {/* 회원가입 링크 */}
+        <div className="text-body-2 text-center">
+          <span className="text-muted-foreground">계정이 없으신가요?</span>
+          <Link className="ml-2 text-sky-600 underline" to={"/sign-up"}>
             회원가입
           </Link>
         </div>
       </form>
-    </div>
+    </main>
   );
 }
