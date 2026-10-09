@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "/android-chrome-512x512.png";
 import IconButtons from "./icon-buttons";
 
 type Props = {
@@ -33,22 +32,24 @@ export default function MainHeader({ isAdmin = false }: Props) {
 
   return (
     <header
-      className={`sticky top-0 z-50 flex h-14 items-center justify-between bg-sky-500 px-6 text-white transition-transform duration-300 md:h-16 ${
+      className={`bg-primary sticky top-0 z-50 text-white transition-transform duration-300 ${
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      {/* 로고 영역 */}
-      <div className="flex items-center gap-2">
-        {/* <img src={logo} alt="북메이트" className="size-8 object-contain" /> */}
+      <div className="px-page-x mx-auto flex h-14 w-full max-w-2xl items-center justify-between md:h-16">
+        {/* 로고 영역 */}
+        <div className="flex items-center gap-2">
+          <span className="text-title-2 font-semibold tracking-wide">
+            북메이트
+          </span>
+          <span className="rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
+            BETA
+          </span>
+        </div>
 
-        <span className="text-lg font-semibold tracking-wide">북메이트</span>
-
-        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
-          BETA
-        </span>
+        {/* 아이콘 버튼 영역 */}
+        <IconButtons isAdmin={isAdmin} />
       </div>
-      {/* 아이콘 버튼 영역 */}
-      <IconButtons isAdmin={isAdmin} />
     </header>
   );
 }

@@ -43,16 +43,15 @@ export default function IconButtons({ isAdmin = false }: Props) {
   ];
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-4">
       {iconButtons.map((button) => (
         <button
           key={button.label}
           type="button"
           aria-label={button.label}
           onClick={button.onClick}
-          className="flex size-8 items-center justify-center rounded-full transition-colors hover:bg-gray-100 hover:text-gray-900"
         >
-          <button.icon className="size-5" strokeWidth={2} />
+          <button.icon className="size-6" strokeWidth={1.5} />
         </button>
       ))}
     </div>
