@@ -19,22 +19,25 @@ export default function PostListPage() {
   const { posts } = data;
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-2xl bg-gray-100">
+    <div>
       {/* 헤더 */}
       <MainHeader />
 
-      {/* 선생님이 작성한 타이틀 */}
-      <PostListIntro />
+      {/* 본문 */}
+      <main className="mx-auto w-full max-w-lg py-5">
+        {/* 선생님이 작성한 타이틀 */}
+        <PostListIntro />
 
-      {/* 카드 리스트 */}
-      <div className="space-y-8">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+        {/* 카드 리스트 */}
+        <section className="space-y-15">
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </section>
 
-      {/* 플로팅 버튼 */}
-      <PostListFAB />
-    </main>
+        {/* 플로팅 버튼 */}
+        <PostListFAB />
+      </main>
+    </div>
   );
 }

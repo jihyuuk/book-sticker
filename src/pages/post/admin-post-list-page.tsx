@@ -37,44 +37,50 @@ export default function AdminPostListPage() {
   if (!posts) return null;
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-2xl bg-gray-100">
+    <div>
+      {/* 헤더 */}
       <MainHeader isAdmin />
 
-      <div className="bg-white p-3">
-        <Select
-          value={selectedClassroomId ?? ALL_CLASSROOMS}
-          onValueChange={handleClassroomChange}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
+      {/* 본문 */}
+      <main className="mx-auto w-full max-w-lg py-5">
+        {/* 반 필터링 */}
+        {/* <section className="bg-white">
+          <Select
+            value={selectedClassroomId ?? ALL_CLASSROOMS}
+            onValueChange={handleClassroomChange}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value={ALL_CLASSROOMS}>전체</SelectItem>
+            <SelectContent>
+              <SelectItem value={ALL_CLASSROOMS}>전체</SelectItem>
 
-            {classrooms?.map((classroom) => (
-              <SelectItem key={classroom.id} value={classroom.id}>
-                {classroom.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+              {classrooms?.map((classroom) => (
+                <SelectItem key={classroom.id} value={classroom.id}>
+                  {classroom.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </section> */}
 
-      <div className="space-y-8">
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            isAdmin
-            post={post}
-            classroomName={
-              selectedClassroomId === null
-                ? (post.classroom.name ?? undefined)
-                : undefined
-            }
-          />
-        ))}
-      </div>
-    </main>
+        {/* 카드 리스트 */}
+        <section className="space-y-15">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              isAdmin
+              post={post}
+              classroomName={
+                selectedClassroomId === null
+                  ? (post.classroom.name ?? undefined)
+                  : undefined
+              }
+            />
+          ))}
+        </section>
+      </main>
+    </div>
   );
 }
