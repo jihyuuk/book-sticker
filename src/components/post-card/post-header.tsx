@@ -13,7 +13,7 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
   const kid = post.kid;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="px-page-x flex items-center justify-between">
       <div className="flex min-w-0 items-center gap-3">
         {/* 프로필 이미지 */}
         <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">

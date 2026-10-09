@@ -30,18 +30,18 @@ type Props = {
 
 export default function PostCard({ post, classroomName, isAdmin }: Props) {
   return (
-    <article className="bg-white shadow-sm">
+    <article className="bg-white">
       {/* 헤더 */}
       <PostHeader post={post} classroomName={classroomName} isAdmin={isAdmin} />
+
+      {/* 독서록 */}
+      <PostCaption caption={post.content} />
 
       {/* 피드 이미지 */}
       <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />
 
       {/* 책 정보 */}
       <BookInfo book={post.book} />
-
-      {/* 독서 기록 */}
-      <PostCaption caption={post.content} />
     </article>
   );
 }

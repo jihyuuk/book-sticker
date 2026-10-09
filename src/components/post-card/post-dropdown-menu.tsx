@@ -75,10 +75,7 @@ export default function PostDropdownMenu({ post }: Props) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className="flex size-10 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
-          >
+          <button type="button" className="text-gray-500">
             <EllipsisVertical className="size-5" />
           </button>
         </DropdownMenuTrigger>

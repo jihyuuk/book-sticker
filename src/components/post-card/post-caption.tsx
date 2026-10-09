@@ -20,25 +20,27 @@ export default function PostCaption({ caption }: Props) {
   if (!caption?.trim()) return null;
 
   return (
-    <div className="px-4 pb-5">
-      <p
-        ref={ref}
-        className={`text-sm leading-6 text-gray-700 ${
-          expanded ? "" : "line-clamp-4"
-        }`}
+    <div className="px-page-x py-3">
+      <button
+        type="button"
+        disabled={!isOverflowing}
+        aria-expanded={expanded}
+        onClick={() => setExpanded((prev) => !prev)}
+        className="block w-full cursor-default! text-left"
       >
-        {caption}
-      </p>
-
-      {isOverflowing && (
-        <button
-          type="button"
-          onClick={() => setExpanded((prev) => !prev)}
-          className="mt-1 text-sm font-medium text-gray-400"
+        <p
+          ref={ref}
+          className={`px-1 text-sm leading-6 wrap-break-word whitespace-pre-wrap text-gray-700 ${
+            expanded ? "" : "line-clamp-4"
+          }`}
         >
-          {expanded ? "접기" : "더보기"}
-        </button>
-      )}
+          {caption}
+        </p>
+
+        {isOverflowing && !expanded && (
+          <span className="text-sm font-medium text-gray-400">... 더보기</span>
+        )}
+      </button>
     </div>
   );
 }
