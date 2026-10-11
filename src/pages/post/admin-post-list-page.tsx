@@ -42,7 +42,7 @@ export default function AdminPostListPage() {
       <MainHeader isAdmin />
 
       {/* 본문 */}
-      <main className="mx-auto w-full max-w-lg py-5">
+      <main className="mx-auto w-full max-w-2xl py-5">
         {/* 반 필터링 */}
         {/* <section className="bg-white">
           <Select
@@ -84,3 +84,28 @@ export default function AdminPostListPage() {
     </div>
   );
 }
+
+// 1. 셀렉트 박스 도입
+// 2. 반 필터링 적용
+// 3. 게시물 작성 디자인 수정
+// 4. 게시물 수정 디자인 수정
+// 5. 어드민 설정 페이지 수정
+// 6. confirm 다이얼로그 수정
+
+// 1. 일일 포스팅 수 제한
+// 2. 검색 기능
+// 3. 리사이징 최적화 (지금 폰에서 올리면 막힘 리사이징 해도 용량이 큼)
+
+// 1. 차트 디자인 수정
+
+// 1. 백엔드 수정
+// 삭제시 큐 도입
+// sbin 조회 로직 수정
+
+// 로딩 페이지, 스켈레톤
+
+// 게시물 작성중 뒤로가기 방지
+
+//모달 뒤로가기시에 모달이 닫히게
+
+//최종 동영상 도입

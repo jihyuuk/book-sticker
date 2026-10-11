@@ -24,9 +24,9 @@ export default function PostListPage() {
       <MainHeader />
 
       {/* 본문 */}
-      <main className="mx-auto w-full max-w-lg py-5">
+      <main className="mx-auto w-full max-w-2xl py-5">
         {/* 선생님이 작성한 타이틀 */}
-        <PostListIntro />
+        <PostListIntro classroomName={data.classroom.name} />
 
         {/* 카드 리스트 */}
         <section className="space-y-15">
