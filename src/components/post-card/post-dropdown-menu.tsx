@@ -80,21 +80,25 @@ export default function PostDropdownMenu({ post }: Props) {
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="w-28 min-w-28">
+        <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem
             onClick={() => setModalAction("EDIT")}
             className="py-2.5"
           >
-            <Pencil className="size-4" />
-            수정
+            <div className="flex items-center gap-1.5 py-2 text-gray-700">
+              <Pencil size={4} />
+              <span>수정</span>
+            </div>
           </DropdownMenuItem>
 
           <DropdownMenuItem
             onClick={() => setModalAction("DELETE")}
-            className="py-2.5 text-red-500 focus:text-red-500 [&_svg]:!text-red-500"
+            variant="destructive"
           >
-            <Trash2 className="size-4" />
-            삭제
+            <div className="flex items-center gap-1.5 py-2">
+              <Trash2 size={4} />
+              <span>삭제</span>
+            </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
