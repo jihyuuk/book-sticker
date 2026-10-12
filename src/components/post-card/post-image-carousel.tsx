@@ -8,28 +8,24 @@ type Props = {
   images: string[];
 };
 
+const margin = 20;
+
 export default function PostImageCarousel({ images }: Props) {
   if (images.length === 0) return null;
-
-  if (images.length === 1)
-    return (
-      <div className="px-page-x mb-2">
-        <div className="aspect-square overflow-hidden rounded-sm bg-gray-100">
-          {/* 이미지 */}
-          <img
-            src={images[0]}
-            alt={"게시글 이미지"}
-            className="h-full w-full object-cover"
-          />
-        </div>
-      </div>
-    );
 
   return (
     <Carousel
       opts={{
-        align: "start",
-        containScroll: "trimSnaps",
+        align: (viewSize, snapSize, index) => {
+          if (images.length === 1) return margin;
+
+          if (index === images.length - 1) {
+            return viewSize - snapSize - margin;
+          }
+
+          return margin;
+        },
+        containScroll: false,
         loop: false,
       }}
       className="w-full"
@@ -38,9 +34,13 @@ export default function PostImageCarousel({ images }: Props) {
         {images.map((src, index) => (
           <CarouselItem
             key={`${src}-${index}`}
-            className={`first:ml-page-x last:mr-page-x basis-[85%] overflow-hidden rounded-sm pl-0 only:basis-[calc(100%-var(--spacing-page-x)*2)]`}
+            className={
+              images.length === 1
+                ? "basis-[calc(100%-40px)] pl-0"
+                : "basis-[85%] pl-0"
+            }
           >
-            <div className="relative aspect-square overflow-hidden bg-gray-100">
+            <div className="relative aspect-square overflow-hidden rounded-sm border bg-gray-100">
               {/* 이미지 */}
               <img
                 src={src}
