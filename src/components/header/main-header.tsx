@@ -44,7 +44,7 @@ export default function MainHeader({ isAdmin = false }: Props) {
               북메이트
             </span>
           </a>
-          <span className="min-w-75:show hidden rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white">
+          <span className="hidden rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white min-[300px]:inline-block">
             BETA
           </span>
         </div>
