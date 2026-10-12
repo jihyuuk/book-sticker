@@ -52,6 +52,8 @@ export default function PostDropdownMenu({ post }: Props) {
     openAlertModal({
       title: "게시물을 삭제할까요?",
       description: "삭제한 게시물은 다시 복구할 수 없습니다.",
+      actionVariant: "destructive",
+      actionLabel: "삭제하기",
       onAction: () => {
         deletePost(
           {

@@ -1,11 +1,12 @@
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { useState } from "react";
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useVerifyPostPassword } from "@/hooks/mutations/post/use-verify-post-password";
-import { Field, FieldGroup, FieldLabel } from "../ui/field";
+import { Field, FieldLabel } from "../ui/field";
 import { FunctionsHttpError } from "@supabase/supabase-js";
+import PasswordInput from "../ui/password-input";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -21,14 +22,11 @@ export default function PostPasswordModal({
   onVerified,
 }: Props) {
   const [password, setPassword] = useState("");
-  const [isInvalid, setIsInvalid] = useState(false);
 
   const { mutate: verifyPassword, isPending } = useVerifyPostPassword();
 
   const handleConfirm = () => {
     if (!password) return;
-
-    setIsInvalid(false);
 
     verifyPassword(
       {
@@ -47,7 +45,6 @@ export default function PostPasswordModal({
             error.context.status === 401
           ) {
             setPassword("");
-            setIsInvalid(true);
             toast.error("비밀번호가 올바르지 않습니다.");
             return;
           }
@@ -65,48 +62,45 @@ export default function PostPasswordModal({
 
     if (!nextOpen) {
       setPassword("");
-      setIsInvalid(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="rounded-3xl border-4 border-gray-100 p-6 shadow-xl sm:max-w-md"
+        className="rounded-lg p-5! pb-4.5! shadow-xl sm:max-w-md"
         onOpenAutoFocus={(e) => {
           e.preventDefault();
         }}
       >
-        <div className="mt-2">
-          <FieldGroup className="mt-2 md:space-y-5">
-            <Field className="flex flex-col gap-2">
-              <FieldLabel
-                htmlFor="password"
-                className="ml-1 text-base font-bold text-gray-700 md:text-lg"
-              >
-                비밀번호
-              </FieldLabel>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                autoComplete="off"
-                placeholder="비밀번호를 입력해주세요"
-                disabled={isPending}
-                className="h-12 rounded-2xl border-2 border-gray-200 px-4 text-base transition-all focus-visible:border-sky-400 focus-visible:ring-sky-200 md:h-14 md:text-lg"
-                onChange={(e) => setPassword(e.target.value)}
-                aria-invalid={isInvalid}
-              />
-            </Field>
-          </FieldGroup>
-        </div>
+        {/* 비밀번호 */}
+        <Field>
+          <FieldLabel
+            htmlFor="password"
+            className="text-headline-5 mb-1 font-semibold"
+          >
+            비밀번호
+          </FieldLabel>
+
+          <PasswordInput
+            id="password"
+            autoComplete="off"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            placeholder="비밀번호 입력"
+            disabled={isPending}
+          />
+        </Field>
 
         <Button
+          size="lg"
           onClick={handleConfirm}
           disabled={!password || isPending}
-          className="mt-3 h-12 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
+          className="mt-3 flex-1 rounded-md"
         >
-          {isPending ? "확인 중..." : "확인"}
+          {isPending ? <Loader2 className="animate-spin" /> : "확인"}
         </Button>
       </DialogContent>
     </Dialog>

@@ -1,3 +1,5 @@
+import type { ComponentProps } from "react";
+import type { Button } from "@/components/ui/button";
 import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 
@@ -5,6 +7,8 @@ type OpenState = {
   isOpen: true;
   title: string;
   description: string;
+  actionLabel?: string;
+  actionVariant?: ComponentProps<typeof Button>["variant"];
   onAction?: () => void;
   onCancel?: () => void;
 };

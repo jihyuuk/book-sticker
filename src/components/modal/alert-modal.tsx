@@ -1,10 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { useAlertModal } from "@/store/alert-modal";
 import { Button } from "../ui/button";
 
@@ -24,27 +18,30 @@ export default function AlertModal() {
 
   return (
     <AlertDialog open={store.isOpen}>
-      <AlertDialogContent className="rounded-3xl border-4 border-gray-100 p-6 shadow-xl sm:max-w-md">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-lg font-bold text-gray-800">
-            {store.title}
-          </AlertDialogTitle>
-          <AlertDialogDescription>{store.description}</AlertDialogDescription>
-        </AlertDialogHeader>
+      <AlertDialogContent className="rounded-lg p-5! pb-4.5! shadow-xl sm:max-w-md">
+        <header>
+          <h1 className="text-headline-5 font-semibold">{store.title}</h1>
+          <p className="text-body-2 text-muted-foreground mt-1.5">
+            {store.description}
+          </p>
+        </header>
 
-        <div className="mt-2 flex justify-end gap-3">
+        <div className="mt-3 flex gap-2">
           <Button
-            variant={"outline"}
+            size="lg"
+            className="flex-1 rounded-md"
             onClick={handleCancelClick}
-            className="h-14 flex-1 rounded-2xl border-2 border-gray-200 text-lg font-bold text-gray-600 transition-colors hover:bg-gray-100"
+            variant={"outline"}
           >
             취소
           </Button>
           <Button
+            size="lg"
+            variant={store.actionVariant ?? "default"}
             onClick={handleActionClick}
-            className="h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
+            className="flex-1 rounded-md"
           >
-            확인
+            {store.actionLabel ?? "확인"}
           </Button>
         </div>
       </AlertDialogContent>
