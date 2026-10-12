@@ -1,8 +1,12 @@
 import { useEffect, useRef } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { AlertCircle, LoaderCircle, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Field, FieldLabel } from "@/components/ui/field";
+import { cn } from "cn";
+import { optimizeImage } from "@/lib/image-optimzie";
+
+type ImageStatus = "optimizing" | "ready" | "error";
 
 export type PostImageData =
   | {
@@ -15,11 +19,12 @@ export type PostImageData =
       id: string; // 프론트 임시 id
       file: File;
       previewUrl: string; // blob URL
+      status: ImageStatus; // 최적화 상태
     };
 
 type Props = {
   value: PostImageData[];
-  onValueChange: (images: PostImageData[]) => void;
+  onValueChange: React.Dispatch<React.SetStateAction<PostImageData[]>>;
   disabled?: boolean;
 };
 
@@ -51,14 +56,12 @@ export default function PostImageField({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
 
-    if (files.length === 0) {
-      return;
-    }
+    if (files.length === 0) return;
 
     const remainingCount = MAX_IMAGES - value.length;
 
     if (remainingCount <= 0) {
-      toast.warning("사진은 최대 5장까지 등록할 수 있어요.");
+      toast.warning(`사진은 최대 ${MAX_IMAGES}장까지 등록할 수 있어요.`);
       event.target.value = "";
       return;
     }
@@ -74,12 +77,49 @@ export default function PostImageField({
       id: crypto.randomUUID(),
       file,
       previewUrl: URL.createObjectURL(file),
+      status: "optimizing",
     }));
 
-    onValueChange([...value, ...newImages]);
+    // 1. 원본 이미지 즉시 표시
+    onValueChange((prev) => [...prev, ...newImages]);
 
-    // 같은 사진을 다시 선택할 수 있도록 초기화
     event.target.value = "";
+
+    // 2. 이미지별 비동기 최적화
+    newImages.forEach(async (image) => {
+      if (image.type !== "new") return;
+
+      try {
+        const optimizedFile = await optimizeImage(image.file);
+
+        // 3. 최적화 성공
+        onValueChange((prev) =>
+          prev.map((item) =>
+            item.id === image.id && item.type === "new"
+              ? {
+                  ...item,
+                  file: optimizedFile,
+                  status: "ready",
+                }
+              : item,
+          ),
+        );
+      } catch (error) {
+        console.error("이미지 최적화 실패:", error);
+
+        // 4. 최적화 실패
+        onValueChange((prev) =>
+          prev.map((item) =>
+            item.id === image.id && item.type === "new"
+              ? {
+                  ...item,
+                  status: "error",
+                }
+              : item,
+          ),
+        );
+      }
+    });
   };
 
   const handleRemove = (id: string) => {
@@ -93,32 +133,56 @@ export default function PostImageField({
   };
 
   return (
-    <Field className="w-full px-4 py-5">
+    <Field className="w-full">
+      {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <FieldLabel className="text-sm font-semibold">사진</FieldLabel>
+        <FieldLabel>사진 / 동영상</FieldLabel>
 
         <span className="text-xs text-gray-400">
           {value.length}/{MAX_IMAGES}
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* 이미지 영역 */}
+      <div className="flex w-full gap-2 overflow-x-auto pb-4">
         {value.map((image) => (
           <div
             key={image.id}
-            className="relative size-20 overflow-hidden rounded-lg bg-gray-100"
+            className={cn(
+              "relative size-25 shrink-0 overflow-hidden rounded-lg border bg-white",
+              image.type === "new" &&
+                image.status === "error" &&
+                "border-destructive",
+            )}
           >
+            {/* 이미지 미리보기 */}
             <img
               src={image.previewUrl}
               alt=""
               className="size-full object-cover"
             />
 
+            {/* 최적화 중 */}
+            {image.type === "new" && image.status === "optimizing" && (
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-black/30 text-white">
+                <LoaderCircle className="size-6 animate-spin" />
+              </div>
+            )}
+
+            {/* 최적화 실패 */}
+            {image.type === "new" && image.status === "error" && (
+              <div className="text-destructive bg-destructive/20 pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1">
+                <AlertCircle className="size-6" />
+                <span className="text-xs font-semibold">업로드 실패</span>
+              </div>
+            )}
+
+            {/* 삭제 버튼 */}
             {!disabled && (
               <button
                 type="button"
                 onClick={() => handleRemove(image.id)}
-                className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-black/60 text-white"
+                className="absolute top-1 right-1 z-10 flex size-6 items-center justify-center rounded-full bg-black/30 text-white"
                 aria-label="사진 삭제"
               >
                 <X className="size-4" />
@@ -127,19 +191,24 @@ export default function PostImageField({
           </div>
         ))}
 
+        {/* 이미지 추가 버튼 */}
         {value.length < MAX_IMAGES && (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={disabled}
-            className="flex size-20 flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-gray-400 disabled:opacity-50"
+            className={cn(
+              "text-muted-foreground flex size-25 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed bg-gray-100 disabled:opacity-50",
+              "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
+              "active:bg-sky-100",
+            )}
           >
-            <ImagePlus className="size-5" />
-            <span className="text-xs">사진 추가</span>
+            <Plus className="size-6" strokeWidth={1.5} />
           </button>
         )}
       </div>
 
+      {/* 가려진 인풋 */}
       <input
         ref={inputRef}
         type="file"
