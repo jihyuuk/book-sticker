@@ -14,6 +14,7 @@ import PostImageField, {
 } from "../post-field/post-image-field";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+import { STORAGE_KEY } from "@/lib/constants";
 
 type Props = {
   data: PostCreateData;
@@ -26,14 +27,24 @@ export default function PostNewForm({ data }: Props) {
 
   const { mutate, isPending } = useCreatePost();
 
-  //입력 정보
-  const [kidId, setKidId] = useState("");
+  const [kidId, setKidId] = useState(() => {
+    const savedKidId = localStorage.getItem(STORAGE_KEY);
+    if (savedKidId && kids.some((kid) => kid.id === savedKidId)) {
+      return savedKidId;
+    }
+    return "";
+  });
   const [book, setBook] = useState<BookInfoData | null>(null);
   const [caption, setCaption] = useState("");
   const [images, setImages] = useState<PostImageData[]>([]);
   const [password, setPassword] = useState("");
 
-  //이미지 업로드
+  const handleKidChange = (id: string) => {
+    setKidId(id);
+    localStorage.setItem(STORAGE_KEY, id);
+  };
+
+  //이미지 업로드 중인지
   const isImageProcessing = images.some(
     (image) => image.type === "new" && image.status !== "ready",
   );
@@ -101,7 +112,7 @@ export default function PostNewForm({ data }: Props) {
         <PostKidField
           kids={kids}
           value={kidId}
-          onValueChange={setKidId}
+          onValueChange={handleKidChange}
           disabled={isPending}
         />
 
