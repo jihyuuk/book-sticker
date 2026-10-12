@@ -12,15 +12,17 @@ export default function PostSubmitButton({
   children,
 }: Props) {
   return (
-    <section className="px-4 pt-5 pb-2">
-      <Button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        className="h-12 w-full bg-sky-500 text-base hover:bg-sky-600"
-      >
-        {children}
-      </Button>
+    <section className="fixed inset-x-0 bottom-0 z-50">
+      <div className="px-page-x mx-auto w-full max-w-2xl border-t bg-white pt-2 pb-4">
+        <Button
+          size="lg"
+          onClick={onClick}
+          disabled={disabled}
+          className="w-full"
+        >
+          {children}
+        </Button>
+      </div>
     </section>
   );
 }

@@ -23,21 +23,17 @@ export default function PostKidField({
   disabled,
 }: Props) {
   return (
-    <Field className="w-full px-4 py-5">
-      <FieldLabel className="text-sm font-semibold">작성자</FieldLabel>
+    <Field className="w-full">
+      <FieldLabel>작성자</FieldLabel>
 
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger className="!h-12 px-4 text-sm">
+        <SelectTrigger>
           <SelectValue placeholder="작성자를 선택해주세요" />
         </SelectTrigger>
-        <SelectContent position="popper">
+        <SelectContent>
           <SelectGroup>
             {kids.map((kid) => (
-              <SelectItem
-                className="h-12 px-4 text-sm"
-                key={kid.id}
-                value={kid.id}
-              >
+              <SelectItem key={kid.id} value={kid.id}>
                 {kid.name}
               </SelectItem>
             ))}

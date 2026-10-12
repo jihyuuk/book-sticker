@@ -30,7 +30,7 @@ export default function PostCaption({ caption }: Props) {
       >
         <p
           ref={ref}
-          className={`px-1 text-sm leading-6 wrap-break-word whitespace-pre-wrap text-gray-700 ${
+          className={`text-body-2 px-1 wrap-break-word whitespace-pre-wrap text-gray-700 ${
             expanded ? "" : "line-clamp-4"
           }`}
         >

@@ -13,6 +13,7 @@ import PostImageField, {
   type PostImageData,
 } from "../post-field/post-image-field";
 import { FunctionsHttpError } from "@supabase/supabase-js";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   data: PostCreateData;
@@ -32,7 +33,14 @@ export default function PostNewForm({ data }: Props) {
   const [images, setImages] = useState<PostImageData[]>([]);
   const [password, setPassword] = useState("");
 
+  //이미지 업로드
+  const isImageProcessing = images.some(
+    (image) => image.type === "new" && image.status !== "ready",
+  );
+
   const handleSubmit = () => {
+    if (isPending || isImageProcessing) return;
+
     const message = validatePostForm({
       kidId,
       book,
@@ -87,46 +95,51 @@ export default function PostNewForm({ data }: Props) {
   };
 
   return (
-    <div className="mt-2 space-y-2">
-      {/* 작성자 */}
-      <PostKidField
-        kids={kids}
-        value={kidId}
-        onValueChange={setKidId}
-        disabled={isPending}
-      />
+    <div>
+      <div className="px-page-x space-y-5 py-3 pb-40">
+        {/* 작성자 */}
+        <PostKidField
+          kids={kids}
+          value={kidId}
+          onValueChange={setKidId}
+          disabled={isPending}
+        />
 
-      {/* 책 */}
-      <PostBookField
-        value={book}
-        onValueChange={setBook}
-        disabled={isPending}
-      />
+        {/* 책 */}
+        <PostBookField
+          value={book}
+          onValueChange={setBook}
+          disabled={isPending}
+        />
 
-      {/* 독후감 */}
-      <PostCaptionField
-        value={caption}
-        onValueChange={setCaption}
-        disabled={isPending}
-      />
+        {/* 독후감 */}
+        <PostCaptionField
+          value={caption}
+          onValueChange={setCaption}
+          disabled={isPending}
+        />
 
-      {/* 사진 */}
-      <PostImageField
-        value={images}
-        onValueChange={setImages}
-        disabled={isPending}
-      />
+        {/* 사진 */}
+        <PostImageField
+          value={images}
+          onValueChange={setImages}
+          disabled={isPending}
+        />
 
-      {/* 비밀번호 */}
-      <PostPasswordField
-        value={password}
-        onValueChange={setPassword}
-        disabled={isPending}
-      />
+        {/* 비밀번호 */}
+        <PostPasswordField
+          value={password}
+          onValueChange={setPassword}
+          disabled={isPending}
+        />
+      </div>
 
       {/* 작성 버튼 */}
-      <PostSubmitButton onClick={handleSubmit} disabled={isPending}>
-        {isPending ? "작성 중..." : "작성하기"}
+      <PostSubmitButton
+        onClick={handleSubmit}
+        disabled={isPending || isImageProcessing}
+      >
+        {isPending ? <Loader2 className="animate-spin" /> : "작성하기"}
       </PostSubmitButton>
     </div>
   );
