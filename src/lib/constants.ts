@@ -5,6 +5,9 @@ export const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
 //세션 스토리지 키
 export const VERIFICATION_EMAIL = "verificationEmail";
 
+//로컬 스토리지 키
+export const STORAGE_KEY = "bookmate-selected-kid";
+
 //차트 관련 기본 값
 export const INFO_HEIGHT = 64;
 export const STICKER_SIZE = 40;
