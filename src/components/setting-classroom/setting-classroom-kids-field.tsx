@@ -1,9 +1,13 @@
-import { Plus } from "lucide-react";
+import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { Field, FieldLabel } from "../ui/field";
 import type { Kid } from "@/types/entity-types";
 import { useOpenCreateKidModal } from "@/store/create-kid-modal-store";
 import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
 import { Button } from "../ui/button";
+import { useOpenAlertModal } from "@/store/alert-modal";
+import { toast } from "sonner";
+import { useDeleteKid } from "@/hooks/mutations/kid/use-delete-kid";
+import { useState } from "react";
 
 type Props = {
   classroomId: string;
@@ -14,8 +18,58 @@ export default function SettingClassroomKidsField({
   classroomId,
   kids,
 }: Props) {
+  //모달
+  const openAlertModal = useOpenAlertModal();
   const openCreateKidModal = useOpenCreateKidModal();
   const openUpdateKidModal = useOpenUpdateKidModal();
+
+  //뮤테이션
+  const deleteKid = useDeleteKid();
+
+  // 삭제 중인 아이 ID 관리
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(() => new Set());
+
+  //삭제 상태 변경
+  const setDeleting = (id: string, deleting: boolean) => {
+    setDeletingIds((prev) => {
+      const next = new Set(prev);
+
+      if (deleting) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+
+      return next;
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    if (deletingIds.has(id)) return;
+
+    openAlertModal({
+      title: "원아를 삭제할까요?",
+      description: "작성된 게시글이 모두 삭제되며, 다시 복구할 수 없습니다.",
+      actionLabel: "삭제하기",
+      actionVariant: "destructive",
+      onAction: () => {
+        void executeDelete(id);
+      },
+    });
+  };
+
+  const executeDelete = async (id: string) => {
+    setDeleting(id, true);
+
+    try {
+      await deleteKid.mutateAsync(id);
+      toast.success("삭제 완료");
+    } catch {
+      toast.error("삭제 실패");
+    } finally {
+      setDeleting(id, false);
+    }
+  };
 
   return (
     <Field>
@@ -28,59 +82,88 @@ export default function SettingClassroomKidsField({
       </div>
 
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        {kids.map((kid) => (
-          <button
-            key={kid.id}
-            type="button"
-            onClick={() => openUpdateKidModal(kid)}
-            className="flex w-full items-center gap-3 rounded-md border bg-white px-3 py-3 text-left transition-colors hover:bg-gray-50"
-          >
-            {/* 프로필 이미지 */}
-            <div className="size-11 shrink-0 overflow-hidden rounded-full bg-sky-100">
-              {kid.profile_image_url ? (
-                <img
-                  src={kid.profile_image_url}
-                  alt={`${kid.name} 프로필`}
-                  className="size-full object-cover"
-                />
-              ) : (
-                <div className="flex size-full items-center justify-center text-sm font-semibold text-sky-600">
-                  {kid.name.slice(0, 1)}
+        {kids.map((kid) => {
+          const isDeleting = deletingIds.has(kid.id);
+          return (
+            <div
+              key={kid.id}
+              className={`flex w-full min-w-0 items-center rounded-md border bg-white transition-colors ${
+                isDeleting
+                  ? "pointer-events-none opacity-50"
+                  : "hover:bg-gray-50"
+              }`}
+            >
+              {/* 수정 버튼 */}
+              <button
+                type="button"
+                onClick={() => openUpdateKidModal(kid)}
+                className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-0 text-left"
+              >
+                {/* 프로필 이미지 */}
+                <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
+                  {kid.profile_image_url ? (
+                    <img
+                      src={kid.profile_image_url}
+                      alt={`${kid.name} 프로필`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-sky-600">
+                      {kid.name.slice(0, 1)}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* 아이 정보 */}
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-gray-800">{kid.name}</p>
+                {/* 아이 정보 */}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold text-gray-900">
+                    {kid.name}
+                  </p>
 
-              <div className="mt-1 flex flex-wrap gap-1 text-xs text-gray-500">
-                <span>
-                  패들렛{" "}
-                  <strong className="font-semibold text-gray-700">
-                    {kid.book_count}
-                  </strong>
-                </span>
-                ·
-                <span>
-                  게시글{" "}
-                  <strong className="font-semibold text-gray-700">
-                    {kid.book_count + 10}
-                  </strong>
-                </span>
-              </div>
+                  <div className="mt-1 flex flex-wrap gap-1 text-xs text-gray-500">
+                    <span>
+                      패들렛{" "}
+                      <strong className="font-semibold text-gray-700">
+                        {kid.book_count}
+                      </strong>
+                    </span>
+                    ·
+                    <span>
+                      게시글{" "}
+                      <strong className="font-semibold text-gray-700">
+                        {kid.book_count + 10}
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </button>
+
+              {/* 삭제 버튼 */}
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => handleDelete(kid.id)}
+                aria-label={`${kid.name} 삭제`}
+                className="shrink-0 p-3"
+              >
+                {isDeleting ? (
+                  <LoaderCircle className="text-muted-foreground size-5 animate-spin" />
+                ) : (
+                  <Trash2 className="text-destructive size-5" />
+                )}
+              </button>
             </div>
-          </button>
-        ))}
+          );
+        })}
 
         {/* 학생 추가 */}
         <Button
           variant="outline"
           onClick={() => openCreateKidModal(classroomId)}
-          className="text-muted-foreground flex h-[70px] w-full items-center justify-center gap-1 border border-dashed bg-gray-100"
+          className="text-muted-foreground flex h-17.5 w-full items-center justify-center gap-1 border border-dashed bg-gray-100"
         >
-          <Plus className="size-4" />
-          원아 등록{" "}
+          <Plus className="size-4" strokeWidth={1.5} />
+          원아 등록
         </Button>
       </div>
     </Field>
