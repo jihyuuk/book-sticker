@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import CreateClassroomModal from "../modal/create-classroom-modal";
+import { Button } from "../ui/button";
 
 type Props = {
   classrooms: Pick<Classroom, "id" | "name">[];
@@ -16,29 +17,35 @@ export default function SettingClassroomsField({ classrooms }: Props) {
 
   return (
     <>
-      <Field className="w-full px-4 py-5">
-        <FieldLabel className="text-sm font-semibold">반 관리</FieldLabel>
+      <Field>
+        <div className="flex items-center gap-2">
+          <FieldLabel>반 관리</FieldLabel>
+          <span className="text-xs text-gray-700">
+            <strong className="text-primary">{classrooms.length}</strong>개 반
+          </span>
+        </div>
 
         <div className="grid grid-cols-2 gap-2">
           {classrooms.map((classroom) => (
-            <button
+            <Button
               key={classroom.id}
-              type="button"
+              size="xl"
+              variant="outline"
               onClick={() => navigate(`/setting/classroom/${classroom.id}`)}
-              className="rounded-lg border bg-white py-3 text-center text-sm font-medium transition-colors hover:bg-gray-50"
+              className="font-medium"
             >
               {classroom.name}
-            </button>
+            </Button>
           ))}
 
-          <button
-            type="button"
+          <Button
+            size="xl"
+            variant="outline"
             onClick={() => setIsOpen(true)}
-            className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-sky-300 bg-sky-50 py-3 text-sm font-semibold text-sky-500 transition-colors hover:bg-sky-100"
+            className="text-muted-foreground flex items-center justify-center gap-1 border-dashed bg-gray-100 font-medium"
           >
-            <Plus className="size-4" />
-            추가
-          </button>
+            <Plus className="size-4" />반 생성
+          </Button>
         </div>
       </Field>
 

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { useCreateClassroom } from "@/hooks/mutations/classroom/use-create-classroom";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -65,38 +66,36 @@ export default function CreateClassroomModal({ open, setOpen }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="rounded-3xl border-4 border-gray-100 p-6 shadow-xl sm:max-w-md"
+        className="rounded-lg p-5! pb-4.5! sm:max-w-sm"
         onOpenAutoFocus={(e) => {
           e.preventDefault();
         }}
       >
-        <div className="mt-2 space-y-6">
-          <Field className="flex flex-col gap-2">
-            <FieldLabel
-              htmlFor="name"
-              className="ml-1 text-base font-bold text-gray-700 md:text-lg"
-            >
-              반 이름
-            </FieldLabel>
-            {/* 리팩토링 - truncate */}
-            <Input
-              id="name"
-              autoComplete="off"
-              placeholder="반 이름을 입력해주세요"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isPending}
-              className="h-12 rounded-2xl border-2 border-gray-200 px-4 text-base transition-all focus-visible:border-sky-400 focus-visible:ring-sky-200 md:h-14 md:text-lg"
-            />
-          </Field>
-        </div>
+        <Field>
+          <FieldLabel
+            htmlFor="name"
+            className="text-headline-5 mb-1 font-semibold"
+          >
+            반 이름
+          </FieldLabel>
+
+          {/* 리팩토링 - truncate */}
+          <Input
+            id="name"
+            autoComplete="off"
+            placeholder="반 이름을 입력해주세요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={isPending}
+          />
+        </Field>
 
         <Button
           onClick={handleSubmit}
-          className="mt-8 h-14 flex-1 rounded-2xl border-none bg-sky-400 text-lg font-bold text-white shadow-[0_4px_0_0_rgba(14,165,233,1)] transition-all hover:bg-sky-500 active:translate-y-1 active:shadow-none"
-          disabled={!canSubmit}
+          className="mt-3 flex-1 rounded-md"
+          disabled={!canSubmit || isPending}
         >
-          추가하기
+          {isPending ? <Loader2 className="animate-spin" /> : "생성하기"}
         </Button>
       </DialogContent>
     </Dialog>

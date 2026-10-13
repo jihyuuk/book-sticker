@@ -39,24 +39,18 @@ export default function SettingNameField({ oriName }: Props) {
   };
 
   return (
-    <Field className="w-full px-4 py-5">
-      <FieldLabel className="text-sm font-semibold">유치원명</FieldLabel>
+    <Field>
+      <FieldLabel>유치원명</FieldLabel>
 
       <div className="flex gap-2">
         <Input
           placeholder="유치원명을 입력해주세요"
-          className="h-12 flex-1 px-4 text-sm"
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isUpdating}
         />
 
-        <Button
-          type="button"
-          onClick={handleNameUpdateClick}
-          className="h-12 shrink-0 bg-sky-500 px-5 font-semibold text-white hover:bg-sky-600"
-          disabled={!canSubmit}
-        >
+        <Button onClick={handleNameUpdateClick} disabled={!canSubmit}>
           저장
         </Button>
       </div>

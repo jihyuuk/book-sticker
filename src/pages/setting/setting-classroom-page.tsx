@@ -22,28 +22,23 @@ export default function SettingClassroomPage() {
   const publicUrl = `${DOMAIN_URL}/classroom/${data.classroom.public_id}/posts`;
 
   return (
-    <main className="min-h-dvh bg-white">
-      <div className="mx-auto w-full max-w-2xl pb-10">
-        {/* 헤더 */}
-        <SubHeader title="반 설정" />
+    <div>
+      {/* 헤더 */}
+      <SubHeader title="반 설정" />
 
-        <div className="space-y-6">
-          {/* 반 이름 */}
-          <SettingClassroomNameField oriName={data.classroom.name ?? ""} />
+      <main className="px-page-x mx-auto w-full max-w-2xl space-y-6 py-3 pb-10">
+        {/* 반 이름 */}
+        <SettingClassroomNameField oriName={data.classroom.name ?? ""} />
 
-          {/* 공개 주소 */}
-          <SettingClassroomPublicLinkField publicUrl={publicUrl} />
+        {/* 공개 주소 */}
+        <SettingClassroomPublicLinkField publicUrl={publicUrl} />
 
-          {/* 학생 관리 */}
-          <SettingClassroomKidsField
-            classroomId={classroomId}
-            kids={data.kids}
-          />
+        {/* 학생 관리 */}
+        <SettingClassroomKidsField classroomId={classroomId} kids={data.kids} />
 
-          {/* 반 삭제 */}
-          <SettingClassroomDeleteField />
-        </div>
-      </div>
-    </main>
+        {/* 반 삭제 */}
+        <SettingClassroomDeleteField />
+      </main>
+    </div>
   );
 }

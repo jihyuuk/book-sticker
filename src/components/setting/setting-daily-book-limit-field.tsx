@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
 
 import { Button } from "../ui/button";
-import { Field, FieldDescription, FieldLabel } from "../ui/field";
+import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 
 type Props = {
@@ -62,32 +62,22 @@ export default function SettingDailyBookLimitField({
   };
 
   return (
-    <Field className="w-full px-4 py-5">
-      <FieldLabel className="text-sm font-semibold">차트 설정</FieldLabel>
+    <Field className="w-full">
+      <FieldLabel>일일 게시글 작성 한도</FieldLabel>
 
       <div className="flex gap-2">
         <Input
           inputMode="numeric"
           pattern="[0-9]*"
-          className="h-12 flex-1 px-4 text-sm"
           value={dailyBookLimit}
           onChange={handleDailyBookLimitChange}
           disabled={isUpdating}
         />
 
-        <Button
-          type="button"
-          onClick={handleUpdateClick}
-          className="h-12 shrink-0 bg-sky-500 px-5 font-semibold text-white hover:bg-sky-600"
-          disabled={!canSubmit}
-        >
+        <Button onClick={handleUpdateClick} disabled={!canSubmit}>
           저장
         </Button>
       </div>
-
-      <FieldDescription className="pl-1 text-xs text-gray-400">
-        하루 최대 인정 독서 수
-      </FieldDescription>
     </Field>
   );
 }

@@ -3,6 +3,7 @@ import { Field, FieldLabel } from "../ui/field";
 import type { Kid } from "@/types/entity-types";
 import { useOpenCreateKidModal } from "@/store/create-kid-modal-store";
 import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
+import { Button } from "../ui/button";
 
 type Props = {
   classroomId: string;
@@ -17,16 +18,22 @@ export default function SettingClassroomKidsField({
   const openUpdateKidModal = useOpenUpdateKidModal();
 
   return (
-    <Field className="w-full px-4">
-      <FieldLabel className="text-sm font-semibold">학생 관리</FieldLabel>
+    <Field>
+      <div className="flex items-center gap-2">
+        <FieldLabel>원아 관리</FieldLabel>
 
-      <div className="space-y-2">
+        <span className="text-xs text-gray-700">
+          <strong className="text-primary">{kids.length}</strong>명
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {kids.map((kid) => (
           <button
             key={kid.id}
             type="button"
             onClick={() => openUpdateKidModal(kid)}
-            className="flex w-full items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition-colors hover:bg-gray-50"
+            className="flex w-full items-center gap-3 rounded-md border bg-white px-3 py-3 text-left transition-colors hover:bg-gray-50"
           >
             {/* 프로필 이미지 */}
             <div className="size-11 shrink-0 overflow-hidden rounded-full bg-sky-100">
@@ -47,25 +54,18 @@ export default function SettingClassroomKidsField({
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-gray-800">{kid.name}</p>
 
-              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+              <div className="mt-1 flex flex-wrap gap-1 text-xs text-gray-500">
                 <span>
                   패들렛{" "}
                   <strong className="font-semibold text-gray-700">
-                    {kid.book_count}권
+                    {kid.book_count}
                   </strong>
                 </span>
-
+                ·
                 <span>
                   게시글{" "}
                   <strong className="font-semibold text-gray-700">
-                    {kid.book_count + 10}권
-                  </strong>
-                </span>
-
-                <span>
-                  차트{" "}
-                  <strong className="font-semibold text-gray-700">
-                    {kid.book_count + 5}권
+                    {kid.book_count + 10}
                   </strong>
                 </span>
               </div>
@@ -74,14 +74,14 @@ export default function SettingClassroomKidsField({
         ))}
 
         {/* 학생 추가 */}
-        <button
-          type="button"
+        <Button
+          variant="outline"
           onClick={() => openCreateKidModal(classroomId)}
-          className="flex w-full items-center justify-center gap-1 rounded-xl border border-dashed border-sky-300 bg-sky-50 py-3 text-sm font-semibold text-sky-500 transition-colors hover:bg-sky-100"
+          className="text-muted-foreground flex h-[70px] w-full items-center justify-center gap-1 border border-dashed bg-gray-100"
         >
           <Plus className="size-4" />
-          학생 추가
-        </button>
+          원아 등록{" "}
+        </Button>
       </div>
     </Field>
   );

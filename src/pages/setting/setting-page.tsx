@@ -12,23 +12,23 @@ export default function SettingPage() {
   if (isPending || !data) return <GlobalLoading />;
 
   return (
-    <main className="min-h-dvh bg-white">
-      <div className="mx-auto w-full max-w-2xl pb-10">
-        {/* 헤더 */}
-        <SubHeader title="설정" />
+    <div>
+      {/* 헤더 */}
+      <SubHeader title="설정" />
 
+      <main className="px-page-x mx-auto w-full max-w-2xl space-y-6 py-3 pb-10">
         {/* 유치원명 설정 */}
         <SettingNameField oriName={data.name} />
+
+        {/* 일일 게시글 작성한도 */}
+        <SettingDailyBookLimitField oriDailyBookLimit={data.daily_book_limit} />
 
         {/* 반 관리 */}
         <SettingClassroomsField classrooms={data.classrooms} />
 
-        {/* 차트 설정 */}
-        <SettingDailyBookLimitField oriDailyBookLimit={data.daily_book_limit} />
-
         {/* 계정 */}
         <SettingAccountField />
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
