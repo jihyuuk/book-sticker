@@ -66,6 +66,7 @@ function Input({
   size = "lg",
   startIcon,
   endIcon,
+  maxLength = 30,
   ...props
 }: InputProps) {
   return (
@@ -73,6 +74,7 @@ function Input({
       {startIcon}
 
       <input
+        maxLength={maxLength}
         data-slot="input"
         className="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent outline-none disabled:pointer-events-none disabled:cursor-not-allowed"
         {...props}
