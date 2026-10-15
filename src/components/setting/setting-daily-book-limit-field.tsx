@@ -5,7 +5,8 @@ import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
 
 import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
+import { Loader2 } from "lucide-react";
+import NumberInput from "../ui/number-input";
 
 type Props = {
   oriDailyBookLimit: number;
@@ -29,19 +30,9 @@ export default function SettingDailyBookLimitField({
   const canSubmit =
     dailyBookLimit.length > 0 &&
     dailyBookLimitNumber >= 1 &&
+    dailyBookLimitNumber <= 99999 &&
     dailyBookLimitNumber !== oriDailyBookLimit &&
     !isUpdating;
-
-  const handleDailyBookLimitChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const value = e.target.value;
-
-    // 숫자만 허용
-    if (!/^\d*$/.test(value)) return;
-
-    setDailyBookLimit(value);
-  };
 
   const handleUpdateClick = () => {
     if (!canSubmit) return;
@@ -52,10 +43,10 @@ export default function SettingDailyBookLimitField({
       },
       {
         onSuccess: () => {
-          toast.success("차트 설정이 변경되었습니다.");
+          toast.success("게시글 작성 한도가 변경되었습니다.");
         },
         onError: () => {
-          toast.error("차트 설정 변경에 실패했습니다.");
+          toast.error("게시글 작성 한도 변경에 실패했습니다.");
         },
       },
     );
@@ -66,16 +57,17 @@ export default function SettingDailyBookLimitField({
       <FieldLabel>일일 게시글 작성 한도</FieldLabel>
 
       <div className="flex gap-2">
-        <Input
-          inputMode="numeric"
-          pattern="[0-9]*"
+        <NumberInput
+          placeholder="일일 게시글 작성 한도를 입력해주세요"
           value={dailyBookLimit}
-          onChange={handleDailyBookLimitChange}
+          onValueChange={setDailyBookLimit}
           disabled={isUpdating}
+          maxLength={5}
+          aria-invalid={Number(dailyBookLimit) < 1}
         />
 
         <Button onClick={handleUpdateClick} disabled={!canSubmit}>
-          저장
+          {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
         </Button>
       </div>
     </Field>

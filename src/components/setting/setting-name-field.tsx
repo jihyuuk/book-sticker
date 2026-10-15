@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   oriName: string;
@@ -48,10 +49,11 @@ export default function SettingNameField({ oriName }: Props) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={isUpdating}
+          aria-invalid={!trimmedName}
         />
 
         <Button onClick={handleNameUpdateClick} disabled={!canSubmit}>
-          저장
+          {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
         </Button>
       </div>
     </Field>

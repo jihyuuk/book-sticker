@@ -32,11 +32,11 @@ export default function CreateClassroomModal({ open, setOpen }: Props) {
       },
       {
         onSuccess: () => {
-          toast.success("반이 추가되었습니다.");
+          toast.success("새로운 반이 생성되었습니다.");
           setOpen(false);
         },
         onError: () => {
-          toast.error("반 추가에 실패했습니다.");
+          toast.error("반 생성에 실패했습니다.");
         },
       },
     );
@@ -47,7 +47,7 @@ export default function CreateClassroomModal({ open, setOpen }: Props) {
 
     if (name.trim()) {
       openAlertModal({
-        title: "추가가 완료되지 않았습니다",
+        title: "작업이 완료되지 않았습니다",
         description: "이 화면에서 나가면 입력 중이던 내용이 사라집니다.",
         onAction: () => {
           setOpen(false);
@@ -67,36 +67,44 @@ export default function CreateClassroomModal({ open, setOpen }: Props) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className="rounded-lg p-5! pb-4.5! sm:max-w-sm"
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
+        onOpenAutoFocus={(event) => {
+          if (window.matchMedia("(pointer: coarse)").matches) {
+            event.preventDefault();
+          }
         }}
       >
-        <Field>
-          <FieldLabel
-            htmlFor="name"
-            className="text-headline-5 mb-1 font-semibold"
-          >
-            반 이름
-          </FieldLabel>
-
-          {/* 리팩토링 - truncate */}
-          <Input
-            id="name"
-            autoComplete="off"
-            placeholder="반 이름을 입력해주세요"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={isPending}
-          />
-        </Field>
-
-        <Button
-          onClick={handleSubmit}
-          className="mt-3 flex-1 rounded-md"
-          disabled={!canSubmit || isPending}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
         >
-          {isPending ? <Loader2 className="animate-spin" /> : "생성하기"}
-        </Button>
+          <Field>
+            <FieldLabel
+              htmlFor="classroom-name"
+              className="text-headline-5 mb-1 font-semibold"
+            >
+              반 이름
+            </FieldLabel>
+
+            <Input
+              id="classroom-name"
+              autoComplete="off"
+              placeholder="반 이름을 입력해주세요"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isPending}
+            />
+          </Field>
+
+          <Button
+            type="submit"
+            className="mt-3 w-full rounded-md"
+            disabled={!canSubmit || isPending}
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : "생성하기"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );
