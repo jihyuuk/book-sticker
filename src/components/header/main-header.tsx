@@ -39,12 +39,12 @@ export default function MainHeader({ isAdmin = false }: Props) {
       <div className="px-page-x mx-auto flex h-14 w-full max-w-2xl items-center justify-between md:h-16">
         {/* 로고 영역 */}
         <div className="flex items-center gap-2">
-          <a href="/">
+          <button type="button" onClick={() => window.location.reload()}>
             <span className="text-title-2 font-semibold tracking-wide">
               북메이트
             </span>
-          </a>
-          <span className="hidden rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white min-[300px]:inline-block">
+          </button>
+          <span className="hidden cursor-default rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white min-[300px]:inline-block">
             BETA
           </span>
         </div>
