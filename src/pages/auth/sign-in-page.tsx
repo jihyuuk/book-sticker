@@ -5,7 +5,7 @@ import { Loader2, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/sign-in-logo.png";
 import PasswordInput from "@/components/ui/password-input";
 import ClearableInput from "@/components/ui/clearable-input";
 import { EMAIL_REGEX } from "@/lib/constants";
@@ -22,13 +22,8 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState<LoginErrors | null>(null);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setLoginError((prev) => (prev ? { ...prev, email: undefined } : null));
-  };
-
-  const handleClear = () => {
-    setEmail("");
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
     setLoginError((prev) => (prev ? { ...prev, email: undefined } : null));
   };
 
@@ -40,6 +35,7 @@ export default function SignInPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setEmail(email.trim());
     setLoginError(null);
 
     const isEmailEmpty = !email.trim();
@@ -87,8 +83,8 @@ export default function SignInPage() {
         <div className="flex items-center justify-center p-4">
           <img
             src={logo}
-            width={714}
-            height={256}
+            width={400}
+            height={143}
             className="w-full max-w-50"
           />
         </div>
@@ -100,8 +96,8 @@ export default function SignInPage() {
               variant="underline"
               size="xl"
               value={email}
-              onChange={handleEmailChange}
-              onClear={handleClear}
+              onChange={(e) => handleEmailChange(e.target.value)}
+              onClear={() => handleEmailChange("")}
               placeholder="이메일 주소"
               startIcon={<Mail className="text-sky-600" />}
               disabled={isPending}
