@@ -1,17 +1,29 @@
 import { supabase } from "@/lib/supabse";
 
-type AuthParam = {
+type SignInParam = {
   email: string;
   password: string;
 };
 
+type SignUpParam = SignInParam & {
+  kindergartenName: string;
+};
+
 // 회원가입
-export async function signUp({ email, password }: AuthParam) {
+export async function signUp({
+  email,
+  password,
+  kindergartenName,
+}: SignUpParam) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: import.meta.env.VITE_DOMAIN_URL,
+      data: {
+        kindergarten_name: kindergartenName.trim(),
+        // 이메일 인증을 사용 할 경우
+        //emailRedirectTo: import.meta.env.VITE_DOMAIN_URL,
+      },
     },
   });
 
@@ -21,7 +33,7 @@ export async function signUp({ email, password }: AuthParam) {
 }
 
 // 로그인
-export async function signIn({ email, password }: AuthParam) {
+export async function signIn({ email, password }: SignInParam) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,

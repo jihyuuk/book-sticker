@@ -9,19 +9,18 @@ import {
 } from "@/components/ui/field";
 import PasswordInput from "@/components/ui/password-input";
 import { useSignUp } from "@/hooks/mutations/auth/use-sign-up";
-import { EMAIL_REGEX, VERIFICATION_EMAIL } from "@/lib/constants";
+import { EMAIL_REGEX } from "@/lib/constants";
 import { generateErrorMessage } from "@/lib/supabse-error";
 import { Loader2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 type FieldName = "kindergartenName" | "email" | "password" | "passwordConfirm";
 type FormErrors = Partial<Record<FieldName, string>>;
 
-export default function SignUpPage() {
-  const navigate = useNavigate();
+const PASSWORD_MIN_LENGTH = 6;
 
+export default function SignUpPage() {
   const { mutate: signUp, isPending } = useSignUp();
 
   const [kindergartenName, setKindergartenName] = useState("");
@@ -31,7 +30,7 @@ export default function SignUpPage() {
 
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const passwordValid = password.length >= 6;
+  const passwordValid = password.length >= PASSWORD_MIN_LENGTH;
 
   const passwordConfirmValid =
     passwordConfirm.length > 0 && password === passwordConfirm;
@@ -92,12 +91,14 @@ export default function SignUpPage() {
       {
         email: email.trim(),
         password,
+        kindergartenName: kindergartenName.trim(),
       },
       {
         onSuccess: () => {
-          sessionStorage.setItem(VERIFICATION_EMAIL, email.trim());
-          toast.success("인증 이메일을 보냈습니다.");
-          navigate("/verify-email", { replace: true });
+          // 이메일 인증을 사용 할 경우
+          // sessionStorage.setItem(VERIFICATION_EMAIL, email.trim());
+          // toast.success("인증 이메일을 보냈습니다.");
+          // navigate("/verify-email", { replace: true });
         },
         onError: (error) => {
           toast.error(generateErrorMessage(error));
@@ -110,7 +111,7 @@ export default function SignUpPage() {
     <div>
       <SubHeader title="회원가입" />
 
-      <main className="px-page-x mx-auto w-full max-w-2xl py-5">
+      <main className="px-page-x mx-auto w-full max-w-2xl py-4">
         <form onSubmit={handleSubmit} noValidate>
           <FieldGroup>
             {/* 유치원 이름 */}
