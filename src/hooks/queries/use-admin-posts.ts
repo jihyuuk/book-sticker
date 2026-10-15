@@ -1,11 +1,21 @@
 import { fetchAdminPosts } from "@/api/admin-post-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-export function useAdminPosts(classroomId: string | null | undefined) {
-  return useQuery({
-    queryKey: QUERY_KEYS.adminPosts.list(classroomId ?? null),
-    queryFn: () => fetchAdminPosts(classroomId ?? null),
-    enabled: classroomId !== undefined,
+export function useAdminPosts(classroomId: string | null, enabled = true) {
+  return useInfiniteQuery({
+    queryKey: QUERY_KEYS.adminPosts.list(classroomId),
+
+    queryFn: ({ pageParam }) =>
+      fetchAdminPosts({
+        classroomId,
+        cursor: pageParam,
+      }),
+
+    initialPageParam: null as string | null,
+
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+
+    enabled,
   });
 }
