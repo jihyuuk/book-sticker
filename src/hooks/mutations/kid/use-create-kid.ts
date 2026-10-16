@@ -9,7 +9,7 @@ export function useCreateKid() {
     mutationFn: createKid,
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.settingClassroom(variables.classroom_id),
+        queryKey: QUERY_KEYS.kid.list2(variables.classroomId),
       });
     },
   });

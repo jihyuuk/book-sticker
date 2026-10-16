@@ -1,8 +1,8 @@
-import { updateKid, type UpdateKidParam } from "@/api/kid-api";
+import { updateKid } from "@/api/kid-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type UpdateKidMutationParam = UpdateKidParam & {
+type UpdateKidMutationParam = Parameters<typeof updateKid>[0] & {
   classroomId: string;
 };
 
@@ -10,16 +10,16 @@ export function useUpdateKid() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, name, book_count }: UpdateKidMutationParam) =>
+    mutationFn: ({ kidId, name, bookCount }: UpdateKidMutationParam) =>
       updateKid({
-        id,
+        kidId,
         name,
-        book_count,
+        bookCount,
       }),
 
     onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.settingClassroom(variables.classroomId),
+        queryKey: QUERY_KEYS.kid.list2(variables.classroomId),
       });
     },
   });

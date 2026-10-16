@@ -93,9 +93,9 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
     if (mode.type === "CREATE") {
       createKid.mutate(
         {
-          classroom_id: classroomId,
+          classroomId,
           name: trimmedName,
-          book_count: Number(bookCount),
+          bookCount: Number(bookCount),
         },
         {
           onSuccess: () => {
@@ -114,10 +114,10 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
     // 수정
     updateKid.mutate(
       {
-        id: mode.kid.id,
+        kidId: mode.kid.id,
         classroomId: mode.kid.classroom_id,
         name: trimmedName,
-        book_count: Number(bookCount),
+        bookCount: Number(bookCount),
       },
       {
         onSuccess: () => {

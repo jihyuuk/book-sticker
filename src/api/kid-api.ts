@@ -1,10 +1,18 @@
 import { supabase } from "@/lib/supabse";
-import type { Kid } from "@/types/entity-types";
 
-export type CreateKidParam = Pick<Kid, "classroom_id" | "name" | "book_count">;
-export type UpdateKidParam = Pick<Kid, "id" | "name" | "book_count">;
+type CreateKidParams = {
+  classroomId: string;
+  name: string;
+  bookCount: number;
+};
 
-//모든 아이 조회
+type UpdateKidParams = {
+  kidId: string;
+  name: string;
+  bookCount: number;
+};
+
+//반의 모든 원아 조회
 export async function fetchKidsByClassroomId(classroom_id: string) {
   const { data, error } = await supabase
     .from("kid")
@@ -17,11 +25,19 @@ export async function fetchKidsByClassroomId(classroom_id: string) {
   return data;
 }
 
-// 생성
-export async function createKid(request: CreateKidParam) {
+// 원아 생성
+export async function createKid({
+  classroomId,
+  name,
+  bookCount,
+}: CreateKidParams) {
   const { data, error } = await supabase
     .from("kid")
-    .insert(request)
+    .insert({
+      classroom_id: classroomId,
+      name: name.trim(),
+      book_count: bookCount,
+    })
     .select()
     .single();
 
@@ -30,19 +46,31 @@ export async function createKid(request: CreateKidParam) {
   return data;
 }
 
-//수정
-export async function updateKid(request: UpdateKidParam): Promise<void> {
-  const { id, ...updates } = request;
-
-  const { error } = await supabase.from("kid").update(updates).eq("id", id);
+// 원아 수정
+export async function updateKid({ kidId, name, bookCount }: UpdateKidParams) {
+  const { data, error } = await supabase
+    .from("kid")
+    .update({
+      name: name.trim(),
+      book_count: bookCount,
+    })
+    .eq("id", kidId)
+    .select()
+    .single();
 
   if (error) throw error;
+
+  return data;
 }
 
-//삭제
-// 리팩토링 - 게시글 이미지, 프로필 이미지 Storage 정리를 위해 Edge Function으로 전환
-export async function deleteKidById(id: Kid["id"]): Promise<void> {
-  const { error } = await supabase.from("kid").delete().eq("id", id);
+// 원아 삭제
+export async function deleteKid(kidId: string) {
+  const { error } = await supabase
+    .from("kid")
+    .delete()
+    .eq("id", kidId)
+    .select("id")
+    .single();
 
   if (error) throw error;
 }

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useParams } from "react-router";
 import { useUpdateClassroom } from "@/hooks/mutations/classroom/use-update-classroom";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   oriName: string;
@@ -24,7 +25,9 @@ export default function SettingClassroomNameField({ oriName }: Props) {
   const canSubmit =
     trimmedName.length > 0 && trimmedName !== oriName && !isUpdating;
 
-  const handleNameUpdateClick = () => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!canSubmit || !classroomId) return;
 
     mutate(
@@ -44,21 +47,25 @@ export default function SettingClassroomNameField({ oriName }: Props) {
   };
 
   return (
-    <Field>
-      <FieldLabel>반 이름</FieldLabel>
+    <form onSubmit={handleSubmit}>
+      <Field>
+        <FieldLabel htmlFor="classroom-name">반 이름</FieldLabel>
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="반 이름을 입력해주세요"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={isUpdating}
-        />
+        <div className="flex gap-2">
+          <Input
+            id="classroom-name"
+            placeholder="반 이름을 입력해주세요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={isUpdating}
+            aria-invalid={!trimmedName}
+          />
 
-        <Button onClick={handleNameUpdateClick} disabled={!canSubmit}>
-          저장
-        </Button>
-      </div>
-    </Field>
+          <Button type="submit" disabled={!canSubmit}>
+            {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
+          </Button>
+        </div>
+      </Field>
+    </form>
   );
 }

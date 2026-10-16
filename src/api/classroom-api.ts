@@ -43,11 +43,26 @@ export async function createClassroom() {
 
 export type CreateClassroomParam = Pick<Classroom, "name" | "is_public">;
 
-export type UpdateClassroomParam = Pick<Classroom, "id" | "name" | "is_public">;
+export type UpdateClassroomParam = {
+  id: Classroom["id"];
+} & Partial<Pick<Classroom, "name" | "is_public">>;
 
 // ============================================================
 // 조회
 // ============================================================
+
+// 반 단건 조회
+export async function fetchClassroom2(classroomId: string) {
+  const { data, error } = await supabase
+    .from("classroom")
+    .select("*")
+    .eq("id", classroomId)
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
 
 // 현재 로그인한 유치원 계정의 모든 classroom 조회
 export async function fetchClassrooms() {
@@ -107,6 +122,17 @@ export async function deleteClassroom(id: Classroom["id"]): Promise<void> {
       classroomId: id,
     },
   });
+
+  if (error) throw error;
+}
+
+export async function deleteClassroom2(classroomId: string) {
+  const { error } = await supabase
+    .from("classroom")
+    .delete()
+    .eq("id", classroomId)
+    .select("id")
+    .single();
 
   if (error) throw error;
 }

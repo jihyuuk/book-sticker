@@ -1,13 +1,13 @@
 import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { Field, FieldLabel } from "../ui/field";
 import type { Kid } from "@/types/entity-types";
-import { useOpenCreateKidModal } from "@/store/create-kid-modal-store";
-import { useOpenUpdateKidModal } from "@/store/update-kid-modal";
 import { Button } from "../ui/button";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
 import { useDeleteKid } from "@/hooks/mutations/kid/use-delete-kid";
 import { useState } from "react";
+import type { KidModalState } from "../modal/kid-form-modal";
+import KidFormModal from "../modal/kid-form-modal";
 
 type Props = {
   classroomId: string;
@@ -20,8 +20,7 @@ export default function SettingClassroomKidsField({
 }: Props) {
   //모달
   const openAlertModal = useOpenAlertModal();
-  const openCreateKidModal = useOpenCreateKidModal();
-  const openUpdateKidModal = useOpenUpdateKidModal();
+  const [kidModal, setKidModal] = useState<KidModalState>(null);
 
   //뮤테이션
   const deleteKid = useDeleteKid();
@@ -72,100 +71,111 @@ export default function SettingClassroomKidsField({
   };
 
   return (
-    <Field>
-      <div className="flex items-center gap-2">
-        <FieldLabel>원아 관리</FieldLabel>
+    <>
+      <Field>
+        <div className="flex items-center gap-2">
+          <FieldLabel>원아 관리</FieldLabel>
 
-        <span className="text-xs text-gray-700">
-          <strong className="text-primary">{kids.length}</strong>명
-        </span>
-      </div>
+          <span className="text-xs text-gray-700">
+            <strong className="text-primary">{kids.length}</strong>명
+          </span>
+        </div>
 
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        {kids.map((kid) => {
-          const isDeleting = deletingIds.has(kid.id);
-          return (
-            <div
-              key={kid.id}
-              className={`flex w-full min-w-0 items-center rounded-md border bg-white transition-colors ${
-                isDeleting
-                  ? "pointer-events-none opacity-50"
-                  : "hover:bg-gray-50"
-              }`}
-            >
-              {/* 수정 버튼 */}
-              <button
-                type="button"
-                onClick={() => openUpdateKidModal(kid)}
-                className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-0 text-left"
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {kids.map((kid) => {
+            const isDeleting = deletingIds.has(kid.id);
+            return (
+              <div
+                key={kid.id}
+                className={`flex w-full min-w-0 items-center rounded-md border bg-white transition-colors ${
+                  isDeleting
+                    ? "pointer-events-none opacity-50"
+                    : "hover:bg-gray-50"
+                }`}
               >
-                {/* 프로필 이미지 */}
-                <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
-                  {kid.profile_image_url ? (
-                    <img
-                      src={kid.profile_image_url}
-                      alt={`${kid.name} 프로필`}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-sky-600">
-                      {kid.name.slice(0, 1)}
-                    </div>
-                  )}
-                </div>
-
-                {/* 아이 정보 */}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-semibold text-gray-900">
-                    {kid.name}
-                  </p>
-
-                  <div className="mt-1 flex flex-wrap gap-1 text-xs text-gray-500">
-                    <span>
-                      패들렛{" "}
-                      <strong className="font-semibold text-gray-700">
-                        {kid.book_count}
-                      </strong>
-                    </span>
-                    ·
-                    <span>
-                      게시글{" "}
-                      <strong className="font-semibold text-gray-700">
-                        {kid.book_count + 10}
-                      </strong>
-                    </span>
+                {/* 수정 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => setKidModal({ type: "UPDATE", kid })}
+                  className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-0 text-left"
+                >
+                  {/* 프로필 이미지 */}
+                  <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
+                    {kid.profile_image_url ? (
+                      <img
+                        src={kid.profile_image_url}
+                        alt={`${kid.name} 프로필`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-sky-600">
+                        {kid.name.slice(0, 1)}
+                      </div>
+                    )}
                   </div>
-                </div>
-              </button>
 
-              {/* 삭제 버튼 */}
-              <button
-                type="button"
-                disabled={isDeleting}
-                onClick={() => handleDelete(kid.id)}
-                aria-label={`${kid.name} 삭제`}
-                className="shrink-0 p-3"
-              >
-                {isDeleting ? (
-                  <LoaderCircle className="text-muted-foreground size-5 animate-spin" />
-                ) : (
-                  <Trash2 className="text-destructive size-5" />
-                )}
-              </button>
-            </div>
-          );
-        })}
+                  {/* 아이 정보 */}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-base font-semibold text-gray-900">
+                      {kid.name}
+                    </p>
 
-        {/* 학생 추가 */}
-        <Button
-          variant="outline"
-          onClick={() => openCreateKidModal(classroomId)}
-          className="text-muted-foreground flex h-17.5 w-full items-center justify-center gap-1 border border-dashed bg-gray-100"
-        >
-          <Plus className="size-4" strokeWidth={1.5} />
-          원아 등록
-        </Button>
-      </div>
-    </Field>
+                    <div className="mt-1 flex flex-wrap gap-1 text-xs text-gray-500">
+                      <span>
+                        패들렛{" "}
+                        <strong className="font-semibold text-gray-700">
+                          {kid.book_count}
+                        </strong>
+                      </span>
+                      ·
+                      <span>
+                        게시글{" "}
+                        <strong className="font-semibold text-gray-700">
+                          {kid.book_count + 10}
+                        </strong>
+                      </span>
+                    </div>
+                  </div>
+                </button>
+
+                {/* 삭제 버튼 */}
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={() => handleDelete(kid.id)}
+                  aria-label={`${kid.name} 삭제`}
+                  className="shrink-0 p-3"
+                >
+                  {isDeleting ? (
+                    <LoaderCircle className="text-muted-foreground size-5 animate-spin" />
+                  ) : (
+                    <Trash2 className="text-destructive size-5" />
+                  )}
+                </button>
+              </div>
+            );
+          })}
+
+          {/* 학생 추가 */}
+          <Button
+            variant="outline"
+            onClick={() => setKidModal({ type: "CREATE" })}
+            className="text-muted-foreground flex h-17.5 w-full items-center justify-center gap-1 border border-dashed bg-gray-100"
+          >
+            <Plus className="size-4" strokeWidth={1.5} />
+            원아 등록
+          </Button>
+        </div>
+      </Field>
+
+      <KidFormModal
+        classroomId={classroomId}
+        mode={kidModal}
+        onClose={() => setKidModal(null)}
+      />
+    </>
   );
 }
+
+//zustand삭제 2
+//모달 삭제 2
