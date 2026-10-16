@@ -16,7 +16,7 @@ type Props = {
 
 export default function PostDropdownAdminMenu({ post }: Props) {
   const openAlertModal = useOpenAlertModal();
-  const { mutate: deletePost } = useDeletePostByAdmin();
+  const { mutateAsync: deletePost } = useDeletePostByAdmin();
 
   const handleDelete = () => {
     openAlertModal({
@@ -24,15 +24,13 @@ export default function PostDropdownAdminMenu({ post }: Props) {
       description: "삭제한 게시물은 다시 복구할 수 없습니다.",
       actionVariant: "destructive",
       actionLabel: "삭제하기",
-      onAction: () => {
-        deletePost(post.id, {
-          onSuccess: () => {
-            toast.success("게시물이 삭제되었습니다.");
-          },
-          onError: () => {
-            toast.error("게시물 삭제에 실패했습니다.");
-          },
-        });
+      onAction: async () => {
+        try {
+          await deletePost(post.id);
+          toast.success("게시물이 삭제되었습니다.");
+        } catch {
+          toast.error("게시물 삭제에 실패했습니다.");
+        }
       },
     });
   };
@@ -48,7 +46,7 @@ export default function PostDropdownAdminMenu({ post }: Props) {
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem onClick={handleDelete} variant="destructive">
           <div className="flex items-center gap-1.5 py-2">
-            <Trash2 size={4} />
+            <Trash2 size={6} />
             <span>삭제</span>
           </div>
         </DropdownMenuItem>

@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { deletePostByAdmin, type AdminPost } from "@/api/admin-post-api";
+import { deletePostByAdmin } from "@/api/admin-post-api";
 
 export function useDeletePostByAdmin() {
   const queryClient = useQueryClient();
@@ -9,17 +8,11 @@ export function useDeletePostByAdmin() {
   return useMutation({
     mutationFn: deletePostByAdmin,
 
-    onSuccess: (_, postId) => {
-      queryClient.setQueriesData<AdminPost[]>(
-        {
-          queryKey: QUERY_KEYS.adminPosts.all,
-        },
-        (old) => {
-          if (!old) return old;
-
-          return old.filter((post) => post.id !== postId);
-        },
-      );
+    //리팩토링 고려 새로고침이 아닌 해당값만 지우게
+    onSuccess: () => {
+      return queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.adminPosts.all,
+      });
     },
   });
 }
