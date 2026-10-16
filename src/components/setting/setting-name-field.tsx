@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
@@ -23,7 +23,9 @@ export default function SettingNameField({ oriName }: Props) {
   const canSubmit =
     trimmedName.length > 0 && trimmedName !== oriName && !isUpdating;
 
-  const handleNameUpdateClick = () => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!canSubmit) return;
 
     mutate(
@@ -40,22 +42,25 @@ export default function SettingNameField({ oriName }: Props) {
   };
 
   return (
-    <Field>
-      <FieldLabel>유치원명</FieldLabel>
+    <form onSubmit={handleSubmit}>
+      <Field>
+        <FieldLabel htmlFor="kindergarten-name">유치원명</FieldLabel>
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="유치원명을 입력해주세요"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={isUpdating}
-          aria-invalid={!trimmedName}
-        />
+        <div className="flex gap-2">
+          <Input
+            id="kindergarten-name"
+            placeholder="유치원명을 입력해주세요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={isUpdating}
+            aria-invalid={!trimmedName}
+          />
 
-        <Button onClick={handleNameUpdateClick} disabled={!canSubmit}>
-          {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
-        </Button>
-      </div>
-    </Field>
+          <Button type="submit" disabled={!canSubmit}>
+            {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
+          </Button>
+        </div>
+      </Field>
+    </form>
   );
 }

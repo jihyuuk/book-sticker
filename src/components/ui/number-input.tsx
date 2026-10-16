@@ -6,9 +6,15 @@ type Props = Omit<
 > & {
   value: string;
   onValueChange: (value: string) => void;
+  removeLeadingZeros?: boolean;
 };
 
-export default function NumberInput({ value, onValueChange, ...props }: Props) {
+export default function NumberInput({
+  value,
+  onValueChange,
+  removeLeadingZeros = false,
+  ...props
+}: Props) {
   return (
     <Input
       {...props}
@@ -17,7 +23,12 @@ export default function NumberInput({ value, onValueChange, ...props }: Props) {
       pattern="[0-9]*"
       value={value}
       onChange={(e) => {
-        const nextValue = e.target.value.replace(/\D/g, "");
+        let nextValue = e.target.value.replace(/\D/g, "");
+
+        if (removeLeadingZeros) {
+          nextValue = nextValue.replace(/^0+(?=\d)/, "");
+        }
+
         onValueChange(nextValue);
       }}
     />

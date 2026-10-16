@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
@@ -34,7 +34,9 @@ export default function SettingDailyBookLimitField({
     dailyBookLimitNumber !== oriDailyBookLimit &&
     !isUpdating;
 
-  const handleUpdateClick = () => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!canSubmit) return;
 
     mutate(
@@ -53,23 +55,29 @@ export default function SettingDailyBookLimitField({
   };
 
   return (
-    <Field className="w-full">
-      <FieldLabel>일일 게시글 작성 한도</FieldLabel>
+    <form onSubmit={handleSubmit}>
+      <Field className="w-full">
+        <FieldLabel htmlFor="daily-book-limit">
+          일일 게시글 작성 한도
+        </FieldLabel>
 
-      <div className="flex gap-2">
-        <NumberInput
-          placeholder="일일 게시글 작성 한도를 입력해주세요"
-          value={dailyBookLimit}
-          onValueChange={setDailyBookLimit}
-          disabled={isUpdating}
-          maxLength={5}
-          aria-invalid={Number(dailyBookLimit) < 1}
-        />
+        <div className="flex gap-2">
+          <NumberInput
+            id="daily-book-limit"
+            placeholder="일일 게시글 작성 한도를 입력해주세요"
+            value={dailyBookLimit}
+            onValueChange={setDailyBookLimit}
+            disabled={isUpdating}
+            maxLength={5}
+            aria-invalid={Number(dailyBookLimit) < 1}
+            removeLeadingZeros
+          />
 
-        <Button onClick={handleUpdateClick} disabled={!canSubmit}>
-          {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
-        </Button>
-      </div>
-    </Field>
+          <Button type="submit" disabled={!canSubmit}>
+            {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
+          </Button>
+        </div>
+      </Field>
+    </form>
   );
 }

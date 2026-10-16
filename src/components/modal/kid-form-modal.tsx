@@ -140,46 +140,61 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
     >
       <DialogContent
         className="rounded-lg p-5! pb-4.5! sm:max-w-sm"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="kid-name">이름</FieldLabel>
-            <Input
-              id="kid-name"
-              autoComplete="off"
-              placeholder="이름을 입력해 주세요"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isPending}
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="kid-book-count">패들렛 게시글 수</FieldLabel>
-            <NumberInput
-              value={bookCount}
-              onValueChange={setBookCount}
-              disabled={isPending}
-            />
-          </Field>
-        </FieldGroup>
-
-        <Button
-          className="mt-3 w-full"
-          onClick={handleSubmit}
-          disabled={
-            isPending || !name.trim() || !bookCount || (isUpdate && !isChanged)
+        onOpenAutoFocus={(event) => {
+          if (window.matchMedia("(pointer: coarse)").matches) {
+            event.preventDefault();
           }
+        }}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
         >
-          {isPending ? (
-            <Loader2 className="animate-spin" />
-          ) : isUpdate ? (
-            "수정하기"
-          ) : (
-            "등록하기"
-          )}
-        </Button>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="kid-name">이름</FieldLabel>
+              <Input
+                id="kid-name"
+                autoComplete="off"
+                placeholder="이름을 입력해 주세요"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isPending}
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="kid-book-count">패들렛 게시글 수</FieldLabel>
+              <NumberInput
+                value={bookCount}
+                onValueChange={setBookCount}
+                disabled={isPending}
+                removeLeadingZeros
+              />
+            </Field>
+          </FieldGroup>
+
+          <Button
+            type="submit"
+            className="mt-3 w-full"
+            disabled={
+              isPending ||
+              !name.trim() ||
+              !bookCount ||
+              (isUpdate && !isChanged)
+            }
+          >
+            {isPending ? (
+              <Loader2 className="animate-spin" />
+            ) : isUpdate ? (
+              "수정하기"
+            ) : (
+              "등록하기"
+            )}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

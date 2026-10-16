@@ -1,44 +1,68 @@
-import GlobalLoading from "@/components/global-loading";
+import GlobalError from "@/components/global-error";
 import SubHeader from "@/components/header/sub-header";
 import SettingClassroomDeleteField from "@/components/setting-classroom/setting-classroom-delete-field";
 import SettingClassroomKidsField from "@/components/setting-classroom/setting-classroom-kids-field";
 import SettingClassroomNameField from "@/components/setting-classroom/setting-classroom-name-field";
 import SettingClassroomPublicLinkField from "@/components/setting-classroom/setting-classroom-public-link-field";
-import { useSettingClassroomData } from "@/hooks/queries/use-setting-classroom-data";
+import SettingClassroomPageSkeleton from "@/components/skeletons/setting-classroom-skeleton";
+import { useClassroom } from "@/hooks/queries/use-classroom";
+import { useKids } from "@/hooks/queries/use-kids";
 import { DOMAIN_URL } from "@/lib/constants";
 import { useParams } from "react-router";
+import NotFoundPage from "../not-found-page";
 
 export default function SettingClassroomPage() {
-  //const openCreateKidModal = useOpenCreateKidModal();
-  //const openUpdateKidModal = useOpenUpdateKidModal();
   const { classroomId } = useParams();
 
-  const { data, isPending } = useSettingClassroomData(classroomId ?? "");
+  // 반 정보
+  const { data: classroom, isPending: isClassroomPending } = useClassroom(
+    classroomId ?? "",
+  );
 
-  if (!isPending) console.log(data);
+  // 원아 목록
+  const { data: kids, isPending: isKidsPending } = useKids(classroomId ?? "");
 
-  if (isPending || !data || !classroomId) return <GlobalLoading />;
+  const isLoading = isClassroomPending || isKidsPending;
+  const isError = !classroom || !kids;
 
-  const publicUrl = `${DOMAIN_URL}/classroom/${data.classroom.public_id}/posts`;
+  if (!classroomId) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div>
-      {/* 헤더 */}
       <SubHeader title="반 설정" />
 
-      <main className="px-page-x mx-auto w-full max-w-2xl space-y-6 py-3 pb-10">
-        {/* 반 이름 */}
-        <SettingClassroomNameField oriName={data.classroom.name ?? ""} />
+      <main className="px-page-x mx-auto w-full max-w-2xl py-3">
+        {isLoading ? (
+          // 로딩
+          <SettingClassroomPageSkeleton />
+        ) : isError ? (
+          // 에러
+          <GlobalError className="h-100" />
+        ) : (
+          // 정상
+          <div className="space-y-6 pb-20">
+            {/* 반 이름 */}
+            <SettingClassroomNameField oriName={classroom.name ?? ""} />
 
-        {/* 공개 주소 */}
-        <SettingClassroomPublicLinkField publicUrl={publicUrl} />
+            {/* 공개 주소 */}
+            <SettingClassroomPublicLinkField
+              publicUrl={`${DOMAIN_URL}/classroom/${classroom.public_id}/posts`}
+            />
 
-        {/* 학생 관리 */}
-        <SettingClassroomKidsField classroomId={classroomId} kids={data.kids} />
+            {/* 원아 관리 */}
+            <SettingClassroomKidsField classroomId={classroomId} kids={kids} />
 
-        {/* 반 삭제 */}
-        <SettingClassroomDeleteField />
+            {/* 반 삭제 */}
+            <SettingClassroomDeleteField classroomId={classroomId} />
+          </div>
+        )}
       </main>
     </div>
   );
 }
+
+//1. 로딩분리
+//2. 반이름 필드 수정하기로 수정, aria-invalid적용
+//3. 각각 api 점검
