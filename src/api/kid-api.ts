@@ -12,17 +12,25 @@ type UpdateKidParams = {
   bookCount: number;
 };
 
-//반의 모든 원아 조회
-export async function fetchKidsByClassroomId(classroom_id: string) {
+// 반의 모든 원아 + 게시글 수 조회
+export async function fetchKidsByClassroomId(classroomId: string) {
   const { data, error } = await supabase
     .from("kid")
-    .select("*")
-    .eq("classroom_id", classroom_id)
+    .select(
+      `
+      *,
+      posts:post(count)
+    `,
+    )
+    .eq("classroom_id", classroomId)
     .order("name");
 
   if (error) throw error;
 
-  return data;
+  return data.map(({ posts, ...kid }) => ({
+    ...kid,
+    post_count: posts?.[0]?.count ?? 0,
+  }));
 }
 
 // 원아 생성

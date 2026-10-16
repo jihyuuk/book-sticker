@@ -9,9 +9,13 @@ import { useState } from "react";
 import type { KidModalState } from "../modal/kid-form-modal";
 import KidFormModal from "../modal/kid-form-modal";
 
+type KidWithPostCount = Kid & {
+  post_count: number;
+};
+
 type Props = {
   classroomId: string;
-  kids: Kid[];
+  kids: KidWithPostCount[];
 };
 
 export default function SettingClassroomKidsField({
@@ -131,7 +135,7 @@ export default function SettingClassroomKidsField({
                       <span>
                         게시글{" "}
                         <strong className="font-semibold text-gray-700">
-                          {kid.book_count + 10}
+                          {kid.post_count}
                         </strong>
                       </span>
                     </div>
