@@ -6,7 +6,8 @@ export const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
 export const VERIFICATION_EMAIL = "verificationEmail";
 
 //로컬 스토리지 키
-export const STORAGE_KEY = "bookmate-selected-kid";
+export const SELECTED_KID_KEY = "bookmate-selected-kid";
+export const SELECTED_CLASSROOM_KEY = "selectedClassroomId";
 
 //차트 관련 기본 값
 export const INFO_HEIGHT = 64;
@@ -16,3 +17,6 @@ export const DEFALUT_CHART_SCALE = 30; //10단위로
 
 //이메일 정규식
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+//무한스크롤 감지 기준
+export const INFINITE_SCROLL_ROOT_MARGIN = "500px";

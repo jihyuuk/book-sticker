@@ -48,24 +48,39 @@ export type UpdatePostResponse = {
   }[];
 };
 
+type FetchPostListParams = {
+  publicId: string;
+  cursor: string | null;
+};
+
+export type PostListPageData = PostListData & {
+  nextCursor: string | null;
+};
+
 // ============================================================
 // 조회
 // ============================================================
 
 // 게시글 목록 조회
-export async function fetchPostListData(
-  publicId: string,
-): Promise<PostListData | null> {
-  const { data, error } = await supabase.functions.invoke<PostListData | null>(
+export async function fetchPostListData({
+  publicId,
+  cursor,
+}: FetchPostListParams): Promise<PostListPageData> {
+  const { data, error } = await supabase.functions.invoke<PostListPageData>(
     "fetch-public-posts",
     {
       body: {
         publicId,
+        cursor,
       },
     },
   );
 
   if (error) throw error;
+
+  if (!data) {
+    throw new Error("게시글 데이터를 불러오지 못했습니다.");
+  }
 
   return data;
 }
