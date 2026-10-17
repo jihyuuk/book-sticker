@@ -6,6 +6,7 @@ import BookBarcodeScanner from "@/components/book/book-barcode-scanner";
 import { useBookByIsbn } from "@/hooks/mutations/book/use-book-by-isbn";
 import type { BookInfoData } from "@/components/book/book-info";
 import BookBarcodeImagePicker from "./book-barcode-image-picker";
+import SubHeader from "@/components/header/sub-header";
 
 type Props = {
   onClose: () => void;
@@ -97,17 +98,17 @@ export default function BookScannerView({
   return (
     <section className="relative flex h-full min-h-0 flex-col bg-neutral-950 text-white">
       {/* 헤더 */}
-      <header className="relative z-20 flex h-14 shrink-0 items-center justify-center bg-slate-900 px-4">
+      <header className="bg-primary px-page-x relative z-20 flex h-14 shrink-0 items-center justify-center">
         <button
           type="button"
           onClick={onClose}
-          className="absolute left-4 flex size-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/15"
+          className="absolute left-4 flex size-10 items-center justify-center rounded-full"
           aria-label="닫기"
         >
-          <X className="size-5" />
+          <X className="size-6" />
         </button>
 
-        <h1 className="text-lg font-semibold">책 조회하기</h1>
+        <h1 className="text-lg font-semibold">바코드 스캔</h1>
       </header>
 
       {/* 카메라 영역 */}
@@ -140,7 +141,7 @@ export default function BookScannerView({
       </div>
 
       {/* 보조 기능 */}
-      <div className="relative z-20 shrink-0 bg-slate-900 px-6 pt-4 pb-[max(28px,env(safe-area-inset-bottom))]">
+      <div className="bg-primary relative z-20 shrink-0 px-6 pt-4 pb-[max(28px,env(safe-area-inset-bottom))]">
         <div className="mx-auto flex max-w-sm items-start justify-around">
           <BookBarcodeImagePicker onDetected={handleDetected} />
 
@@ -149,11 +150,11 @@ export default function BookScannerView({
             onClick={onSearchIsbn}
             className="flex w-20 flex-col items-center gap-2"
           >
-            <span className="flex size-12 items-center justify-center rounded-full bg-white/15">
+            <span className="flex size-12 items-center justify-center rounded-full bg-white/20">
               <Search className="size-5" />
             </span>
 
-            <span className="text-xs text-white/80">ISBN 검색</span>
+            <span className="text-sm font-medium text-white">ISBN 검색</span>
           </button>
 
           <button
@@ -161,11 +162,11 @@ export default function BookScannerView({
             onClick={onManualInput}
             className="flex w-20 flex-col items-center gap-2"
           >
-            <span className="flex size-12 items-center justify-center rounded-full bg-white/15">
+            <span className="flex size-12 items-center justify-center rounded-full bg-white/20">
               <PencilLine className="size-5" />
             </span>
 
-            <span className="text-xs text-white/80">직접 입력</span>
+            <span className="text-sm font-medium text-white">직접 입력</span>
           </button>
         </div>
       </div>

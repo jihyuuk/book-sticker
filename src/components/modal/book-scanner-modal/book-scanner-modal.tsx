@@ -44,7 +44,7 @@ export default function BookScannerModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="h-dvh w-screen max-w-none gap-0 overflow-hidden rounded-none border-0 p-0 sm:h-[90dvh] sm:max-h-[760px] sm:max-w-lg sm:rounded-2xl"
+        className="h-dvh w-screen max-w-none gap-0 overflow-hidden rounded-none border-0 p-0 sm:h-[90dvh] sm:max-h-190 sm:max-w-lg sm:rounded-2xl"
       >
         <section className="relative flex h-full min-h-0 flex-col">
           {view === "SCANNER" && (

@@ -1,11 +1,13 @@
-import { ArrowLeft, ImagePlus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { BookInfoData } from "@/components/book/book-info";
+import SubHeader from "@/components/header/sub-header";
+import { cn } from "cn";
+import PostSubmitButton from "@/components/post-field/post-submit-button";
 
 type Props = {
   onBack: () => void;
@@ -34,9 +36,16 @@ export default function BookManualInputView({ onBack, onConfirm }: Props) {
   };
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-white">
+    <section className="h-full bg-white">
       {/* 헤더 */}
-      <header className="relative flex h-14 shrink-0 items-center justify-center border-b px-4">
+      <header className="px-page-x flex h-14 items-center justify-start">
+        <button type="button" onClick={onBack} aria-label="이전">
+          <ArrowLeft className="size-6" strokeWidth={1.5} />
+        </button>
+      </header>
+
+      {/* 헤더 */}
+      {/* <header className="relative flex h-14 shrink-0 items-center justify-center px-4">
         <button
           type="button"
           onClick={onBack}
@@ -45,72 +54,69 @@ export default function BookManualInputView({ onBack, onConfirm }: Props) {
         >
           <ArrowLeft className="size-5" />
         </button>
-
-        <h1 className="text-lg font-semibold">직접 입력</h1>
       </header>
 
+      <h2 className="px-page-x text-xl font-semibold">ISBN으로 책 검색</h2> */}
+
       {/* 입력 영역 */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="space-y-1 py-4">
-          {/* 표지 기능은 나중에 구현 */}
-          <Field className="w-full px-4 py-3">
-            <FieldLabel className="text-sm font-semibold">책 표지</FieldLabel>
+      <div className="px-page-x space-y-4 pb-4">
+        {/* 표지 기능은 나중에 구현 */}
+        <Field>
+          <FieldLabel>
+            책 표지 <span className="text-destructive">*</span>
+          </FieldLabel>
 
-            <div className="flex">
-              <button
-                type="button"
-                disabled
-                className="flex aspect-[20/29] w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-gray-50 text-gray-400"
-              >
-                <ImagePlus className="size-4" />
-                <span className="text-[10px]">표지 추가</span>
-              </button>
-            </div>
-          </Field>
+          <div>
+            <button
+              type="button" // onClick={() => inputRef.current?.click()}
+              // disabled={disabled}
+              className={cn(
+                "text-muted-foreground flex size-23 flex-col items-center justify-center gap-1 rounded-lg border border-dashed bg-gray-100 disabled:opacity-50",
+                "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
+                "active:bg-sky-100",
+              )}
+            >
+              <Plus className="size-5" strokeWidth={1.5} />
+            </button>
+          </div>
+        </Field>
 
-          <BookInputField
-            label="책 이름"
-            value={title}
-            placeholder="책 이름을 입력해주세요"
-            onValueChange={setTitle}
-          />
+        <BookInputField
+          label="책 이름"
+          value={title}
+          placeholder="책 이름을 입력해주세요"
+          onValueChange={setTitle}
+          isRequired
+        />
 
-          <BookInputField
-            label="저자"
-            value={author}
-            placeholder="저자를 입력해주세요"
-            onValueChange={setAuthor}
-          />
+        <BookInputField
+          label="저자"
+          value={author}
+          placeholder="저자를 입력해주세요"
+          onValueChange={setAuthor}
+          isRequired
+        />
 
-          <BookInputField
-            label="발행처"
-            value={publisher}
-            placeholder="발행처를 입력해주세요"
-            onValueChange={setPublisher}
-          />
+        <BookInputField
+          label="발행처"
+          value={publisher}
+          placeholder="발행처를 입력해주세요"
+          onValueChange={setPublisher}
+        />
 
-          <BookInputField
-            label="ISBN"
-            value={isbn}
-            placeholder="ISBN을 입력해주세요"
-            inputMode="numeric"
-            onValueChange={(value) => {
-              setIsbn(value.replace(/\D/g, "").slice(0, 13));
-            }}
-          />
-        </div>
+        <BookInputField
+          label="ISBN"
+          value={isbn}
+          placeholder="ISBN을 입력해주세요"
+          inputMode="numeric"
+          onValueChange={(value) => {
+            setIsbn(value.replace(/\D/g, "").slice(0, 13));
+          }}
+        />
       </div>
 
       {/* 하단 버튼 */}
-      <div className="shrink-0 px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          className="h-12 w-full bg-sky-500 text-base hover:bg-sky-600"
-        >
-          책 선택
-        </Button>
-      </div>
+      <PostSubmitButton onClick={handleSubmit}>책 입력하기</PostSubmitButton>
     </section>
   );
 }
@@ -121,6 +127,7 @@ type BookInputFieldProps = {
   placeholder: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   onValueChange: (value: string) => void;
+  isRequired?: boolean;
 };
 
 function BookInputField({
@@ -129,17 +136,19 @@ function BookInputField({
   placeholder,
   inputMode,
   onValueChange,
+  isRequired,
 }: BookInputFieldProps) {
   return (
-    <Field className="w-full px-4 py-3">
-      <FieldLabel className="text-sm font-semibold">{label}</FieldLabel>
+    <Field>
+      <FieldLabel>
+        {label} {isRequired && <span className="text-destructive">*</span>}
+      </FieldLabel>
 
       <Input
         value={value}
         inputMode={inputMode}
         placeholder={placeholder}
         onChange={(e) => onValueChange(e.target.value)}
-        className="h-12 px-4 text-sm"
       />
     </Field>
   );

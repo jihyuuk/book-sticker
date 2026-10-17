@@ -43,11 +43,11 @@ export default function BookBarcodeImagePicker({ onDetected }: Props) {
         onClick={() => inputRef.current?.click()}
         className="flex w-20 flex-col items-center gap-2"
       >
-        <span className="flex size-12 items-center justify-center rounded-full bg-white/15">
+        <span className="flex size-12 items-center justify-center rounded-full bg-white/20">
           <ImageIcon className="size-5" />
         </span>
 
-        <span className="text-xs text-white/80">사진첩</span>
+        <span className="text-sm font-medium text-white">사진첩</span>
       </button>
 
       <input

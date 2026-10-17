@@ -1,9 +1,14 @@
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import type { BookInfoData } from "@/components/book/book-info";
 import { useBookByIsbn } from "@/hooks/mutations/book/use-book-by-isbn";
+import PostSubmitButton from "@/components/post-field/post-submit-button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import SubHeader from "@/components/header/sub-header";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 
 type Props = {
   onBack: () => void;
@@ -56,37 +61,16 @@ export default function BookIsbnSearchView({ onBack, onFound }: Props) {
   return (
     <section className="flex h-full min-h-0 flex-col bg-white">
       {/* 헤더 */}
-      <header className="relative flex h-14 shrink-0 items-center justify-center px-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="absolute left-4 flex size-10 items-center justify-center rounded-full transition hover:bg-slate-100"
-          aria-label="뒤로가기"
-        >
-          <ArrowLeft className="size-5" />
+      <header className="px-page-x flex h-14 items-center justify-start">
+        <button type="button" onClick={onBack} aria-label="이전">
+          <ArrowLeft className="size-6" strokeWidth={1.5} />
         </button>
       </header>
 
       {/* 검색 영역 */}
-      <div className="flex-1 px-6 py-8">
-        <div className="mx-auto max-w-sm">
-          <div>
-            <h2 className="text-xl font-semibold">ISBN으로 책 검색</h2>
-
-            <p className="mt-2 text-sm text-slate-500">
-              책 뒷면에 있는 ISBN 13자리 숫자를 입력해주세요.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="mt-8">
-            {/* <label
-              htmlFor="isbn"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              ISBN
-            </label> */}
-
-            <input
+      <div className="px-page-x">
+        <form onSubmit={handleSubmit}>
+          {/* <input
               id="isbn"
               type="text"
               inputMode="numeric"
@@ -99,27 +83,47 @@ export default function BookIsbnSearchView({ onBack, onFound }: Props) {
                 setIsbn(value.slice(0, 13));
               }}
               className="h-12 w-full rounded-xl border border-slate-300 px-4 text-base transition outline-none focus:border-slate-900"
+            /> */}
+
+          <Field className="gap-1">
+            <FieldLabel className="text-headline-5">
+              ISBN 번호로 책 조회
+            </FieldLabel>
+
+            <FieldDescription className="text-body-2 mb-3 text-gray-400">
+              책 뒷면에 있는 ISBN 13자리 숫자를 입력해주세요.
+            </FieldDescription>
+
+            <Input
+              id="isbn"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="예: 9788928330027"
+              value={isbn}
+              onChange={(event) => {
+                const value = event.target.value.replace(/\D/g, "");
+
+                setIsbn(value.slice(0, 13));
+              }}
             />
 
-            <button
+            <Button
               type="submit"
               disabled={isPending || !isbn}
-              className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-sky-500 font-medium text-white transition hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-3 w-full"
             >
               {isPending ? (
-                <>
-                  <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  책 검색 중...
-                </>
+                <Loader2 className="animate-spin" />
               ) : (
-                <>
+                <div className="flex items-center justify-center gap-2">
                   <Search className="size-4" />
-                  검색하기
-                </>
+                  조회하기
+                </div>
               )}
-            </button>
-          </form>
-        </div>
+            </Button>
+          </Field>
+        </form>
       </div>
     </section>
   );
