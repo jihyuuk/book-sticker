@@ -1,16 +1,22 @@
-import { Plus, ScanBarcode, X } from "lucide-react";
+import { LoaderCircle, Plus, ScanBarcode, X } from "lucide-react";
 
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "cn";
 import type { BookModalView } from "./book-scanner-modal";
 import type { BookInfoData } from "@/components/book/book-info";
+import { useCoverPreviewUrl } from "@/hooks/utils/use-cover-preview-url";
+import { useRef } from "react";
 
 type Props = {
   book: BookInfoData;
   onBookChange: React.Dispatch<React.SetStateAction<BookInfoData>>;
   onBack: () => void;
   onChangeView: (view: BookModalView) => void;
+  coverImageFile: File | null;
+  onCoverSelect: (file: File) => void;
+  onCoverRemove: () => void;
+  isCoverOptimizing: boolean;
 };
 
 export default function BookManualInputView({
@@ -18,11 +24,20 @@ export default function BookManualInputView({
   onBookChange,
   onBack,
   onChangeView,
+  coverImageFile,
+  onCoverSelect,
+  onCoverRemove,
+  isCoverOptimizing,
 }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const previewUrl = useCoverPreviewUrl(coverImageFile);
+  const coverSrc = previewUrl ?? book.cover_url;
+
   return (
-    <section className="h-full bg-white">
+    <section className="flex min-h-0 flex-1 flex-col bg-white">
       {/* 헤더 */}
-      <header className="sticky top-0 z-50 flex h-14 items-center justify-center bg-white md:h-16">
+      <header className="z-50 flex h-14 shrink-0 items-center justify-center bg-white md:h-16">
         <div className="px-page-x grid w-full max-w-2xl grid-cols-[24px_1fr_24px] items-center">
           <button type="button" onClick={onBack} aria-label="모달 닫기">
             <X className="size-6" strokeWidth={1.5} />
@@ -43,47 +58,83 @@ export default function BookManualInputView({
       </header>
 
       {/* 입력 영역 */}
-      <div className="px-page-x space-y-4 pb-4">
-        {/* 표지 기능은 나중에 구현 */}
+      <div className="px-page-x min-h-0 flex-1 space-y-4 overflow-y-auto pb-24">
+        {/* 책 표지 */}
         <Field>
           <FieldLabel>
             책 표지 <span className="text-destructive">*</span>
           </FieldLabel>
 
-          {book.cover_url && (
-            <img
-              src={book.cover_url}
-              alt={book.title}
-              className="aspect-20/29 h-25 w-auto! self-start rounded-md object-contain"
-            />
-          )}
+          <div className="relative aspect-20/29 w-16!">
+            {coverSrc ? (
+              <>
+                {/* 책 표지 */}
+                <button
+                  type="button"
+                  disabled={isCoverOptimizing}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="size-full overflow-hidden rounded-md border bg-gray-100"
+                  aria-label="책 표지 변경"
+                >
+                  <img
+                    src={coverSrc}
+                    alt={book.title || "책 표지"}
+                    className="size-full object-cover"
+                  />
+                </button>
 
-          {!book.cover_url && (
-            <button
-              type="button"
-              className={cn(
-                "text-muted-foreground flex aspect-20/29 h-25 w-auto! flex-col items-center justify-center gap-1 self-start rounded-md border border-dashed bg-gray-100 disabled:opacity-50",
-                "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
-                "active:bg-sky-100",
-              )}
-            >
-              <Plus className="size-5" strokeWidth={1.5} />
-            </button>
-          )}
+                {/* 표지 삭제 */}
+                <button
+                  type="button"
+                  disabled={isCoverOptimizing}
+                  onClick={onCoverRemove}
+                  aria-label="책 표지 삭제"
+                  className="absolute -top-2 -right-2 z-20 flex size-6 items-center justify-center rounded-full bg-black text-white disabled:opacity-50"
+                >
+                  <X className="size-4" strokeWidth={1.5} />
+                </button>
+              </>
+            ) : (
+              /* 표지 추가 */
+              <button
+                type="button"
+                disabled={isCoverOptimizing}
+                onClick={() => fileInputRef.current?.click()}
+                className={cn(
+                  "text-muted-foreground flex size-full flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-gray-100",
+                  "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
+                  "active:bg-sky-100",
+                )}
+                aria-label="책 표지 추가"
+              >
+                <Plus className="size-5" strokeWidth={1.5} />
+              </button>
+            )}
 
-          {/* <div>
-            <button
-              type="button" // onClick={() => inputRef.current?.click()}
-              // disabled={disabled}
-              className={cn(
-                "text-muted-foreground flex size-23 flex-col items-center justify-center gap-1 rounded-lg border border-dashed bg-gray-100 disabled:opacity-50",
-                "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
-                "active:bg-sky-100",
-              )}
-            >
-              <Plus className="size-5" strokeWidth={1.5} />
-            </button>
-          </div> */}
+            {/* 이미지 최적화 중 로딩 오버레이 */}
+            {isCoverOptimizing && (
+              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-md bg-black/30">
+                <LoaderCircle className="size-6 animate-spin text-white" />
+              </div>
+            )}
+          </div>
+
+          {/* 실제 파일 선택 input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+
+              if (file) {
+                onCoverSelect(file);
+              }
+
+              e.currentTarget.value = "";
+            }}
+          />
         </Field>
 
         <BookInputField
@@ -165,7 +216,7 @@ export function BookInputField({
       </FieldLabel>
 
       <Input
-        size="lg"
+        size="md"
         value={value}
         inputMode={inputMode}
         placeholder={placeholder}
