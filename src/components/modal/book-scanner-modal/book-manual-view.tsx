@@ -1,62 +1,46 @@
-import { ArrowLeft, Plus } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { Plus, ScanBarcode, X } from "lucide-react";
 
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { BookInfoData } from "@/components/book/book-info";
-import SubHeader from "@/components/header/sub-header";
 import { cn } from "cn";
-import PostSubmitButton from "@/components/post-field/post-submit-button";
+import type { BookModalView } from "./book-scanner-modal";
+import type { BookInfoData } from "@/components/book/book-info";
 
 type Props = {
+  book: BookInfoData;
+  onBookChange: React.Dispatch<React.SetStateAction<BookInfoData>>;
   onBack: () => void;
-  onConfirm: (book: BookInfoData) => void;
+  onChangeView: (view: BookModalView) => void;
 };
 
-export default function BookManualInputView({ onBack, onConfirm }: Props) {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [publisher, setPublisher] = useState("");
-  const [isbn, setIsbn] = useState("");
-
-  const handleSubmit = () => {
-    if (!title.trim()) {
-      toast.error("책 제목은 필수입니다.");
-      return;
-    }
-
-    onConfirm({
-      title: title.trim(),
-      author: author.trim() || null,
-      publisher: publisher.trim() || null,
-      isbn: isbn.trim() || null,
-      cover_url: null,
-    });
-  };
-
+export default function BookManualInputView({
+  book,
+  onBookChange,
+  onBack,
+  onChangeView,
+}: Props) {
   return (
     <section className="h-full bg-white">
       {/* 헤더 */}
-      <header className="px-page-x flex h-14 items-center justify-start">
-        <button type="button" onClick={onBack} aria-label="이전">
-          <ArrowLeft className="size-6" strokeWidth={1.5} />
-        </button>
-      </header>
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-center bg-white md:h-16">
+        <div className="px-page-x grid w-full max-w-2xl grid-cols-[24px_1fr_24px] items-center">
+          <button type="button" onClick={onBack} aria-label="모달 닫기">
+            <X className="size-6" strokeWidth={1.5} />
+          </button>
 
-      {/* 헤더 */}
-      {/* <header className="relative flex h-14 shrink-0 items-center justify-center px-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="absolute left-4 flex size-10 items-center justify-center rounded-full transition hover:bg-slate-100"
-          aria-label="뒤로가기"
-        >
-          <ArrowLeft className="size-5" />
-        </button>
-      </header>
+          <div className="text-title-2 min-w-0 truncate px-2 text-center font-semibold">
+            책 정보
+          </div>
 
-      <h2 className="px-page-x text-xl font-semibold">ISBN으로 책 검색</h2> */}
+          <button
+            type="button"
+            onClick={() => onChangeView("SCANNER")}
+            aria-label="바코드 검색"
+          >
+            <ScanBarcode className="size-6 text-sky-600" strokeWidth={1.5} />
+          </button>
+        </div>
+      </header>
 
       {/* 입력 영역 */}
       <div className="px-page-x space-y-4 pb-4">
@@ -66,7 +50,28 @@ export default function BookManualInputView({ onBack, onConfirm }: Props) {
             책 표지 <span className="text-destructive">*</span>
           </FieldLabel>
 
-          <div>
+          {book.cover_url && (
+            <img
+              src={book.cover_url}
+              alt={book.title}
+              className="aspect-20/29 h-25 w-auto! self-start rounded-md object-contain"
+            />
+          )}
+
+          {!book.cover_url && (
+            <button
+              type="button"
+              className={cn(
+                "text-muted-foreground flex aspect-20/29 h-25 w-auto! flex-col items-center justify-center gap-1 self-start rounded-md border border-dashed bg-gray-100 disabled:opacity-50",
+                "hover:border-primary hover:text-primary transition-colors hover:bg-sky-50",
+                "active:bg-sky-100",
+              )}
+            >
+              <Plus className="size-5" strokeWidth={1.5} />
+            </button>
+          )}
+
+          {/* <div>
             <button
               type="button" // onClick={() => inputRef.current?.click()}
               // disabled={disabled}
@@ -78,45 +83,60 @@ export default function BookManualInputView({ onBack, onConfirm }: Props) {
             >
               <Plus className="size-5" strokeWidth={1.5} />
             </button>
-          </div>
+          </div> */}
         </Field>
 
         <BookInputField
           label="책 이름"
-          value={title}
+          value={book.title}
           placeholder="책 이름을 입력해주세요"
-          onValueChange={setTitle}
+          onValueChange={(value) =>
+            onBookChange((prev) => ({
+              ...prev,
+              title: value,
+            }))
+          }
           isRequired
         />
 
         <BookInputField
           label="저자"
-          value={author}
+          value={book.author ?? ""}
           placeholder="저자를 입력해주세요"
-          onValueChange={setAuthor}
+          onValueChange={(value) =>
+            onBookChange((prev) => ({
+              ...prev,
+              author: value,
+            }))
+          }
           isRequired
         />
 
         <BookInputField
           label="발행처"
-          value={publisher}
+          value={book.publisher ?? ""}
           placeholder="발행처를 입력해주세요"
-          onValueChange={setPublisher}
+          onValueChange={(value) =>
+            onBookChange((prev) => ({
+              ...prev,
+              publisher: value,
+            }))
+          }
         />
 
         <BookInputField
           label="ISBN"
-          value={isbn}
+          value={book.isbn ?? ""}
           placeholder="ISBN을 입력해주세요"
           inputMode="numeric"
-          onValueChange={(value) => {
-            setIsbn(value.replace(/\D/g, "").slice(0, 13));
-          }}
+          onValueChange={(value) =>
+            onBookChange((prev) => ({
+              ...prev,
+              isbn: value,
+            }))
+          }
         />
       </div>
-
-      {/* 하단 버튼 */}
-      <PostSubmitButton onClick={handleSubmit}>책 입력하기</PostSubmitButton>
     </section>
   );
 }
@@ -130,7 +150,7 @@ type BookInputFieldProps = {
   isRequired?: boolean;
 };
 
-function BookInputField({
+export function BookInputField({
   label,
   value,
   placeholder,
@@ -145,6 +165,7 @@ function BookInputField({
       </FieldLabel>
 
       <Input
+        size="lg"
         value={value}
         inputMode={inputMode}
         placeholder={placeholder}
