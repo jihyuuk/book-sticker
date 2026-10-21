@@ -1,29 +1,23 @@
 import { createPost, type CreatePostParam } from "@/api/post-api";
-import { optimizePostImage } from "@/lib/optimize-post-image";
 import { useMutation } from "@tanstack/react-query";
 
 export function useCreatePost() {
   return useMutation({
     mutationFn: async (params: CreatePostParam) => {
-      //이미지 최적화
-      const optimizedImages = await Promise.all(
-        params.images.map((image) => optimizePostImage(image)),
-      );
+      const cover = params.book.coverImageFile;
 
       alert(
-        optimizedImages
-          .map(
+        [
+          `책 표지: ${cover ? (cover.size / 1024).toFixed(2) + " KB" : "파일 없음 (외부 URL)"}`,
+          "",
+          ...params.images.map(
             (image, index) =>
-              `${index + 1}번: ${(image.size / 1024 / 1024).toFixed(2)} MB`,
-          )
-          .join("\n"),
+              `게시글 이미지 ${index + 1}: ${(image.size / 1024).toFixed(2)} KB`,
+          ),
+        ].join("\n"),
       );
 
-      //api 호출
-      return createPost({
-        ...params,
-        images: optimizedImages,
-      });
+      return createPost(params);
     },
   });
 }

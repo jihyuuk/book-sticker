@@ -1,11 +1,12 @@
 import { cn } from "cn";
-import { Field, FieldLabel } from "../ui/field";
+import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Textarea } from "../ui/textarea";
 
 type Props = {
   value: string;
   onValueChange: (value: string) => void;
   disabled?: boolean;
+  error: boolean;
 };
 
 const MAX_LENGTH = 300;
@@ -14,9 +15,10 @@ export default function PostCaptionField({
   value,
   onValueChange,
   disabled,
+  error,
 }: Props) {
   return (
-    <Field className="w-full">
+    <Field id="post-content" className="w-full scroll-mt-24">
       <FieldLabel>독후감</FieldLabel>
 
       <div
@@ -24,6 +26,7 @@ export default function PostCaptionField({
           "overflow-hidden rounded-[6px]",
           "border border-transparent bg-gray-100",
           "focus-within:border-primary focus-within:bg-blue-50",
+          error && "border-destructive",
         )}
       >
         <Textarea
@@ -43,6 +46,8 @@ export default function PostCaptionField({
           {value.length}/{MAX_LENGTH} 자
         </div>
       </div>
+
+      {error && <FieldError>독후감을 작성해주세요.</FieldError>}
     </Field>
   );
 }

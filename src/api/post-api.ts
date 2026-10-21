@@ -16,7 +16,9 @@ export type PostPasswordParam = {
 export type CreatePostParam = {
   publicId: string;
   kidId: string;
-  book: BookInfoData;
+  book: BookInfoData & {
+    coverImageFile: File | null;
+  };
   content: string;
   password: string;
   images: File[];
@@ -107,19 +109,29 @@ export async function createPost(
 ): Promise<{ postId: string }> {
   const { publicId, kidId, book, content, password, images } = params;
 
+  // 파일과 책 정보 분리
+  const { coverImageFile, ...bookData } = book;
+
   const formData = new FormData();
 
+  // JSON 데이터
   formData.append(
     "payload",
     JSON.stringify({
       publicId,
       kidId,
-      book,
+      book: bookData,
       content,
       password,
     }),
   );
 
+  // 책 표지 파일
+  if (coverImageFile) {
+    formData.append("cover_image_file", coverImageFile);
+  }
+
+  // 게시글 이미지
   images.forEach((image) => {
     formData.append("images", image);
   });

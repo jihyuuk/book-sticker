@@ -6,7 +6,6 @@ import PostBookField from "../post-field/post-book-field";
 import { useNavigate } from "react-router";
 import type { PostCreateData } from "@/types/data-types";
 import PostKidField from "../post-field/post-kid-field";
-import type { BookInfoData } from "../book/book-info";
 import PostPasswordField from "../post-field/post-password-field";
 import PostSubmitButton from "../post-field/post-submit-button";
 import PostImageField, {
@@ -14,7 +13,9 @@ import PostImageField, {
 } from "../post-field/post-image-field";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
-import { STORAGE_KEY } from "@/lib/constants";
+import { SELECTED_KID_KEY } from "@/lib/constants";
+import { FieldGroup } from "../ui/field";
+import type { CreatePostParam } from "@/api/post-api";
 
 type Props = {
   data: PostCreateData;
@@ -28,20 +29,20 @@ export default function PostNewForm({ data }: Props) {
   const { mutate, isPending } = useCreatePost();
 
   const [kidId, setKidId] = useState(() => {
-    const savedKidId = localStorage.getItem(STORAGE_KEY);
+    const savedKidId = localStorage.getItem(SELECTED_KID_KEY);
     if (savedKidId && kids.some((kid) => kid.id === savedKidId)) {
       return savedKidId;
     }
     return "";
   });
-  const [book, setBook] = useState<BookInfoData | null>(null);
+  const [book, setBook] = useState<CreatePostParam["book"] | null>(null);
   const [caption, setCaption] = useState("");
   const [images, setImages] = useState<PostImageData[]>([]);
   const [password, setPassword] = useState("");
 
   const handleKidChange = (id: string) => {
     setKidId(id);
-    localStorage.setItem(STORAGE_KEY, id);
+    localStorage.setItem(SELECTED_KID_KEY, id);
   };
 
   //이미지 업로드 중인지
@@ -52,19 +53,27 @@ export default function PostNewForm({ data }: Props) {
   const handleSubmit = () => {
     if (isPending || isImageProcessing) return;
 
-    const message = validatePostForm({
-      kidId,
-      book,
-      caption,
-      password,
-    });
+    // 에러 표시 활성화
+    setShowErrors(true);
 
-    if (message) {
-      toast.error(message);
+    // 첫 번째 오류 찾기
+    const firstError = Object.entries(errors).find(
+      ([, hasError]) => hasError,
+    )?.[0];
+
+    if (firstError) {
+      toast.error("필수 항목을 확인해주세요.");
+
+      requestAnimationFrame(() => {
+        document.getElementById(`post-${firstError}`)?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+
       return;
     }
 
-    // validatePostForm에서 이미 검사했지만
     // TypeScript 타입 좁히기용
     if (!book) return;
 
@@ -105,15 +114,26 @@ export default function PostNewForm({ data }: Props) {
     );
   };
 
+  //빈칸처리
+  const [showErrors, setShowErrors] = useState(false);
+
+  const errors = {
+    kid: !kidId.trim(),
+    book: !book,
+    content: !caption.trim(),
+    password: password.length < 6,
+  };
+
   return (
     <div>
-      <div className="px-page-x space-y-5 py-3 pb-40">
+      <FieldGroup className="px-page-x gap-6! py-3 pb-60">
         {/* 작성자 */}
         <PostKidField
           kids={kids}
           value={kidId}
           onValueChange={handleKidChange}
           disabled={isPending}
+          error={showErrors && errors.kid}
         />
 
         {/* 책 */}
@@ -121,6 +141,7 @@ export default function PostNewForm({ data }: Props) {
           value={book}
           onValueChange={setBook}
           disabled={isPending}
+          error={showErrors && errors.book}
         />
 
         {/* 독후감 */}
@@ -128,6 +149,7 @@ export default function PostNewForm({ data }: Props) {
           value={caption}
           onValueChange={setCaption}
           disabled={isPending}
+          error={showErrors && errors.content}
         />
 
         {/* 사진 */}
@@ -142,8 +164,9 @@ export default function PostNewForm({ data }: Props) {
           value={password}
           onValueChange={setPassword}
           disabled={isPending}
+          error={showErrors && errors.password}
         />
-      </div>
+      </FieldGroup>
 
       {/* 작성 버튼 */}
       <PostSubmitButton
@@ -154,25 +177,4 @@ export default function PostNewForm({ data }: Props) {
       </PostSubmitButton>
     </div>
   );
-}
-
-//검증
-function validatePostForm({
-  kidId,
-  book,
-  caption,
-  password,
-}: {
-  kidId: string;
-  book: BookInfoData | null;
-  caption: string;
-  password: string;
-}) {
-  if (!kidId) return "작성자를 선택해주세요.";
-  if (!book) return "책을 선택해주세요.";
-  if (!caption.trim()) return "독후감을 작성해주세요.";
-  if (!password.trim()) return "비밀번호를 입력해주세요.";
-  if (password.length < 4) return "비밀번호는 4자리 이상 입력해주세요.";
-
-  return null;
 }
