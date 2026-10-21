@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import FALLBACK_IMAGE from "@/assets/no-book-cover.png";
+import { useOpenImageViewer } from "@/store/image-viewer-store";
 
 export type BookInfoData = {
   isbn: string | null;
@@ -17,6 +18,8 @@ type Props = {
 
 // 책 표지 이미지 전용 컴포넌트
 function BookCover({ src, title }: { src: string | null; title: string }) {
+  const openImageViewer = useOpenImageViewer();
+
   // 현재 표시할 이미지와 로딩 완료 여부 관리
   const [imageSrc, setImageSrc] = useState(src || FALLBACK_IMAGE);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -29,8 +32,22 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
     }
   };
 
+  const canOpen = !!src && imageSrc !== FALLBACK_IMAGE && isLoaded;
+
   return (
-    <div className="aspect-20/29 h-18 shrink-0 overflow-hidden rounded-sm bg-gray-100">
+    <button
+      type="button"
+      disabled={!canOpen}
+      onClick={() =>
+        openImageViewer({
+          images: [imageSrc],
+        })
+      }
+      aria-label={`${title} 표지 크게 보기`}
+      className={cn(
+        "aspect-20/29 h-18 shrink-0 overflow-hidden rounded-sm bg-gray-100",
+      )}
+    >
       {/* 로딩 중에는 회색 배경만 표시 */}
       <img
         src={imageSrc}
@@ -39,7 +56,7 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
         onError={handleError}
         className={cn("h-full w-full object-cover", !isLoaded && "opacity-0")}
       />
-    </div>
+    </button>
   );
 }
 

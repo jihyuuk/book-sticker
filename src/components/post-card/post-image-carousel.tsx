@@ -3,6 +3,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useOpenImageViewer } from "@/store/image-viewer-store";
 
 type Props = {
   images: string[];
@@ -11,6 +12,8 @@ type Props = {
 const margin = 20;
 
 export default function PostImageCarousel({ images }: Props) {
+  const openImageViewer = useOpenImageViewer();
+
   if (images.length === 0) return null;
 
   return (
@@ -37,16 +40,27 @@ export default function PostImageCarousel({ images }: Props) {
             className={
               images.length === 1
                 ? "basis-[calc(100%-40px)] pl-0"
-                : "basis-[85%] pl-0"
+                : "basis-[90%] pl-0"
             }
           >
             <div className="relative aspect-square overflow-hidden rounded-sm border bg-gray-100">
-              {/* 이미지 */}
-              <img
-                src={src}
-                alt={`게시글 이미지 ${index + 1}`}
-                className="h-full w-full object-cover"
-              />
+              <button
+                type="button"
+                className="h-full w-full"
+                onClick={() =>
+                  openImageViewer({
+                    images,
+                    initialIndex: index,
+                  })
+                }
+              >
+                {/* 이미지 */}
+                <img
+                  src={src}
+                  alt={`게시글 이미지 ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+              </button>
 
               {/* 숫자 인디케이터 */}
               {images.length > 1 && (
