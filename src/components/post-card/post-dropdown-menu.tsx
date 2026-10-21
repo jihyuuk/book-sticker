@@ -78,11 +78,16 @@ export default function PostDropdownMenu({ post }: Props) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button type="button" className="text-gray-500">
-            <EllipsisVertical className="size-5" />
+            <EllipsisVertical className="size-6" />
           </button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuContent
+          align="end"
+          side="bottom"
+          sideOffset={12}
+          className="w-40"
+        >
           <DropdownMenuItem
             onClick={() => setModalAction("EDIT")}
             className="py-2.5"

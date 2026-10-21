@@ -41,7 +41,12 @@ export default function PostCard({ post, classroomName, isAdmin }: Props) {
       <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />
 
       {/* 책 정보 */}
-      <BookInfo book={post.book} />
+      <div className="px-page-x">
+        <BookInfo
+          book={post.book}
+          className="border-primary border-l-2 bg-slate-50 p-2"
+        />
+      </div>
     </article>
   );
 }

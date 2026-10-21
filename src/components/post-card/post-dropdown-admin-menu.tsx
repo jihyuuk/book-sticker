@@ -43,7 +43,12 @@ export default function PostDropdownAdminMenu({ post }: Props) {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent
+        align="end"
+        side="bottom"
+        sideOffset={12}
+        className="w-40"
+      >
         <DropdownMenuItem onClick={handleDelete} variant="destructive">
           <div className="flex items-center gap-1.5 py-2">
             <Trash2 size={6} />

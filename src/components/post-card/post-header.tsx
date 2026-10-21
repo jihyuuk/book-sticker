@@ -36,15 +36,19 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
             {post.kid.name}
           </p>
 
-          <p className="text-xs text-gray-400">
+          <p className="flex gap-1 text-xs text-gray-400">
             {classroomName && (
               <>
                 <span className="text-gray-500">{classroomName}</span>
-                <span className="mx-1">·</span>
+                <span className="">·</span>
               </>
             )}
 
             {formatRelativeTime(post.created_at)}
+
+            {post.created_at !== post.updated_at && (
+              <span className="">(수정됨)</span>
+            )}
           </p>
         </div>
       </div>
