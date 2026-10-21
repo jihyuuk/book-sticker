@@ -7,13 +7,11 @@ export default function PostListIntro({ classroomName }: Props) {
 
   return (
     <div className="px-page-x bg-white pb-5">
-      <h1 className="text-xl font-bold tracking-tight text-gray-700">
+      <h1 className="text text-lg font-bold tracking-tight text-gray-700">
         {classroomName} 독서장
       </h1>
 
-      <p className="mt-1 text-sm leading-6 text-gray-500">
-        {classroomName} 친구들의 독후감을 공유해주세요😊
-      </p>
+      <p className="text-sm text-gray-500">아이들의 독후감을 공유해주세요😊</p>
     </div>
   );
 }
