@@ -1,51 +1,93 @@
 import ChartList from "@/components/chart/chart-list";
-import ChartToolbar from "@/components/chart/chart-toolbar";
 import FooterImage from "@/components/chart/footer-image";
 import GlobalError from "@/components/global-error";
 import GlobalLoading from "@/components/global-loading";
-import HeaderImage from "@/components/chart/header-image";
-import { useClassroom } from "@/hooks/queries/use-classroom";
-import { useKids } from "@/hooks/queries/use-kids";
 import { usePreloadImages } from "@/hooks/utils/use-preload-images";
+import ChartHeader from "@/components/header/chart-header";
+import { useAdminChart } from "@/hooks/queries/use-admin-chart";
+import NotFoundPage from "./not-found-page";
+import { useEffect, useState } from "react";
+import { SELECTED_CHART_CLASSROOM_KEY } from "@/lib/constants";
+import { useClassrooms } from "@/hooks/queries/use-classrooms";
 
 export default function ChartPage() {
-  // 1. classroom 조회
-  const {
-    data: classroom,
-    isPending: isClassroomPending,
-    isError: isClassroomError,
-  } = useClassroom();
+  const [selectedClassroomId, setSelectedClassroomId] = useState<
+    string | null | undefined
+  >(undefined);
 
-  // 2. classroom을 기반으로 kids 조회
+  // 1. 반 목록 조회
   const {
-    data: kids = [],
-    isPending: isKidsPending,
-    isError: isKidsError,
-  } = useKids(classroom?.id);
+    data: classrooms,
+    isPending: isClassroomsPending,
+    isError: isClassroomsError,
+    isSuccess: isClassroomsSuccess,
+  } = useClassrooms();
 
-  // 이미지 로딩 완료 여부
+  // 2. 저장된 반 ID 검증
+  useEffect(() => {
+    if (!isClassroomsSuccess) return;
+
+    const storedId = localStorage.getItem(SELECTED_CHART_CLASSROOM_KEY);
+
+    const isValid = classrooms.some((classroom) => classroom.id === storedId);
+
+    if (!isValid) {
+      localStorage.removeItem(SELECTED_CHART_CLASSROOM_KEY);
+    }
+
+    setSelectedClassroomId(isValid ? storedId : null);
+  }, [classrooms, isClassroomsSuccess]);
+
+  // 3. 반 변경
+  const handleClassroomChange = (classroomId: string) => {
+    localStorage.setItem(SELECTED_CHART_CLASSROOM_KEY, classroomId);
+    setSelectedClassroomId(classroomId);
+  };
+
+  // 4. 차트 조회
+  const {
+    data,
+    isPending: isChartPending,
+    isError: isChartError,
+  } = useAdminChart(selectedClassroomId ?? undefined);
+
   const isImagesLoaded = usePreloadImages();
 
-  //로딩 처리
-  if (isClassroomPending || isKidsPending || !isImagesLoaded) {
+  if (isClassroomsError || isChartError) {
+    return <GlobalError />;
+  }
+
+  if (
+    isClassroomsPending ||
+    selectedClassroomId === undefined ||
+    (selectedClassroomId !== null && (isChartPending || !isImagesLoaded))
+  ) {
     return <GlobalLoading />;
   }
 
-  //에러 처리
-  if (isClassroomError || isKidsError) return <GlobalError />;
+  if (selectedClassroomId && !data) {
+    return <NotFoundPage />;
+  }
+
+  const title = data?.classroom.name ? data.classroom.name : "독서판";
 
   return (
     <div className="flex h-dvh flex-col">
-      {/* 헤더 이미지 */}
-      <HeaderImage />
+      <ChartHeader
+        title={title}
+        classrooms={classrooms ?? []}
+        selectedClassroomId={selectedClassroomId}
+        onClassroomChange={handleClassroomChange}
+      />
 
-      {/* 툴바 */}
-      <ChartToolbar />
+      {selectedClassroomId && data ? (
+        <ChartList key={selectedClassroomId} kids={data.kids} />
+      ) : (
+        <div className="mb-20 flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground">반을 선택해 주세요.</p>
+        </div>
+      )}
 
-      {/* 차트 영역 */}
-      <ChartList kids={kids} />
-
-      {/* 푸터 이미지 */}
       <FooterImage />
     </div>
   );

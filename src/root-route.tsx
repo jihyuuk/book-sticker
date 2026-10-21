@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router";
-import AdminPage from "./pages/admin-page";
 import GuestOnlyRoute from "./routes/guest-only-route";
 import UserOnlyRoute from "./routes/user-only-route";
 import SignInPage from "./pages/auth/sign-in-page";
@@ -10,9 +9,10 @@ import PostCreatePage from "./pages/post/post-create-page";
 import PostListPage from "./pages/post/post-list-page";
 import PostEditPage from "./pages/post/post-edit-page";
 import NotFoundPage from "./pages/not-found-page";
-import AdminPostListPage from "./pages/post/admin-post-list-page";
 import SettingPage from "./pages/setting/setting-page";
 import SettingClassroomPage from "./pages/setting/setting-classroom-page";
+import AdminPostListPage from "./pages/post/admin-post-list-page";
+import ChartPage from "./pages/chart-page";
 
 export default function RootRoute() {
   return (
@@ -26,9 +26,8 @@ export default function RootRoute() {
 
       {/* 유저 (로그인 O) */}
       <Route element={<UserOnlyRoute />}>
-        {/* <Route path="/" element={<ChartPage />} /> */}
         <Route path="/" element={<AdminPostListPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/chart" element={<ChartPage />} />
         <Route path="/setting" element={<SettingPage />} />
         <Route
           path="/setting/classroom/:classroomId"
