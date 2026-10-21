@@ -39,6 +39,10 @@ const buttonVariants = cva(
         md: "h-11 min-w-[80px] px-4 rounded-[6px] text-button-2 font-semibold gap-0.5 [&_svg:not([class*='size-'])]:size-5 [&_svg:not([class*='stroke-'])]:stroke-[1.5]",
         sm: "h-9 min-w-[68px] px-3 rounded-[4px] text-button-3 gap-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='stroke-'])]:stroke-[1.5]",
         xs: "h-8 min-w-[68px] px-3 rounded-[4px] text-button-3 gap-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='stroke-'])]:stroke-[1.5]",
+
+        "icon-sm": "size-8 rounded-[4px] [&_svg:not([class*='size-'])]:size-4",
+        "icon-md": "size-10 rounded-[6px] [&_svg:not([class*='size-'])]:size-5",
+        "icon-lg": "size-12 rounded-[6px] [&_svg:not([class*='size-'])]:size-6",
       },
     },
     defaultVariants: {
