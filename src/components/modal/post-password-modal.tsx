@@ -25,7 +25,7 @@ export default function PostPasswordModal({
 
   const { mutate: verifyPassword, isPending } = useVerifyPostPassword();
 
-  const handleConfirm = () => {
+  const handleSubmit = () => {
     if (!password) return;
 
     verifyPassword(
@@ -68,40 +68,49 @@ export default function PostPasswordModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="rounded-lg p-5! pb-4.5! shadow-xl sm:max-w-md"
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
+        className="rounded-lg p-5! pb-4.5! sm:max-w-sm"
+        onOpenAutoFocus={(event) => {
+          if (window.matchMedia("(pointer: coarse)").matches) {
+            event.preventDefault();
+          }
         }}
       >
-        {/* 비밀번호 */}
-        <Field>
-          <FieldLabel
-            htmlFor="password"
-            className="text-headline-5 mb-1 font-semibold"
-          >
-            비밀번호
-          </FieldLabel>
-
-          <PasswordInput
-            id="password"
-            autoComplete="off"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-            placeholder="비밀번호 입력"
-            disabled={isPending}
-          />
-        </Field>
-
-        <Button
-          size="lg"
-          onClick={handleConfirm}
-          disabled={!password || isPending}
-          className="mt-3 flex-1 rounded-md"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
         >
-          {isPending ? <Loader2 className="animate-spin" /> : "확인"}
-        </Button>
+          {/* 비밀번호 */}
+          <Field>
+            <FieldLabel
+              htmlFor="password"
+              className="text-headline-5 mb-1 font-semibold"
+            >
+              비밀번호
+            </FieldLabel>
+
+            <PasswordInput
+              id="password"
+              autoComplete="off"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+              placeholder="비밀번호 입력"
+              disabled={isPending}
+            />
+          </Field>
+
+          <Button
+            size="lg"
+            type="submit"
+            disabled={!password || isPending}
+            className="mt-3 w-full flex-1 rounded-md"
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : "확인"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );
