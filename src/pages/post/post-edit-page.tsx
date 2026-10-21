@@ -40,14 +40,14 @@ export default function PostEditPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-white">
-      <div className="mx-auto w-full max-w-2xl pb-10">
-        {/* 헤더 */}
-        <SubHeader title="독후감 수정" />
+    <div>
+      {/* 헤더 */}
+      <SubHeader title="독후감 작성" />
 
-        {/* 수정 폼 */}
+      {/* 입력 폼 */}
+      <main className="mx-auto w-full max-w-2xl">
         <PostEditForm post={post} password={password} />
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

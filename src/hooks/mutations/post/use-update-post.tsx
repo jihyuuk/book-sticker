@@ -1,58 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { updatePost, type UpdatePostParam } from "@/api/post-api";
+import { updatePost } from "@/api/post-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { optimizePostImage } from "@/lib/optimize-post-image";
-import type { PostListData } from "@/types/data-types";
 
 export function useUpdatePost(publicId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: UpdatePostParam) => {
-      // 새 이미지만 최적화
-      const optimizedImages = await Promise.all(
-        params.images.map(async (image) => {
-          if (image.type === "existing") {
-            return image;
-          }
+    // PostImageField에서 이미 최적화했으므로 바로 API 호출
+    mutationFn: updatePost,
 
-          return {
-            ...image,
-            file: await optimizePostImage(image.file),
-          };
-        }),
-      );
-
-      // api 호출
-      return updatePost({
-        ...params,
-        images: optimizedImages,
-      });
-    },
-
-    onSuccess: (data) => {
+    onSuccess: () => {
       if (!publicId) return;
 
-      queryClient.setQueryData<PostListData>(
-        QUERY_KEYS.publicPosts(publicId),
-        (old) => {
-          if (!old) return old;
-
-          return {
-            ...old,
-            posts: old.posts.map((post) =>
-              post.id === data.postId
-                ? {
-                    ...post,
-                    content: data.content,
-                    images: data.images,
-                  }
-                : post,
-            ),
-          };
-        },
-      );
+      // 공개 게시글 목록 캐시 무효화 및 재조회 유도
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.publicPosts(publicId),
+      });
     },
   });
 }
