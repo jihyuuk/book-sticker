@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import logo from "@/assets/sign-in-logo.png";
 import GlobalLoading from "@/components/global-loading";
 import MainHeader from "@/components/header/main-header";
 import PostCard from "@/components/post-card/post-card";
@@ -14,7 +13,10 @@ import {
 import { useAdminPosts } from "@/hooks/queries/use-admin-posts";
 import { useClassrooms } from "@/hooks/queries/use-classrooms";
 import AdminPostListSkeleton from "@/components/skeletons/admin-post-list-skeleton";
-import { SELECTED_CLASSROOM_KEY } from "@/lib/constants";
+import {
+  INFINITE_SCROLL_ROOT_MARGIN,
+  SELECTED_CLASSROOM_KEY,
+} from "@/lib/constants";
 import GlobalError from "@/components/global-error";
 import { LoaderCircle, RotateCw } from "lucide-react";
 
@@ -81,7 +83,7 @@ export default function AdminPostListPage() {
         }
       },
       {
-        rootMargin: "500px",
+        rootMargin: INFINITE_SCROLL_ROOT_MARGIN,
       },
     );
 
@@ -203,17 +205,10 @@ export default function AdminPostListPage() {
               </div>
             )}
 
-            {/* 마지막 요소 */}
+            {/* 마지막 게시글 */}
             {posts.length > 0 && !hasNextPage && !isFetching && (
-              <div className="flex flex-col items-center justify-center gap-10 pt-3 pb-10">
+              <div className="pt-3 pb-20 text-center">
                 <p className="text-sm text-gray-400">- 마지막 게시물 -</p>
-
-                <img
-                  src={logo}
-                  width={400}
-                  height={143}
-                  className="w-full max-w-35"
-                />
               </div>
             )}
           </>
@@ -238,67 +233,69 @@ export default function AdminPostListPage() {
 // 로고 이미지 최적화 배경제거
 // 로고 도입 (파비콘 수정)
 // 헤더 뒤로가기 버튼 히스토리 없을때 / 로 이동
+// 삭제시 큐 도입 (이미지 삭제를 위해)
+// 원아 리스트 게시글 개수 표시
+// 책 조회 모달 isbn 넘버로 수정
+// 책커버 모달에서는 object-cover이고 홈에선 contain같은 다르게 보임
+// 책 입력하기 모달 디자인
+// isbn 조회 로직 수정 (카카오 먼저 조회)
+// password 모달 엔터 버튼(다른 인풋들도 확인)
+// 모달 포커스 (pc는 자동 터치는 클릭해서 하게하기)
+// 모달 x 버튼 크기 및 위치
+// 로딩(스켈레톤, 이미지, 로고 이미지)
+// 캐러샐 이미지 로딩중
+// 책 이미지 없을때
+// 클릭시 이미지 전체화면 캐러셀
+// 차트 페이지 디자인 수정
+// 수정됨 표시
 
 // - 기능 추가 -
-// 0. 원아 리스트 게시글 개수 표시
 // 1. 일일 포스팅 수 제한
-// 2. 검색 기능
-// 3. 동영상
-// 4. 아이들 프사
+// 2. 동영상
+// 3. 아이들 프사
+// 4. 검색 기능
 
 // - 부가기능 -
 // 1. 게시물 작성중 뒤로가기 방지
 // 2. 작성중인 게시물 임시저장
 // 3. 모달 뒤로가기시에 모달이 닫히게
-// 4. 클릭시 이미지 전체화면 캐러셀
 
 // - 백엔드 -
-// 1. 삭제시 큐 도입 (이미지 삭제를 위해)
-// 2. sbin 조회 로직 수정 (카카오 먼저 조회)
 
 // - 스타일 -
-// 1. 차트 페이지 디자인 수정
-// 2. 로딩(스켈레톤, 이미지, 로고 이미지)
-// 3. 모달 x 버튼 크기 및 위치
-// 4. 책 입력하기 모달 디자인
-// 5. 책 이미지 없을때
-// 6. 캐러샐 이미지 로딩중
+// 1. create-page, update-page 작성하기 오른쪽위로 그리고 비번 입력을 작성하기 후로 받기
+// 1-1. 독후감 작성 필드 크기조정(텍스트에어리어 줄이기)
+// 카메라 보달 다시촬여 버튼 호버 색상 파란색
 
 // - 디테일 수정 -
-// 1. password 모달 엔터 버튼(다른 인풋들도 확인)
-// 3. 모달 포커스 (pc는 자동 터치는 클릭해서 하게하기)
-// 4. 버튼 컴포넌트에 ispending내장
 
 // - 버그 수정 -
-// 1.게시글작성(아이폰) -> 이미지 업로드 -> 하단 고정 버튼 스크롤 됌
-// 2.학생 삭제시 반영 되게(설정페이지)
+// 1.학생 삭제시 반영 되게(설정페이지)
+// 2.토스트 클릭시 안사라짐
+// 3.책 모달 이미지 업로드시 비율 꺠짐
 
 // - 최적화 -
-// 2.tansantquery 최적화
-// 3.이미지 캐러샐 로딩
+// 1.tansantquery 최적화
 
 // - 굳이? -
-//1. 수정됨 표시
-//2. 도장 기능
-//3. og-image 반 별로 다르게
+//1. 도장 기능
+//2. og-image 반 별로 다르게
+//3. 맨위 땡겨서 새로고침 - 크롬이 지원함
+//4. 버튼 컴포넌트에 ispending내장 - 있으면 좋은데 이미 다 구현 수정하기 귀찮
+//5. 책 커버 이미지 크기 - 홈에선 썸네일용 작은 용량 - 클릭하면 큰 이미지 로딩 최적화
+//6. 어드민,퍼블릭  - 게시글 이미지 레이지로딩
 
-// - 지금 해야 할 것 -
-// 1.페이지 별로 서버 기능 및 동작확인
-//로그인 페이지 0
-//회원가입 페이지 0
+// - 페이지 모음 -
+//로그인 페이지
+//회원가입 페이지
 
-//어드민 - 홈 화면 0
+//어드민 - 홈 화면
 //어드민 - 설정
 //어드민 - 반 설정
-//퍼블릭 - 홈 화면
+//어드민 - 차트페이지
 
+//퍼블릭 - 홈 화면
 //퍼블릭 - 포스트 생성
 //퍼블릭 - 책 조회
 //퍼블릭 - 포스트 수정
-
-//어드민 - 포스트 카드
-//퍼블릭 - 포스트 카드
-
-//모달
-
-// 2.백엔드 -> 디테일 -> 스타일 -> 부가기능 -> 새기능 -> 버그수정 -> 최적화
+//퍼블릭 - 차트페이지

@@ -40,9 +40,10 @@ export default function MainHeader({ isAdmin = false }: Props) {
         {/* 로고 영역 */}
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => window.location.reload()}>
-            <span className="text-title-2 font-semibold tracking-wide">
+            {/* <span className="text-title-2 font-semibold tracking-wide">
               북메이트
-            </span>
+            </span> */}
+            <span className="text-xl font-semibold">연세유치원</span>
           </button>
           <span className="hidden cursor-default rounded-full bg-white/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white min-[300px]:inline-block">
             BETA

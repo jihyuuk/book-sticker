@@ -1,4 +1,4 @@
-import GlobalLoading from "@/components/global-loading";
+//import GlobalLoading from "@/components/global-loading";
 import { supabase } from "@/lib/supabse";
 import { useIsSessionLoaded, useSetSession } from "@/store/session";
 import { useEffect, type ReactNode } from "react";
@@ -17,7 +17,8 @@ export default function SessionProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [setSession]);
 
-  if (!isSessionLoaded) return <GlobalLoading />;
+  //if (!isSessionLoaded) return <GlobalLoading />;
+  if (!isSessionLoaded) return null;
 
   return children;
 }

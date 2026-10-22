@@ -187,8 +187,9 @@ export default function BookBarcodeScannerView({
               <div className="px-page-x absolute inset-x-0 bottom-0 z-20 w-full pb-[max(24px,env(safe-area-inset-bottom))]">
                 {/* 다시 촬영 */}
                 <Button
+                  variant="outline"
                   onClick={handleRetry}
-                  className="flex w-full items-center gap-2 bg-white text-black"
+                  className="w-full"
                 >
                   <RotateCw className="size-4" />
                   다시 촬영하기

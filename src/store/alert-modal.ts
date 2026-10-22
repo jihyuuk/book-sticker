@@ -9,6 +9,7 @@ type OpenState = {
   description: string;
   actionLabel?: string;
   actionVariant?: ComponentProps<typeof Button>["variant"];
+  showCancel?: boolean;
   onAction?: () => void | Promise<void>;
   onCancel?: () => void;
 };
@@ -33,6 +34,7 @@ const useAlertModalStore = create(
             actionVariant: undefined,
             onAction: undefined,
             onCancel: undefined,
+            showCancel: undefined,
             ...params,
             isOpen: true,
           });

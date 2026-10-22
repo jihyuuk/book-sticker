@@ -1,26 +1,12 @@
-import { createClassroom, fetchClassroom } from "@/api/classroom-api";
+import { fetchClassroom2 } from "@/api/classroom-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
-import { useSession } from "@/store/session";
 import { useQuery } from "@tanstack/react-query";
 
-//레거시
-export function useClassroom() {
-  const session = useSession();
-  const userId = session?.user.id;
-
+// 반 단건 조회
+export function useClassroom(classroomId: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.classroom.byUserId(userId!),
-
-    queryFn: async () => {
-      const classroom = await fetchClassroom(userId!);
-
-      if (!classroom) {
-        return await createClassroom();
-      }
-
-      return classroom;
-    },
-
-    enabled: !!userId,
+    queryKey: QUERY_KEYS.classroom.detail(classroomId),
+    queryFn: () => fetchClassroom2(classroomId),
+    enabled: !!classroomId,
   });
 }

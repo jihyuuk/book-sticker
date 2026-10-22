@@ -51,15 +51,17 @@ export default function AlertModal() {
         </header>
 
         <div className="mt-3 flex gap-2">
-          <Button
-            size="lg"
-            className="flex-1 rounded-md"
-            onClick={handleCancelClick}
-            variant={"outline"}
-            disabled={isProcessing}
-          >
-            취소
-          </Button>
+          {store.showCancel !== false && (
+            <Button
+              size="lg"
+              className="flex-1 rounded-md"
+              onClick={handleCancelClick}
+              variant={"outline"}
+              disabled={isProcessing}
+            >
+              취소
+            </Button>
+          )}
           <Button
             size="lg"
             variant={store.actionVariant ?? "default"}

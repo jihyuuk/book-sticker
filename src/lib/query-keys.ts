@@ -2,6 +2,8 @@ export const QUERY_KEYS = {
   classroom: {
     all: ["classroom"] as const,
     list: ["classroom", "list"] as const,
+    detail: (classroomId: string) =>
+      ["classroom", "detail", classroomId] as const,
 
     //리팩토링 - 레거시
     byUserId: (userId: string) => ["classroom", "byUserId", userId] as const,
@@ -14,12 +16,19 @@ export const QUERY_KEYS = {
   kid: {
     all: ["kid"] as const,
     list: ["kid", "list"] as const,
+    list2: (classroomId: string) => ["kid", "list", classroomId] as const,
     byId: (kidId: string) => ["kid", "byId", kidId] as const,
   },
 
   book: {
     all: ["book"] as const,
     searchByTitle: (title: string) => ["book", "searchByTitle", title] as const,
+  },
+
+  chart: {
+    admin: (classroomId: string) => ["chart", "admin", classroomId] as const,
+
+    public: (publicId: string) => ["chart", "public", publicId] as const,
   },
 
   publicChart: (publicId: string) => ["public-chart", publicId] as const,

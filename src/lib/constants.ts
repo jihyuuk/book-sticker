@@ -8,6 +8,7 @@ export const VERIFICATION_EMAIL = "verificationEmail";
 //로컬 스토리지 키
 export const SELECTED_KID_KEY = "bookmate-selected-kid";
 export const SELECTED_CLASSROOM_KEY = "selectedClassroomId";
+export const SELECTED_CHART_CLASSROOM_KEY = "selectedChartClassroomId";
 
 //차트 관련 기본 값
 export const INFO_HEIGHT = 64;

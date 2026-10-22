@@ -26,7 +26,7 @@ export default function IconButtons({ isAdmin = false }: Props) {
       label: "독서 차트",
       icon: ChartColumn,
       onClick: () => {
-        console.log("차트");
+        navigate("../chart", { relative: "path" });
       },
     },
     ...(isAdmin

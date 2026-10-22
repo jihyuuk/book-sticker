@@ -195,7 +195,7 @@ export default function SignUpPage() {
 
                 {password ? (
                   <p
-                    className={`text-caption-1 ${passwordValid ? "text-green-600" : "text-destructive"}`}
+                    className={`text-caption-1 pl-0.5 ${passwordValid ? "text-green-600" : "text-destructive"}`}
                   >
                     {passwordValid
                       ? "적합한 비밀번호입니다."
@@ -226,7 +226,7 @@ export default function SignUpPage() {
 
                 {passwordConfirm ? (
                   <p
-                    className={`text-caption-1 ${passwordConfirmValid ? "text-green-600" : "text-destructive"}`}
+                    className={`text-caption-1 pl-0.5 ${passwordConfirmValid ? "text-green-600" : "text-destructive"}`}
                   >
                     {passwordConfirmValid
                       ? "비밀번호가 일치합니다."

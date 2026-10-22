@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { ClipboardList, Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { useClassroom } from "@/hooks/queries/use-classroom";
+import { useClassroom } from "@/hooks/queries/use-classroom-regacy";
 import { DOMAIN_URL } from "@/lib/constants";
 
 export default function ChartToolbar() {
