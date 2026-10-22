@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
+import { useUpdateAccountSetting } from "@/hooks/mutations/setting/use-update-account-setting";
 import { Loader2 } from "lucide-react";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 export default function SettingNameField({ oriName }: Props) {
   const [name, setName] = useState(oriName);
 
-  const { mutate, isPending: isUpdating } = useUpdateSetting();
+  const { mutate, isPending: isUpdating } = useUpdateAccountSetting();
 
   useEffect(() => {
     setName(oriName);

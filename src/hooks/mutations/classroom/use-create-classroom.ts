@@ -1,4 +1,4 @@
-import { createClassroom2 } from "@/api/classroom-api";
+import { createClassroom } from "@/api/classroom-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -6,7 +6,7 @@ export function useCreateClassroom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createClassroom2,
+    mutationFn: createClassroom,
 
     onSuccess: async () => {
       await Promise.all([

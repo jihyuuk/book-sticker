@@ -6,11 +6,11 @@ import SettingDailyBookLimitField from "@/components/setting/setting-daily-book-
 import SettingNameField from "@/components/setting/setting-name-field";
 import SettingPageSkeleton from "@/components/skeletons/setting-skeleton";
 import { useClassrooms } from "@/hooks/queries/use-classrooms";
-import { useSettingData } from "@/hooks/queries/use-setting-data";
+import { useAccountSetting } from "@/hooks/queries/use-account-setting";
 
 export default function SettingPage() {
   // 세팅 데이터
-  const { data: settings, isPending: isSettingsPending } = useSettingData();
+  const { data: settings, isPending: isSettingsPending } = useAccountSetting();
   // 반 정보
   const { data: classrooms, isPending: isClassroomsPending } = useClassrooms();
 

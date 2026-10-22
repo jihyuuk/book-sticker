@@ -8,7 +8,7 @@ import {
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
 import type { PublicPost } from "@/types/public-types";
-import { useDeletePostByAdmin } from "@/hooks/mutations/post/use-delete-post-by-admin";
+import { useDeletePostAsAdmin } from "@/hooks/mutations/post/use-delete-post-as-admin";
 
 type Props = {
   post: PublicPost;
@@ -16,7 +16,7 @@ type Props = {
 
 export default function PostDropdownAdminMenu({ post }: Props) {
   const openAlertModal = useOpenAlertModal();
-  const { mutateAsync: deletePost } = useDeletePostByAdmin();
+  const { mutateAsync: deletePost } = useDeletePostAsAdmin();
 
   const handleDelete = () => {
     openAlertModal({

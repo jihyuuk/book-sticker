@@ -6,7 +6,7 @@ import SettingClassroomNameField from "@/components/setting-classroom/setting-cl
 import SettingClassroomPublicLinkField from "@/components/setting-classroom/setting-classroom-public-link-field";
 import SettingClassroomPageSkeleton from "@/components/skeletons/setting-classroom-skeleton";
 import { useClassroom } from "@/hooks/queries/use-classroom";
-import { useKids } from "@/hooks/queries/use-kids";
+import { useKidsByClassroom } from "@/hooks/queries/use-kids-by-classroom";
 import { DOMAIN_URL } from "@/lib/constants";
 import { useParams } from "react-router";
 import NotFoundPage from "../not-found-page";
@@ -20,7 +20,9 @@ export default function SettingClassroomPage() {
   );
 
   // 원아 목록
-  const { data: kids, isPending: isKidsPending } = useKids(classroomId ?? "");
+  const { data: kids, isPending: isKidsPending } = useKidsByClassroom(
+    classroomId ?? "",
+  );
 
   const isLoading = isClassroomPending || isKidsPending;
   const isError = !classroom || !kids;

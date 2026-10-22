@@ -1,11 +1,11 @@
-import { deleteClassroom2 } from "@/api/classroom-api";
+import { deleteClassroom } from "@/api/classroom-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useDeleteClassroom() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteClassroom2,
+    mutationFn: deleteClassroom,
 
     onSuccess: () => {
       // 반 목록 갱신

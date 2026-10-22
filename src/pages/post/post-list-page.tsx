@@ -1,7 +1,7 @@
 import PostListFAB from "@/components/post-list/post-list-floating-button";
 import PostListIntro from "@/components/post-list/post-list-intro";
 import PostCard from "@/components/post-card/post-card";
-import { usePostListData } from "@/hooks/queries/use-post-list-data";
+import { usePublicPosts } from "@/hooks/queries/use-public-post";
 import { useParams } from "react-router";
 import MainHeader from "@/components/header/main-header";
 import GlobalError from "@/components/global-error";
@@ -23,7 +23,7 @@ export default function PostListPage() {
     isFetchNextPageError,
     hasNextPage,
     fetchNextPage,
-  } = usePostListData(publicId);
+  } = usePublicPosts(publicId);
 
   //  반 정보
   const classroom = data?.pages[0]?.classroom;

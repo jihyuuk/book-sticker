@@ -1,13 +1,13 @@
-import { fetchPostListData } from "@/api/post-api";
+import { fetchPublicPosts } from "@/api/post-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export function usePostListData(publicId?: string) {
+export function usePublicPosts(publicId?: string) {
   return useInfiniteQuery({
     queryKey: QUERY_KEYS.publicPosts(publicId ?? ""),
 
     queryFn: ({ pageParam }) =>
-      fetchPostListData({
+      fetchPublicPosts({
         publicId: publicId!,
         cursor: pageParam,
       }),

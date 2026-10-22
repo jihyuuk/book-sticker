@@ -1,11 +1,11 @@
-import { fetchKidsByClassroomId } from "@/api/kid-api";
+import { fetchKidsByClassroom } from "@/api/kid-api";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
-export function useKids(classroomId: string) {
+export function useKidsByClassroom(classroomId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.kid.list2(classroomId),
-    queryFn: () => fetchKidsByClassroomId(classroomId),
+    queryFn: () => fetchKidsByClassroom(classroomId),
     enabled: !!classroomId,
   });
 }

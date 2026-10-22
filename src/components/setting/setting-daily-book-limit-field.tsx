@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
-import { useUpdateSetting } from "@/hooks/mutations/setting/use-update-setting";
+import { useUpdateAccountSetting } from "@/hooks/mutations/setting/use-update-account-setting";
 
 import { Button } from "../ui/button";
 import { Field, FieldLabel } from "../ui/field";
@@ -19,7 +19,7 @@ export default function SettingDailyBookLimitField({
     String(oriDailyBookLimit),
   );
 
-  const { mutate, isPending: isUpdating } = useUpdateSetting();
+  const { mutate, isPending: isUpdating } = useUpdateAccountSetting();
 
   useEffect(() => {
     setDailyBookLimit(String(oriDailyBookLimit));
