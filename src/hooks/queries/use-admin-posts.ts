@@ -1,10 +1,10 @@
 import { fetchAdminPosts } from "@/api/admin-post-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export function useAdminPosts(classroomId: string | null, enabled = true) {
   return useInfiniteQuery({
-    queryKey: QUERY_KEYS.adminPosts.list(classroomId),
+    queryKey: ADMIN_QUERY_KEYS.posts.list(classroomId),
 
     queryFn: ({ pageParam }) =>
       fetchAdminPosts({

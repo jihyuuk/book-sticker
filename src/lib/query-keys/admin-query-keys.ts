@@ -2,13 +2,8 @@ export const ADMIN_QUERY_KEYS = {
   classrooms: {
     all: ["admin", "classrooms"] as const,
     list: ["admin", "classrooms", "list"] as const,
-    detail: (id: string) => ["admin", "classrooms", "detail", id] as const,
-  },
-
-  kids: {
-    all: ["admin", "kids"] as const,
-    list: (classroomId: string) =>
-      ["admin", "kids", "list", classroomId] as const,
+    detail: (classroomId: string) =>
+      ["admin", "classrooms", "detail", classroomId] as const,
   },
 
   posts: {
@@ -17,10 +12,20 @@ export const ADMIN_QUERY_KEYS = {
       ["admin", "posts", "list", classroomId] as const,
   },
 
-  chart: {
-    all: ["admin", "chart"] as const,
-    detail: (classroomId: string) => ["admin", "chart", classroomId] as const,
+  kids: {
+    all: ["admin", "kids"] as const,
+    byClassroom: (classroomId: string) =>
+      ["admin", "kids", "byClassroom", classroomId] as const,
   },
 
-  setting: ["admin", "setting"] as const,
-};
+  charts: {
+    all: ["admin", "charts"] as const,
+    byClassroom: (classroomId: string) =>
+      ["admin", "charts", "byClassroom", classroomId] as const,
+  },
+
+  settings: {
+    all: ["admin", "settings"] as const,
+    account: ["admin", "settings", "account"] as const,
+  },
+} as const;

@@ -1,10 +1,10 @@
 import { fetchKidsByClassroom } from "@/api/kid-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 export function useKidsByClassroom(classroomId: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.kid.list2(classroomId),
+    queryKey: ADMIN_QUERY_KEYS.kids.byClassroom(classroomId),
     queryFn: () => fetchKidsByClassroom(classroomId),
     enabled: !!classroomId,
   });

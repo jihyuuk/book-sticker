@@ -1,10 +1,10 @@
 import { fetchPostCreateData } from "@/api/post-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { PUBLIC_QUERY_KEYS } from "@/lib/query-keys/public-query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePostCreateData(publicId?: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.publicKids(publicId ?? ""),
+    queryKey: PUBLIC_QUERY_KEYS.posts.createData(publicId!),
     queryFn: () => fetchPostCreateData(publicId!),
     enabled: !!publicId,
   });

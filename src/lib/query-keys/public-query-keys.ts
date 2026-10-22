@@ -2,16 +2,13 @@ export const PUBLIC_QUERY_KEYS = {
   posts: {
     all: ["public", "posts"] as const,
     list: (publicId: string) => ["public", "posts", "list", publicId] as const,
+    createData: (publicId: string) =>
+      ["public", "posts", "createData", publicId] as const,
   },
 
-  chart: {
-    all: ["public", "chart"] as const,
-    detail: (publicId: string) => ["public", "chart", publicId] as const,
+  charts: {
+    all: ["public", "charts"] as const,
+    byPublicId: (publicId: string) =>
+      ["public", "charts", "byPublicId", publicId] as const,
   },
-
-  postCreateData: {
-    all: ["public", "post-create-data"] as const,
-    detail: (publicId: string) =>
-      ["public", "post-create-data", publicId] as const,
-  },
-};
+} as const;
