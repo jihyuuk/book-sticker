@@ -13,7 +13,7 @@ type UpdateKidParams = {
 };
 
 // 반의 모든 원아 + 게시글 수 조회
-export async function fetchKidsByClassroomId(classroomId: string) {
+export async function fetchKidsByClassroom(classroomId: string) {
   const { data, error } = await supabase
     .from("kid")
     .select(

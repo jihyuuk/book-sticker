@@ -64,7 +64,7 @@ export type PostListPageData = PostListData & {
 // ============================================================
 
 // 게시글 목록 조회
-export async function fetchPostListData({
+export async function fetchPublicPosts({
   publicId,
   cursor,
 }: FetchPostListParams): Promise<PostListPageData> {

@@ -42,7 +42,7 @@ export async function fetchAdminPosts({
 }
 
 //어드민 - 게시글 삭제
-export async function deletePostByAdmin(postId: string): Promise<void> {
+export async function deletePostAsAdmin(postId: string): Promise<void> {
   const { error } = await supabase.functions.invoke("delete-post-by-admin", {
     body: {
       postId,

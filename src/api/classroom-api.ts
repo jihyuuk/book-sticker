@@ -17,7 +17,7 @@ export type UpdateClassroomParam = {
 // ============================================================
 
 // 반 단건 조회
-export async function fetchClassroom2(classroomId: string) {
+export async function fetchClassroom(classroomId: string) {
   const { data, error } = await supabase
     .from("classroom")
     .select("*")
@@ -45,7 +45,7 @@ export async function fetchClassrooms() {
 // 생성
 // ============================================================
 
-export async function createClassroom2(request: CreateClassroomParam) {
+export async function createClassroom(request: CreateClassroomParam) {
   const { data, error } = await supabase
     .from("classroom")
     .insert({
@@ -81,17 +81,7 @@ export async function updateClassroom(
 // 삭제
 // ============================================================
 
-export async function deleteClassroom(id: Classroom["id"]): Promise<void> {
-  const { error } = await supabase.functions.invoke("delete-classroom", {
-    body: {
-      classroomId: id,
-    },
-  });
-
-  if (error) throw error;
-}
-
-export async function deleteClassroom2(classroomId: string) {
+export async function deleteClassroom(classroomId: string) {
   const { error } = await supabase
     .from("classroom")
     .delete()

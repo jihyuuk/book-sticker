@@ -6,7 +6,7 @@ export type UpdateAccountSettingParam = Partial<
 >;
 
 //account_setting 컬럼 불러오기
-export async function fetchSettingData() {
+export async function fetchAccountSetting() {
   const { data, error } = await supabase
     .from("account_setting")
     .select("name, daily_book_limit")
