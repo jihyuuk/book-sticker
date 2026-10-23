@@ -32,7 +32,7 @@ export default function PublicChartPage() {
       <ChartHeader title={data.classroom.name} />
 
       {/* 차트 영역 */}
-      <ChartList kids={data.kids} />
+      <ChartList chart={data.chart} />
 
       {/* 하단 이미지 */}
       <FooterImage />

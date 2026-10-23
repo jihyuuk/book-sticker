@@ -1,4 +1,6 @@
+import { getKidProfileUrl } from "@/lib/storage";
 import { supabase } from "@/lib/supabse";
+import type { PublicClassroom, PublicKid } from "@/types/dto/public-dto";
 
 // 최신 코드
 export type ChartKid = {
@@ -67,16 +69,26 @@ export async function fetchAdminChart(
   };
 }
 
-// 공개 차트 조회
+//========================================================================
+//Public Chart - 통과
+//========================================================================
+// 공개 차트 응답 - 통과
+export type PublicChartResponse = {
+  classroom: PublicClassroom;
+  chart: {
+    kid: PublicKid;
+    postCount: number;
+    totalCount: number;
+  }[];
+};
+
+// 공개 차트 조회 - 통과
 export async function fetchPublicChart(
   publicId: string,
-): Promise<ChartResponse> {
-  const { data, error } = await supabase.functions.invoke<ChartResponse>(
-    "fetch-public-chart",
-    {
-      body: { publicId },
-    },
-  );
+): Promise<PublicChartResponse> {
+  const { data, error } = await supabase.rpc("get_public_chart", {
+    p_public_id: publicId,
+  });
 
   if (error) throw error;
 
@@ -84,5 +96,17 @@ export async function fetchPublicChart(
     throw new Error("차트 데이터를 불러오지 못했습니다.");
   }
 
-  return data;
+  const response = data as unknown as PublicChartResponse;
+
+  //그냥 반환 못해요 ㅜㅜ kid의 profileImage가 path라 url로 변환해줘야해요 ㅜㅜ
+  return {
+    ...response,
+    chart: response.chart.map((item) => ({
+      ...item,
+      kid: {
+        ...item.kid,
+        profileImageUrl: getKidProfileUrl(item.kid.profileImageUrl),
+      },
+    })),
+  };
 }
