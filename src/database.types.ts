@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -41,32 +41,46 @@ export type Database = {
       book: {
         Row: {
           author: string | null
+          cover_path: string | null
           cover_url: string | null
           created_at: string
           id: string
           isbn: string | null
+          post_id: string
           publisher: string | null
           title: string
         }
         Insert: {
           author?: string | null
+          cover_path?: string | null
           cover_url?: string | null
           created_at?: string
           id?: string
           isbn?: string | null
+          post_id: string
           publisher?: string | null
           title: string
         }
         Update: {
           author?: string | null
+          cover_path?: string | null
           cover_url?: string | null
           created_at?: string
           id?: string
           isbn?: string | null
+          post_id?: string
           publisher?: string | null
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "book_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "post"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       classroom: {
         Row: {
@@ -75,6 +89,7 @@ export type Database = {
           is_public: boolean
           name: string | null
           public_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -83,6 +98,7 @@ export type Database = {
           is_public?: boolean
           name?: string | null
           public_id: string
+          updated_at?: string
           user_id?: string
         }
         Update: {
@@ -91,6 +107,7 @@ export type Database = {
           is_public?: boolean
           name?: string | null
           public_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -103,6 +120,7 @@ export type Database = {
           id: string
           name: string
           profile_image_url: string | null
+          updated_at: string
         }
         Insert: {
           book_count?: number
@@ -111,6 +129,7 @@ export type Database = {
           id?: string
           name: string
           profile_image_url?: string | null
+          updated_at?: string
         }
         Update: {
           book_count?: number
@@ -119,6 +138,7 @@ export type Database = {
           id?: string
           name?: string
           profile_image_url?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -132,7 +152,6 @@ export type Database = {
       }
       post: {
         Row: {
-          book_id: string
           classroom_id: string
           content: string | null
           created_at: string
@@ -142,7 +161,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          book_id: string
           classroom_id: string
           content?: string | null
           created_at?: string
@@ -152,7 +170,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          book_id?: string
           classroom_id?: string
           content?: string | null
           created_at?: string
@@ -162,13 +179,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "post_book_id_fkey"
-            columns: ["book_id"]
-            isOneToOne: false
-            referencedRelation: "book"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "post_classroom_id_fkey"
             columns: ["classroom_id"]
@@ -217,11 +227,67 @@ export type Database = {
           },
         ]
       }
+      storage_cleanup_queue: {
+        Row: {
+          bucket: string
+          claim_token: string | null
+          created_at: string
+          id: number
+          last_error: string | null
+          locked_until: string | null
+          next_attempt_at: string
+          retry_count: number
+          storage_path: string
+        }
+        Insert: {
+          bucket: string
+          claim_token?: string | null
+          created_at?: string
+          id?: never
+          last_error?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          retry_count?: number
+          storage_path: string
+        }
+        Update: {
+          bucket?: string
+          claim_token?: string | null
+          created_at?: string
+          id?: never
+          last_error?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          retry_count?: number
+          storage_path?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      claim_storage_cleanup_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          bucket: string
+          claim_token: string | null
+          created_at: string
+          id: number
+          last_error: string | null
+          locked_until: string | null
+          next_attempt_at: string
+          retry_count: number
+          storage_path: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "storage_cleanup_queue"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       create_post: {
         Args: {
           p_author: string
@@ -236,12 +302,38 @@ export type Database = {
         }
         Returns: string
       }
+      create_post_v2: {
+        Args: {
+          p_author: string
+          p_content: string
+          p_cover_path: string
+          p_cover_url: string
+          p_images: Json
+          p_isbn: string
+          p_kid_id: string
+          p_password_hash: string
+          p_post_id: string
+          p_public_id: string
+          p_publisher: string
+          p_title: string
+        }
+        Returns: string
+      }
+      finish_storage_cleanup_jobs: {
+        Args: { p_claim_token: string; p_error?: string; p_ids: number[] }
+        Returns: number
+      }
+      get_public_chart: { Args: { p_public_id: string }; Returns: Json }
       get_public_chart_data: { Args: { p_public_id: string }; Returns: Json }
       get_public_classroom: { Args: { p_public_id: string }; Returns: Json }
       get_public_kids: { Args: { p_public_id: string }; Returns: Json }
       get_public_posts: { Args: { p_public_id: string }; Returns: Json }
       update_post: {
         Args: { p_content: string; p_post_id: string }
+        Returns: string
+      }
+      update_post_v2: {
+        Args: { p_content: string; p_images: Json; p_post_id: string }
         Returns: string
       }
     }
