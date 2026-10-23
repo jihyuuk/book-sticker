@@ -16,6 +16,7 @@ import { Loader2 } from "lucide-react";
 import { SELECTED_KID_KEY } from "@/lib/constants";
 import { FieldGroup } from "../ui/field";
 import type { CreatePostParam } from "@/api/post-api";
+import { requestScrollReset } from "@/lib/scroll";
 
 type Props = {
   data: PostCreateData;
@@ -91,10 +92,8 @@ export default function PostNewForm({ data }: Props) {
       {
         onSuccess: () => {
           toast.success("성공");
-
-          navigate(`/classroom/${classroom.public_id}/posts`, {
-            replace: true,
-          });
+          requestScrollReset();
+          navigate(-1);
         },
         // onError: (error) => {
         //   alert(error);

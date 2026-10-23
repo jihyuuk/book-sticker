@@ -4,6 +4,7 @@ export const DOMAIN_URL = import.meta.env.VITE_DOMAIN_URL;
 
 //세션 스토리지 키
 export const VERIFICATION_EMAIL = "verificationEmail";
+export const SCROLL_RESET_KEY = "scroll-reset";
 
 //로컬 스토리지 키
 export const SELECTED_KID_KEY = "bookmate-selected-kid";
