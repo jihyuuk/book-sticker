@@ -10,8 +10,21 @@ import { useEffect, useRef } from "react";
 import { INFINITE_SCROLL_ROOT_MARGIN } from "@/lib/constants";
 import NotFoundPage from "../not-found-page";
 import PublicPostListSkeleton from "@/components/skeletons/public-post-list-skeleton";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function PostListPage() {
+  //자동포커스
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const { publicId } = useParams();
 
   const {
@@ -19,6 +32,7 @@ export default function PostListPage() {
     isPending,
     isError,
     isFetching,
+    isRefetching,
     isFetchingNextPage,
     isFetchNextPageError,
     hasNextPage,
@@ -78,6 +92,45 @@ export default function PostListPage() {
             {/* 선생님이 작성한 타이틀 */}
             <PostListIntro classroomName={classroom.name} />
 
+            <Drawer repositionInputs={true}>
+              <DrawerTrigger asChild>
+                <Button>비밀번호 입력</Button>
+              </DrawerTrigger>
+
+              <DrawerContent
+                onOpenAutoFocus={(event) => {
+                  event.preventDefault();
+                  inputRef.current?.focus();
+                }}
+              >
+                <DrawerHeader>
+                  <DrawerTitle>비밀번호 확인</DrawerTitle>
+                </DrawerHeader>
+
+                <div className="flex gap-2 p-4">
+                  <Input
+                    ref={inputRef}
+                    type="password"
+                    placeholder="비밀번호"
+                    onBlur={(e) => {
+                      e.currentTarget.focus();
+                    }}
+                  />
+                  <DrawerClose asChild>
+                    <Button onPointerDown={(e) => e.preventDefault()}>
+                      닫기
+                    </Button>
+                  </DrawerClose>
+                </div>
+              </DrawerContent>
+            </Drawer>
+
+            {isRefetching && (
+              <div className="flex justify-center py-3">
+                <LoaderCircle className="size-5 animate-spin text-gray-400" />
+              </div>
+            )}
+
             {/* 게시글 목록 */}
             {!posts.length ? (
               <p className="py-16 text-center text-gray-400">
@@ -108,7 +161,12 @@ export default function PostListPage() {
                   <div className="py-10 text-center">
                     <button
                       className="inline-flex items-center gap-2 text-sm text-gray-500"
-                      onClick={() => void fetchNextPage()}
+                      onClick={() => {
+                        if (!isFetching && hasNextPage) {
+                          void fetchNextPage();
+                        }
+                      }}
+                      disabled={isFetching}
                     >
                       <RotateCw className="size-4" />
                       다시 시도하기

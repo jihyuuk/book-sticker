@@ -17,5 +17,7 @@ export function usePublicPosts(publicId?: string) {
     getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
 
     enabled: !!publicId,
+
+    staleTime: Infinity, //리패칭 방지
   });
 }

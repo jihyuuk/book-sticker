@@ -7,8 +7,8 @@ import {
 } from "../ui/dropdown-menu";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
-import type { PublicPost } from "@/types/public-types";
 import { useDeletePostAsAdmin } from "@/hooks/mutations/post/use-delete-post-as-admin";
+import type { PublicPost } from "@/types/dto/public-dto";
 
 type Props = {
   post: PublicPost;

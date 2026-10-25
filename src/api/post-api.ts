@@ -1,6 +1,7 @@
 import type { BookInfoData } from "@/components/book/book-info";
 import { supabase } from "@/lib/supabse";
-import type { PostCreateData, PostListData } from "@/types/data-types";
+import type { PostCreateData } from "@/types/data-types";
+import type { PublicPostsPageData } from "@/types/dto/public-dto";
 
 // ============================================================
 // 타입
@@ -50,13 +51,10 @@ export type UpdatePostResponse = {
   }[];
 };
 
-type FetchPostListParams = {
+//publicPost 조회 파라미터
+type FetchPublicPostParams = {
   publicId: string;
   cursor: string | null;
-};
-
-export type PostListPageData = PostListData & {
-  nextCursor: string | null;
 };
 
 // ============================================================
@@ -67,8 +65,8 @@ export type PostListPageData = PostListData & {
 export async function fetchPublicPosts({
   publicId,
   cursor,
-}: FetchPostListParams): Promise<PostListPageData> {
-  const { data, error } = await supabase.functions.invoke<PostListPageData>(
+}: FetchPublicPostParams): Promise<PublicPostsPageData> {
+  const { data, error } = await supabase.functions.invoke<PublicPostsPageData>(
     "fetch-public-posts",
     {
       body: {

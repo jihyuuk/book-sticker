@@ -1,10 +1,11 @@
-import type { PublicPost } from "@/types/public-types";
 import { formatRelativeTime } from "@/lib/utils";
 import PostDropdownMenu from "./post-dropdown-menu";
 import PostDropdownAdminMenu from "./post-dropdown-admin-menu";
+import type { PublicPost } from "@/types/dto/public-dto";
 
 type Props = {
   post: PublicPost;
+  //리팩토링-null 제거
   classroomName?: string | null;
   isAdmin?: boolean;
 };
@@ -17,9 +18,9 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
       <div className="flex min-w-0 items-center gap-3">
         {/* 프로필 이미지 */}
         <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
-          {kid.profile_image_url ? (
+          {kid.profileImageUrl ? (
             <img
-              src={kid.profile_image_url}
+              src={kid.profileImageUrl}
               alt={`${kid.name} 프로필`}
               className="h-full w-full object-cover"
             />
@@ -44,9 +45,9 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
               </>
             )}
 
-            {formatRelativeTime(post.created_at)}
+            {formatRelativeTime(post.createdAt)}
 
-            {post.created_at !== post.updated_at && (
+            {post.createdAt !== post.updatedAt && (
               <span className="">(수정됨)</span>
             )}
           </p>

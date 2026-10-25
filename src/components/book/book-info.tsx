@@ -2,17 +2,10 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import FALLBACK_IMAGE from "@/assets/no-book-cover.png";
 import { useOpenImageViewer } from "@/store/image-viewer-store";
-
-export type BookInfoData = {
-  isbn: string | null;
-  title: string;
-  author: string | null;
-  publisher: string | null;
-  cover_url: string | null;
-};
+import type { PublicBook } from "@/types/dto/public-dto";
 
 type Props = {
-  book: BookInfoData;
+  book: PublicBook;
   className?: string;
 };
 
@@ -64,8 +57,8 @@ export default function BookInfo({ book, className }: Props) {
   return (
     <div className={cn("flex gap-3", className)}>
       <BookCover
-        key={book.cover_url ?? "no-cover"}
-        src={book.cover_url}
+        key={book.coverUrl ?? "no-cover"}
+        src={book.coverUrl}
         title={book.title}
       />
 
