@@ -1,7 +1,7 @@
-import type { BookInfoData } from "@/components/book/book-info";
 import { supabase } from "@/lib/supabse";
 import type {
   PostCreateData,
+  PublicBook,
   PublicPostsPageData,
 } from "@/types/dto/public-dto";
 
@@ -9,22 +9,28 @@ import type {
 // 타입
 // ============================================================
 
-// 게시글 비번 인증
-export type PostPasswordParam = {
-  postId: string;
-  password: string;
+//publicPost 조회 파라미터
+type FetchPublicPostParams = {
+  publicId: string;
+  cursor: string | null;
 };
 
 // 게시글 생성
 export type CreatePostParam = {
   publicId: string;
   kidId: string;
-  book: BookInfoData & {
+  book: PublicBook & {
     coverImageFile: File | null;
   };
   content: string;
   password: string;
   images: File[];
+};
+
+// 게시글 비번 인증
+export type PostPasswordParam = {
+  postId: string;
+  password: string;
 };
 
 // 게시글 수정
@@ -51,12 +57,6 @@ export type UpdatePostResponse = {
     id: string;
     imageUrl: string;
   }[];
-};
-
-//publicPost 조회 파라미터
-type FetchPublicPostParams = {
-  publicId: string;
-  cursor: string | null;
 };
 
 // ============================================================
