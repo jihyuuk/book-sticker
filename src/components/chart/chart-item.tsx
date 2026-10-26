@@ -1,20 +1,14 @@
 import { star } from "@/lib/chart-images";
 import { INFO_HEIGHT } from "@/lib/constants";
-import type { PublicKid } from "@/types/dto/public-dto";
+import type { ChartKid } from "@/types/dto/public-dto";
 
 type Props = {
-  kid: PublicKid;
-  totalCount: number;
+  kid: ChartKid;
   stickerGap: number;
   background: string;
 };
 
-export default function ChartItem({
-  kid,
-  totalCount,
-  stickerGap,
-  background,
-}: Props) {
+export default function ChartItem({ kid, stickerGap, background }: Props) {
   return (
     <section className="h-full w-16 shrink-0 overflow-hidden rounded-xl bg-[rgb(254,247,233)] shadow-sm md:w-19">
       <div
@@ -23,7 +17,7 @@ export default function ChartItem({
       >
         {/* 스티커 영역 */}
         <div className="relative min-h-0 w-full flex-1">
-          {Array.from({ length: totalCount }).map((_, stickerIndex) => (
+          {Array.from({ length: kid.totalCount }).map((_, stickerIndex) => (
             <img
               key={stickerIndex}
               // src={getBookImage(kid.id, stickerIndex)} 스티커가 책 <- 이게 더 좋은데 ㅜㅜ
@@ -45,7 +39,7 @@ export default function ChartItem({
             {kid.name}
           </p>
           <p className="w-full truncate text-center text-xs text-stone-600 md:text-sm">
-            {totalCount}권
+            {kid.totalCount}권
           </p>
         </div>
       </div>

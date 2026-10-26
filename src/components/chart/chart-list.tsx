@@ -7,25 +7,25 @@ import {
 } from "@/lib/utils";
 import { useChartHeight } from "@/hooks/utils/use-chart-height";
 import { useDragScroll } from "@/hooks/utils/use-drag-scroll";
-import type { PublicChartResponse } from "@/api/chart-api";
+import type { PublicChart } from "@/types/dto/public-dto";
 
 type Props = {
-  chart: PublicChartResponse["chart"];
+  kids: PublicChart["chartKids"];
 };
 
-export default function ChartList({ chart }: Props) {
+export default function ChartList({ kids }: Props) {
   //차트 동적 높이 측정
   const { chartRef, chartHeight } = useChartHeight();
   const dragScroll = useDragScroll();
 
   //차트의 최대 권 수
-  const kidMaxBookCount = Math.max(...chart.map((c) => c.totalCount), 0); //현재 아이들 중 최대 권 수
+  const kidMaxBookCount = Math.max(...kids.map((kid) => kid.totalCount), 0); //현재 아이들 중 최대 권 수
   const { chartMaxBookCount, scaleValues } = getChartScale(kidMaxBookCount);
 
   //스티커 갭
   const stickerGap = getStickerGap(chartMaxBookCount, chartHeight);
 
-  if (chart.length === 0) {
+  if (kids.length === 0) {
     return (
       <div className="mb-20 flex min-h-0 flex-1 items-center justify-center px-4 text-center text-stone-400">
         아직 등록된 어린이가 없어요.
@@ -41,13 +41,12 @@ export default function ChartList({ chart }: Props) {
     >
       {/* 차트 */}
       <div className="relative mx-auto flex h-full w-max gap-3 pr-2 pl-6">
-        {chart.map((c, index) => (
+        {kids.map((kid, index) => (
           <ChartItem
-            key={c.kid.id}
-            kid={c.kid}
-            totalCount={c.totalCount}
+            key={kid.id}
+            kid={kid}
             stickerGap={stickerGap}
-            background={getRainbowBackground(index, chart.length)}
+            background={getRainbowBackground(index, kids.length)}
           />
         ))}
 

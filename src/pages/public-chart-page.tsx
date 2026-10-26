@@ -29,10 +29,10 @@ export default function PublicChartPage() {
       {/* <HeaderImage /> */}
 
       {/* 헤더 */}
-      <ChartHeader title={data.classroom.name} />
+      <ChartHeader title={data.classroom.name ?? ""} />
 
       {/* 차트 영역 */}
-      <ChartList chart={data.chart} />
+      <ChartList kids={data.chartKids} />
 
       {/* 하단 이미지 */}
       <FooterImage />
