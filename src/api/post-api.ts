@@ -1,7 +1,9 @@
 import type { BookInfoData } from "@/components/book/book-info";
 import { supabase } from "@/lib/supabse";
-import type { PostCreateData } from "@/types/data-types";
-import type { PublicPostsPageData } from "@/types/dto/public-dto";
+import type {
+  PostCreateData,
+  PublicPostsPageData,
+} from "@/types/dto/public-dto";
 
 // ============================================================
 // 타입
@@ -89,13 +91,17 @@ export async function fetchPublicPosts({
 export async function fetchPostCreateData(
   publicId: string,
 ): Promise<PostCreateData | null> {
-  const { data, error } = await supabase.rpc("get_public_kids", {
+  const { data, error } = await supabase.rpc("get_public_post_create_data", {
     p_public_id: publicId,
   });
 
   if (error) throw error;
 
-  return data as unknown as PostCreateData | null;
+  if (!data) {
+    throw new Error("존재하지 않거나 공개되지 않은 반입니다.");
+  }
+
+  return data as PostCreateData;
 }
 
 // ============================================================

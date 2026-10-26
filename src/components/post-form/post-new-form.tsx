@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
 import PostBookField from "../post-field/post-book-field";
 import { useNavigate } from "react-router";
-import type { PostCreateData } from "@/types/data-types";
 import PostKidField from "../post-field/post-kid-field";
 import PostPasswordField from "../post-field/post-password-field";
 import PostSubmitButton from "../post-field/post-submit-button";
@@ -17,6 +16,7 @@ import { SELECTED_KID_KEY } from "@/lib/constants";
 import { FieldGroup } from "../ui/field";
 import type { CreatePostParam } from "@/api/post-api";
 import { requestScrollReset } from "@/lib/scroll";
+import type { PostCreateData } from "@/types/dto/public-dto";
 
 type Props = {
   data: PostCreateData;
@@ -25,7 +25,7 @@ type Props = {
 export default function PostNewForm({ data }: Props) {
   const navigate = useNavigate();
 
-  const { classroom, kids } = data;
+  const { classroom, kids, dailyBookLimit } = data;
 
   const { mutate, isPending } = useCreatePost();
 
@@ -51,8 +51,26 @@ export default function PostNewForm({ data }: Props) {
     (image) => image.type === "new" && image.status !== "ready",
   );
 
+  //빈칸처리
+  const [showErrors, setShowErrors] = useState(false);
+
+  const errors = {
+    kid: !kidId.trim(),
+    book: !book,
+    content: !caption.trim(),
+    password: password.length < 6,
+  };
+
+  // 선택된 아이
+  const selectedKid = kids.find((kid) => kid.id === kidId);
+
+  // 일일 게시글 제한 여부
+  const isDailyLimitReached =
+    !!selectedKid && selectedKid.todayPostCount >= dailyBookLimit;
+
+  // 작성하기
   const handleSubmit = () => {
-    if (isPending || isImageProcessing) return;
+    if (isPending || isImageProcessing || isDailyLimitReached) return;
 
     // 에러 표시 활성화
     setShowErrors(true);
@@ -80,7 +98,7 @@ export default function PostNewForm({ data }: Props) {
 
     mutate(
       {
-        publicId: classroom.public_id,
+        publicId: classroom.publicId,
         book,
         kidId,
         content: caption,
@@ -113,16 +131,6 @@ export default function PostNewForm({ data }: Props) {
     );
   };
 
-  //빈칸처리
-  const [showErrors, setShowErrors] = useState(false);
-
-  const errors = {
-    kid: !kidId.trim(),
-    book: !book,
-    content: !caption.trim(),
-    password: password.length < 6,
-  };
-
   return (
     <div>
       <FieldGroup className="px-page-x gap-6! py-3 pb-60">
@@ -133,6 +141,7 @@ export default function PostNewForm({ data }: Props) {
           onValueChange={handleKidChange}
           disabled={isPending}
           error={showErrors && errors.kid}
+          limitReached={isDailyLimitReached}
         />
 
         {/* 책 */}
@@ -170,7 +179,7 @@ export default function PostNewForm({ data }: Props) {
       {/* 작성 버튼 */}
       <PostSubmitButton
         onClick={handleSubmit}
-        disabled={isPending || isImageProcessing}
+        disabled={isPending || isImageProcessing || isDailyLimitReached}
       >
         {isPending ? <Loader2 className="animate-spin" /> : "작성하기"}
       </PostSubmitButton>

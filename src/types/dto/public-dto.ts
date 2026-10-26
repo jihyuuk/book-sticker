@@ -33,6 +33,15 @@ export type PublicPostsPageData = {
   nextCursor: string | null;
 };
 
+// Post 생성에 필요한 데이터
+export type PostCreateData = {
+  classroom: PublicClassroom;
+  kids: (Omit<PublicKid, "bookCount"> & {
+    todayPostCount: number;
+  })[];
+  dailyBookLimit: number;
+};
+
 // Book
 export type PublicBook = {
   id: string;

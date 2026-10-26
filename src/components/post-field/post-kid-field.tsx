@@ -1,4 +1,3 @@
-import type { PublicKid } from "@/types/public-types";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import {
   Select,
@@ -8,13 +7,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import type { PostCreateData } from "@/types/dto/public-dto";
 
 type Props = {
-  kids: PublicKid[];
+  kids: PostCreateData["kids"];
   value: string;
   onValueChange: (kidId: string) => void;
   disabled?: boolean;
   error: boolean;
+  limitReached: boolean;
 };
 
 export default function PostKidField({
@@ -23,7 +24,14 @@ export default function PostKidField({
   onValueChange,
   disabled,
   error,
+  limitReached,
 }: Props) {
+  const errorMessage = limitReached
+    ? "오늘은 더 이상 작성할 수 없어요."
+    : error
+      ? "작성자를 선택해주세요."
+      : null;
+
   return (
     <Field className="w-full">
       <FieldLabel id="post-kid" className="scroll-mt-24">
@@ -31,7 +39,7 @@ export default function PostKidField({
       </FieldLabel>
 
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger aria-invalid={error}>
+        <SelectTrigger aria-invalid={error || limitReached}>
           <SelectValue placeholder="누가 읽었나요?" />
         </SelectTrigger>
         <SelectContent>
@@ -45,7 +53,7 @@ export default function PostKidField({
         </SelectContent>
       </Select>
 
-      {error && <FieldError>작성자를 선택해주세요.</FieldError>}
+      {errorMessage && <FieldError>{errorMessage}</FieldError>}
     </Field>
   );
 }
