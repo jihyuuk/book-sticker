@@ -182,3 +182,52 @@ export function formatRelativeTime(dateString: string) {
 
   return `${Math.floor(diffMs / year)}년 전`;
 }
+
+export function formatRelativeTimeKST(dateString: string) {
+  const now = new Date();
+  const date = new Date(dateString);
+
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const kstOffset = 9 * hour;
+
+  const diffMs = now.getTime() - date.getTime();
+
+  if (Number.isNaN(diffMs)) return "날짜 정보 없음";
+
+  // 24시간 미만: 실제 경과 시간
+  if (diffMs < minute) return "방금 전";
+  if (diffMs < hour) return `${Math.floor(diffMs / minute)}분 전`;
+  if (diffMs < day) return `${Math.floor(diffMs / hour)}시간 전`;
+
+  // 한국 시간으로 변환 (UTC+9)
+  const nowKST = new Date(now.getTime() + kstOffset);
+  const dateKST = new Date(date.getTime() + kstOffset);
+
+  // 한국 달력 기준 날짜 차이
+  const daysDiff =
+    Math.floor((now.getTime() + kstOffset) / day) -
+    Math.floor((date.getTime() + kstOffset) / day);
+
+  if (daysDiff === 1) return "어제";
+  if (daysDiff < 7) return `${daysDiff}일 전`;
+
+  // 실제 달력 기준 개월 수
+  let monthsDiff =
+    (nowKST.getUTCFullYear() - dateKST.getUTCFullYear()) * 12 +
+    (nowKST.getUTCMonth() - dateKST.getUTCMonth());
+
+  const daysInMonth = new Date(
+    Date.UTC(nowKST.getUTCFullYear(), nowKST.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+
+  if (nowKST.getUTCDate() < Math.min(dateKST.getUTCDate(), daysInMonth)) {
+    monthsDiff--;
+  }
+
+  if (monthsDiff >= 12) return `${Math.floor(monthsDiff / 12)}년 전`;
+  if (monthsDiff >= 1) return `${monthsDiff}개월 전`;
+
+  return `${Math.floor(daysDiff / 7)}주 전`;
+}
