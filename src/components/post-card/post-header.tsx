@@ -1,8 +1,8 @@
-import { formatRelativeTime } from "@/lib/utils";
 import PostDropdownMenu from "./post-dropdown-menu";
 import PostDropdownAdminMenu from "./post-dropdown-admin-menu";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { useMemo, useState } from "react";
+import { formatRelativeTimeKST } from "@/lib/utils";
 
 type Props = {
   post: PublicPost;
@@ -18,15 +18,20 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
 
   // n 분전
   const relativeTime = useMemo(
-    () => formatRelativeTime(post.createdAt),
+    () => formatRelativeTimeKST(post.createdAt),
     [post.createdAt],
   );
 
-  // 2026-10-05 00:00:00
+  // 2026-10-05 00:00
   const absoluteTime = useMemo(
     () =>
       new Date(post.createdAt).toLocaleString("sv-SE", {
         timeZone: "Asia/Seoul",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       }),
     [post.createdAt],
