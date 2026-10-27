@@ -1,8 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 
 import { deletePost } from "@/api/post-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
 import type { PostListData } from "@/types/data-types";
+import { PUBLIC_QUERY_KEYS } from "@/lib/query-keys/public-query-keys";
 
 export function useDeletePost(publicId?: string) {
   const queryClient = useQueryClient();
@@ -13,14 +17,17 @@ export function useDeletePost(publicId?: string) {
     onSuccess: (_, variables) => {
       if (!publicId) return;
 
-      queryClient.setQueryData<PostListData>(
-        QUERY_KEYS.publicPosts(publicId),
+      queryClient.setQueryData<InfiniteData<PostListData>>(
+        PUBLIC_QUERY_KEYS.posts.list(publicId),
         (old) => {
           if (!old) return old;
 
           return {
             ...old,
-            posts: old.posts.filter((post) => post.id !== variables.postId),
+            pages: old.pages.map((page) => ({
+              ...page,
+              posts: page.posts.filter((post) => post.id !== variables.postId),
+            })),
           };
         },
       );

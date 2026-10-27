@@ -12,7 +12,6 @@ export type PublicKid = {
   id: string;
   name: string;
   profileImageUrl: string | null;
-  bookCount: number;
 };
 
 // Post
@@ -20,7 +19,7 @@ export type PublicPost = {
   id: string;
   content: string | null; // not null 설정 해야함
   images: Image[];
-  kid: Omit<PublicKid, "bookCount">;
+  kid: PublicKid;
   book: PublicBook;
   createdAt: string;
   updatedAt: string;
@@ -36,7 +35,7 @@ export type PublicPostsPageData = {
 // Post 생성에 필요한 데이터
 export type PostCreateData = {
   classroom: PublicClassroom;
-  kids: (Omit<PublicKid, "bookCount"> & {
+  kids: (PublicKid & {
     todayPostCount: number;
   })[];
   dailyBookLimit: number;
@@ -56,4 +55,17 @@ export type PublicBook = {
 export type Image = {
   id: string;
   imageUrl: string;
+};
+
+// Chart Kid - 차트 전용 정보
+export type ChartKid = PublicKid & {
+  bookCount: number;
+  postCount: number;
+  totalCount: number;
+};
+
+// Chart 데이터
+export type PublicChart = {
+  classroom: PublicClassroom;
+  chartKids: ChartKid[];
 };

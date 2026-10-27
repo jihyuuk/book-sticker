@@ -5,7 +5,7 @@ export function requestScrollReset() {
   sessionStorage.setItem(SCROLL_RESET_KEY, "true");
 }
 
-// 요청 확인 및 제거
+// 요청 확인 및 제거d
 export function consumeScrollReset() {
   const shouldReset = sessionStorage.getItem(SCROLL_RESET_KEY) === "true";
 

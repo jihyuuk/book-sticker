@@ -65,7 +65,7 @@ export default function SettingClassroomKidsField({
     setDeleting(id, true);
 
     try {
-      await deleteKid.mutateAsync(id);
+      await deleteKid.mutateAsync({ kidId: id, classroomId });
       toast.success("삭제 완료");
     } catch {
       toast.error("삭제 실패");

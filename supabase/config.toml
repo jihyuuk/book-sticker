@@ -415,3 +415,12 @@ enabled = true
 
 [functions.fetch-public-posts]
 verify_jwt = false
+
+[functions.create-post]
+verify_jwt = false
+
+[functions.delete-post]
+verify_jwt = false
+
+[functions.fetch-admin-posts]
+verify_jwt = true

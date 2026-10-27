@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 export function useAdminPosts(classroomId: string | null, enabled = true) {
   return useInfiniteQuery({
-    queryKey: ADMIN_QUERY_KEYS.posts.list(classroomId),
+    queryKey: ADMIN_QUERY_KEYS.posts.byClassroom(classroomId),
 
     queryFn: ({ pageParam }) =>
       fetchAdminPosts({
@@ -17,5 +17,8 @@ export function useAdminPosts(classroomId: string | null, enabled = true) {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
 
     enabled,
+
+    staleTime: Infinity, //리패칭 방지
+    gcTime: 15 * 60 * 1000, // 15분
   });
 }

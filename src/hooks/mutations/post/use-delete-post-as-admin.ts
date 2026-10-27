@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/lib/query-keys";
 import { deletePostAsAdmin } from "@/api/admin-post-api";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 
 export function useDeletePostAsAdmin() {
   const queryClient = useQueryClient();
@@ -11,7 +11,7 @@ export function useDeletePostAsAdmin() {
     //리팩토링 고려 새로고침이 아닌 해당값만 지우게
     onSuccess: () => {
       return queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.adminPosts.all,
+        queryKey: ADMIN_QUERY_KEYS.posts.all,
       });
     },
   });

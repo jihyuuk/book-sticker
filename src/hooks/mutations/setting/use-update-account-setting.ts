@@ -1,5 +1,5 @@
 import { fetchAccountSetting, updateAccountSetting } from "@/api/setting-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useUpdateAccountSetting() {
@@ -10,7 +10,7 @@ export function useUpdateAccountSetting() {
 
     onSuccess: (_, variables) => {
       queryClient.setQueryData<Awaited<ReturnType<typeof fetchAccountSetting>>>(
-        QUERY_KEYS.setting,
+        ADMIN_QUERY_KEYS.settings.account,
         (old) => {
           if (!old) return old;
 

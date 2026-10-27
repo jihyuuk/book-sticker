@@ -1,5 +1,6 @@
-import { updateKid } from "@/api/kid-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { updateKid, fetchKidsByClassroom } from "@/api/kid-api";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
+import { clearAdminPostsAndChart } from "@/lib/query-keys/remove-cache";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type UpdateKidMutationParam = Parameters<typeof updateKid>[0] & {
@@ -17,10 +18,21 @@ export function useUpdateKid() {
         bookCount,
       }),
 
-    onSuccess: async (_, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.kid.list2(variables.classroomId),
+    onSuccess: (updatedKid, variables) => {
+      queryClient.setQueryData<
+        Awaited<ReturnType<typeof fetchKidsByClassroom>>
+      >(ADMIN_QUERY_KEYS.kids.byClassroom(variables.classroomId), (old) => {
+        if (!old) return old;
+
+        return old
+          .map((kid) =>
+            kid.id === updatedKid.id ? { ...kid, ...updatedKid } : kid,
+          )
+          .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "", "ko"));
       });
+
+      // posts,chart 캐싱 지우기
+      clearAdminPostsAndChart(queryClient);
     },
   });
 }

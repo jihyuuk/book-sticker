@@ -22,11 +22,11 @@ export type ChartResponse = {
 // 관리자 차트 조회
 export async function fetchAdminChart(
   classroomId: string,
-): Promise<ChartResponse> {
+): Promise<PublicChart> {
   const [classroomResult, kidsResult] = await Promise.all([
     supabase
       .from("classroom")
-      .select("id, name")
+      .select("id, name, public_id")
       .eq("id", classroomId)
       .single(),
 
@@ -36,36 +36,41 @@ export async function fetchAdminChart(
         `
         id,
         name,
+        profile_image_url,
         book_count,
         post(count)
       `,
       )
       .eq("classroom_id", classroomId)
-      .order("name", { ascending: true }),
+      .order("name"),
   ]);
 
   if (classroomResult.error) throw classroomResult.error;
   if (kidsResult.error) throw kidsResult.error;
 
-  const kids = (kidsResult.data ?? []).map((kid) => {
+  const classroom = classroomResult.data;
+
+  const chartKids = kidsResult.data.map((kid) => {
     const bookCount = kid.book_count ?? 0;
     const postCount = kid.post?.[0]?.count ?? 0;
 
     return {
       id: kid.id,
       name: kid.name,
-      book_count: bookCount,
-      post_count: postCount,
-      total_count: bookCount + postCount,
+      profileImageUrl: getKidProfileUrl(kid.profile_image_url),
+      bookCount,
+      postCount,
+      totalCount: bookCount + postCount,
     };
   });
 
   return {
     classroom: {
-      id: classroomResult.data.id,
-      name: classroomResult.data.name ?? "",
+      id: classroom.id,
+      name: classroom.name,
+      publicId: classroom.public_id,
     },
-    kids,
+    chartKids,
   };
 }
 

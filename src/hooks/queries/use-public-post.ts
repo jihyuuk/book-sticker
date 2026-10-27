@@ -19,5 +19,6 @@ export function usePublicPosts(publicId?: string) {
     enabled: !!publicId,
 
     staleTime: Infinity, //리패칭 방지
+    gcTime: 15 * 60 * 1000, // 15분
   });
 }

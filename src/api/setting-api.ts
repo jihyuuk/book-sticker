@@ -22,18 +22,18 @@ export async function updateAccountSetting(
   request: UpdateAccountSettingParam,
 ): Promise<void> {
   const {
-    data: { user },
+    data: { session },
     error: authError,
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getSession();
 
-  if (authError || !user) {
+  if (authError || !session) {
     throw new Error("로그인이 필요합니다.");
   }
 
   const { error } = await supabase
     .from("account_setting")
     .update(request)
-    .eq("user_id", user.id)
+    .eq("user_id", session.user.id)
     .select("user_id")
     .single();
 

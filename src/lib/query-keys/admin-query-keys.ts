@@ -8,8 +8,8 @@ export const ADMIN_QUERY_KEYS = {
 
   posts: {
     all: ["admin", "posts"] as const,
-    list: (classroomId: string | null) =>
-      ["admin", "posts", "list", classroomId] as const,
+    byClassroom: (classroomId: string | null) =>
+      ["admin", "posts", "byClassroom", classroomId] as const,
   },
 
   kids: {

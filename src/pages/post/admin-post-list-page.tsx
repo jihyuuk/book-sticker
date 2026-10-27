@@ -19,10 +19,14 @@ import {
 } from "@/lib/constants";
 import GlobalError from "@/components/global-error";
 import { LoaderCircle, RotateCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 
 const ALL_CLASSROOMS = "all";
 
 export default function AdminPostListPage() {
+  const queryClient = useQueryClient();
+
   // 반 목록 조회
   const {
     data: classrooms,
@@ -95,6 +99,11 @@ export default function AdminPostListPage() {
   // 반 필터 변경
   const handleClassroomChange = (value: string) => {
     const nextId = value === ALL_CLASSROOMS ? null : value;
+
+    //게시글 캐시 모두 초기화
+    queryClient.removeQueries({
+      queryKey: ADMIN_QUERY_KEYS.posts.all,
+    });
 
     setSelectedClassroomId(nextId);
 
@@ -218,6 +227,23 @@ export default function AdminPostListPage() {
   );
 }
 
+// - 페이지 모음 -
+//로그인 페이지
+//회원가입 페이지
+
+//어드민 - 홈 화면
+//어드민 - 설정
+//어드민 - 반 설정
+//어드민 - 차트페이지
+
+//퍼블릭 - 홈 화면
+//퍼블릭 - 포스트 생성
+//퍼블릭 - 책 조회
+//퍼블릭 - 포스트 수정
+//퍼블릭 - 차트페이지
+
+// ============================================
+
 // - 완료 작업 -
 // 셀렉트 박스 도입
 // 게시물 작성 디자인 수정
@@ -248,54 +274,42 @@ export default function AdminPostListPage() {
 // 클릭시 이미지 전체화면 캐러셀
 // 차트 페이지 디자인 수정
 // 수정됨 표시
+// 카메라 보달 다시촬여 버튼 호버 색상 파란색
+// 일일 포스팅 수 제한
+
+// ============================================
 
 // - 기능 추가 -
-// 1. 일일 포스팅 수 제한
-// 2. 동영상
-// 3. 아이들 프사
-// 4. 검색 기능
+// 1. 아이들 프사
+// 2. 검색 기능
+// 3. 동영상
 
 // - 부가기능 -
 // 1. 게시물 작성중 뒤로가기 방지
 // 2. 작성중인 게시물 임시저장
 // 3. 모달 뒤로가기시에 모달이 닫히게
 
-// - 백엔드 -
-
 // - 스타일 -
 // 1. create-page, update-page 작성하기 오른쪽위로 그리고 비번 입력을 작성하기 후로 받기
 // 1-1. 독후감 작성 필드 크기조정(텍스트에어리어 줄이기)
-// 카메라 보달 다시촬여 버튼 호버 색상 파란색
+// 2. selectbox -> drawer 도입
 
 // - 디테일 수정 -
+// 1. dropmenu 닫을때 배경 터치 전파 막기
+// 2. react-simple-pull-to-refresh 구현
 
 // - 버그 수정 -
 // 1.학생 삭제시 반영 되게(설정페이지)
 // 2.토스트 클릭시 안사라짐
 // 3.책 모달 이미지 업로드시 비율 꺠짐
 
-// - 최적화 -
-// 1.tansantquery 최적화
-
 // - 굳이? -
+//0. 비밀번호 인증 로직 강화(h.s -> tk)
 //1. 도장 기능
 //2. og-image 반 별로 다르게
-//3. 맨위 땡겨서 새로고침 - 크롬이 지원함
-//4. 버튼 컴포넌트에 ispending내장 - 있으면 좋은데 이미 다 구현 수정하기 귀찮
-//5. 책 커버 이미지 크기 - 홈에선 썸네일용 작은 용량 - 클릭하면 큰 이미지 로딩 최적화
-//6. 어드민,퍼블릭  - 게시글 이미지 레이지로딩
+//3. 버튼 컴포넌트에 ispending내장 - 있으면 좋은데 이미 다 구현 수정하기 귀찮
+//4. 책 커버 이미지 크기 - 홈에선 썸네일용 작은 용량 - 클릭하면 큰 이미지 로딩 최적화
+//5. 어드민,퍼블릭  - 게시글 이미지 레이지로딩
 
-// - 페이지 모음 -
-//로그인 페이지
-//회원가입 페이지
-
-//어드민 - 홈 화면
-//어드민 - 설정
-//어드민 - 반 설정
-//어드민 - 차트페이지
-
-//퍼블릭 - 홈 화면
-//퍼블릭 - 포스트 생성
-//퍼블릭 - 책 조회
-//퍼블릭 - 포스트 수정
-//퍼블릭 - 차트페이지
+// 어드민 포스트 stale infinity
+// 반, 아이들 변경시 캐시 삭제

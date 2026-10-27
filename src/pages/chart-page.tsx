@@ -81,7 +81,7 @@ export default function ChartPage() {
       />
 
       {selectedClassroomId && data ? (
-        <ChartList key={selectedClassroomId} kids={data.kids} />
+        <ChartList key={selectedClassroomId} kids={data.chartKids} />
       ) : (
         <div className="mb-20 flex flex-1 items-center justify-center">
           <p className="text-muted-foreground">반을 선택해 주세요.</p>

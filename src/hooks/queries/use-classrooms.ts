@@ -6,5 +6,6 @@ export function useClassrooms() {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.classrooms.list,
     queryFn: fetchClassrooms,
+    staleTime: 1000 * 60 * 5, //5분
   });
 }

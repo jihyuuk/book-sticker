@@ -1,5 +1,5 @@
-import { createKid } from "@/api/kid-api";
-import { QUERY_KEYS } from "@/lib/query-keys";
+import { createKid, fetchKidsByClassroom } from "@/api/kid-api";
+import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateKid() {
@@ -7,9 +7,20 @@ export function useCreateKid() {
 
   return useMutation({
     mutationFn: createKid,
-    onSuccess: async (_, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.kid.list2(variables.classroomId),
+
+    onSuccess: (createdKid, variables) => {
+      queryClient.setQueryData<
+        Awaited<ReturnType<typeof fetchKidsByClassroom>>
+      >(ADMIN_QUERY_KEYS.kids.byClassroom(variables.classroomId), (old) => {
+        if (!old) return old;
+
+        return [
+          ...old,
+          {
+            ...createdKid,
+            post_count: 0,
+          },
+        ].sort((a, b) => a.name.localeCompare(b.name, "ko"));
       });
     },
   });

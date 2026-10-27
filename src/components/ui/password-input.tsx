@@ -25,6 +25,8 @@ export default function PasswordInput({ value, ...props }: PasswordInputProps) {
             tabIndex={-1}
             className="pl-1.5"
             aria-label={isVisible ? "비밀번호 숨기기" : "비밀번호 보기"}
+            onPointerDown={(e) => e.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => setIsVisible((prev) => !prev)}
           >
             {isVisible ? <Eye /> : <EyeOff />}
