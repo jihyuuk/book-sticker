@@ -9,12 +9,17 @@ import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
 import { useDeletePostAsAdmin } from "@/hooks/mutations/post/use-delete-post-as-admin";
 import type { PublicPost } from "@/types/dto/public-dto";
+import { useState } from "react";
+import DropdownMenuBackdrop from "./dropdown-menu-backdrop";
 
 type Props = {
   post: PublicPost;
 };
 
 export default function PostDropdownAdminMenu({ post }: Props) {
+  //radix 버그용
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const openAlertModal = useOpenAlertModal();
   const { mutateAsync: deletePost } = useDeletePostAsAdmin();
 
@@ -36,7 +41,11 @@ export default function PostDropdownAdminMenu({ post }: Props) {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      {/* radix 버그 */}
+      {/* 가짜 배경 넣음 */}
+      {menuOpen && <DropdownMenuBackdrop onClose={() => setMenuOpen(false)} />}
+
       <DropdownMenuTrigger asChild>
         <button type="button" className="text-gray-500">
           <EllipsisVertical className="size-5" />
@@ -48,6 +57,9 @@ export default function PostDropdownAdminMenu({ post }: Props) {
         side="bottom"
         sideOffset={12}
         className="w-40"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+        }}
       >
         <DropdownMenuItem onClick={handleDelete} variant="destructive">
           <div className="flex items-center gap-1.5 py-2">

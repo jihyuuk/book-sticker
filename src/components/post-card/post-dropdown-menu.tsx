@@ -12,6 +12,8 @@ import { useNavigate, useParams } from "react-router";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { toast } from "sonner";
 import type { PublicPost } from "@/types/dto/public-dto";
+import PostDeleteDrawer from "../drawers/post-delete-drawer";
+import DropdownMenuBackdrop from "./dropdown-menu-backdrop";
 
 type Props = {
   post: PublicPost;
@@ -20,12 +22,17 @@ type Props = {
 type ModalActionType = "EDIT" | "DELETE" | null;
 
 export default function PostDropdownMenu({ post }: Props) {
+  //radix 버그용
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const navigate = useNavigate();
   const { publicId } = useParams();
   const postId = post.id;
 
   const [modalAction, setModalAction] = useState<ModalActionType>(null);
   const openAlertModal = useOpenAlertModal();
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { mutate: deletePost } = useDeletePost(publicId);
 
@@ -49,33 +56,54 @@ export default function PostDropdownMenu({ post }: Props) {
   };
 
   const handleDelete = (password: string) => {
-    openAlertModal({
-      title: "게시물을 삭제할까요?",
-      description: "삭제한 게시물은 다시 복구할 수 없습니다.",
-      actionVariant: "destructive",
-      actionLabel: "삭제하기",
-      onAction: () => {
-        deletePost(
-          {
-            postId,
-            password,
-          },
-          {
-            onSuccess: () => {
-              toast.success("게시물이 삭제되었습니다.");
-            },
-            onError: () => {
-              toast.error("게시물 삭제에 실패했습니다.");
-            },
-          },
-        );
+    // openAlertModal({
+    //   title: "게시물을 삭제할까요?",
+    //   description: "삭제한 게시물은 다시 복구할 수 없습니다.",
+    //   actionVariant: "destructive",
+    //   actionLabel: "삭제하기",
+    //   onAction: () => {
+    //     deletePost(
+    //       {
+    //         postId,
+    //         password,
+    //       },
+    //       {
+    //         onSuccess: () => {
+    //           toast.success("게시물이 삭제되었습니다.");
+    //         },
+    //         onError: () => {
+    //           toast.error("게시물 삭제에 실패했습니다.");
+    //         },
+    //       },
+    //     );
+    //   },
+    // });
+
+    deletePost(
+      {
+        postId,
+        password,
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success("게시물이 삭제되었습니다.");
+        },
+        onError: () => {
+          toast.error("게시물 삭제에 실패했습니다.");
+        },
+      },
+    );
   };
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        {/* radix 버그 */}
+        {/* 가짜 배경 넣음 */}
+        {menuOpen && (
+          <DropdownMenuBackdrop onClose={() => setMenuOpen(false)} />
+        )}
+
         <DropdownMenuTrigger asChild>
           <button type="button" className="text-gray-500">
             <EllipsisVertical className="size-6" />
@@ -87,6 +115,9 @@ export default function PostDropdownMenu({ post }: Props) {
           side="bottom"
           sideOffset={12}
           className="w-40"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
         >
           <DropdownMenuItem
             onClick={() => setModalAction("EDIT")}
@@ -99,7 +130,9 @@ export default function PostDropdownMenu({ post }: Props) {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => setModalAction("DELETE")}
+            onSelect={() => {
+              setDeleteOpen(true);
+            }}
             variant="destructive"
           >
             <div className="flex items-center gap-1.5 py-2">
@@ -115,6 +148,12 @@ export default function PostDropdownMenu({ post }: Props) {
         open={modalAction !== null}
         onOpenChange={() => setModalAction(null)}
         onVerified={handleVerified}
+      />
+
+      <PostDeleteDrawer
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onDelete={handleDelete}
       />
     </>
   );
