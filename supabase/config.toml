@@ -424,3 +424,12 @@ verify_jwt = false
 
 [functions.fetch-admin-posts]
 verify_jwt = true
+
+[functions.create-kid]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-kid/deno.json"
+entrypoint = "./functions/create-kid/index.ts"
+
+[functions.update-kid]
+verify_jwt = true

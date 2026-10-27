@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ChangeEvent } from "react";
+import { Loader2, UserRound, X } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Kid } from "@/types/entity-types";
@@ -12,10 +13,17 @@ import { Button } from "../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import NumberInput from "../ui/number-input";
+import { optimizeKidProfileImage } from "@/lib/profile-image-optimize";
 
 // 모달 상태
 export type KidModalState =
   { type: "CREATE" } | { type: "UPDATE"; kid: Kid } | null;
+
+// 이미지 변경 상태
+type ProfileImageDraft =
+  | { type: "KEEP" }
+  | { type: "UPLOAD"; file: File; previewUrl: string }
+  | { type: "DELETE" };
 
 type Props = {
   classroomId: string;
@@ -34,28 +42,135 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
   const [name, setName] = useState("");
   const [bookCount, setBookCount] = useState("0");
 
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const imageRequestIdRef = useRef(0);
+
+  // 프로필 이미지
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  const [imageDraft, setImageDraft] = useState<ProfileImageDraft>({
+    type: "KEEP",
+  });
+
   // 모달 상태
   const isOpen = mode !== null;
   const isUpdate = mode?.type === "UPDATE";
-  const isPending = createKid.isPending || updateKid.isPending;
+  const isPending = createKid.isPending || updateKid.isPending || isOptimizing;
+
+  // 기존 프로필 이미지
+  const originalImageUrl =
+    mode?.type === "UPDATE" ? mode.kid.profile_image_url : null;
+
+  // 현재 표시할 이미지
+  const previewUrl =
+    imageDraft.type === "UPLOAD"
+      ? imageDraft.previewUrl
+      : imageDraft.type === "DELETE"
+        ? null
+        : originalImageUrl;
+
+  const hasProfileImg = Boolean(previewUrl);
+  const isImageChanged = imageDraft.type !== "KEEP";
 
   // 변경 여부
   const isChanged = mode
     ? mode.type === "UPDATE"
       ? name.trim() !== mode.kid.name ||
-        Number(bookCount) !== mode.kid.book_count
-      : name.trim() !== "" || bookCount !== "0"
+        Number(bookCount) !== mode.kid.book_count ||
+        isImageChanged
+      : name.trim() !== "" || bookCount !== "0" || isImageChanged
     : false;
+
+  // 임시 URL 해제
+  const revokePreviewUrl = useCallback(() => {
+    if (!objectUrlRef.current) return;
+
+    URL.revokeObjectURL(objectUrlRef.current);
+    objectUrlRef.current = null;
+  }, []);
 
   // 초기값 설정
   useEffect(() => {
+    imageRequestIdRef.current += 1;
+    setIsOptimizing(false);
+
+    revokePreviewUrl();
+    setImageDraft({ type: "KEEP" });
+
     if (!mode) return;
 
-    const isUpdate = mode?.type === "UPDATE";
+    const isUpdate = mode.type === "UPDATE";
 
     setName(isUpdate ? mode.kid.name : "");
     setBookCount(isUpdate ? String(mode.kid.book_count) : "0");
-  }, [mode]);
+  }, [mode, revokePreviewUrl]);
+
+  // 컴포넌트 언마운트 시 URL 정리
+  useEffect(() => {
+    return () => {
+      imageRequestIdRef.current += 1;
+      revokePreviewUrl();
+    };
+  }, [revokePreviewUrl]);
+
+  // 이미지 선택
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.warning("이미지 파일을 선택해 주세요.");
+      return;
+    }
+
+    const requestId = ++imageRequestIdRef.current;
+
+    setIsOptimizing(true);
+
+    try {
+      // 이미지 최적화
+      const optimizedFile = await optimizeKidProfileImage(file);
+
+      // 모달이 닫히거나 작업이 취소됐다면 무시
+      if (requestId !== imageRequestIdRef.current) return;
+
+      // 최적화 성공 후에만 기존 URL 정리
+      const url = URL.createObjectURL(optimizedFile);
+
+      revokePreviewUrl();
+      objectUrlRef.current = url;
+
+      setImageDraft({
+        type: "UPLOAD",
+        file: optimizedFile,
+        previewUrl: url,
+      });
+    } catch (error) {
+      if (requestId !== imageRequestIdRef.current) return;
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "이미지를 처리하지 못했습니다.",
+      );
+    } finally {
+      if (requestId === imageRequestIdRef.current) {
+        setIsOptimizing(false);
+      }
+    }
+  };
+  // 이미지 삭제
+  const handleImageDelete = () => {
+    revokePreviewUrl();
+
+    setImageDraft({
+      type: originalImageUrl ? "DELETE" : "KEEP",
+    });
+  };
 
   // 닫기
   const handleClose = () => {
@@ -96,6 +211,8 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
           classroomId,
           name: trimmedName,
           bookCount: Number(bookCount),
+          profileImage:
+            imageDraft.type === "UPLOAD" ? imageDraft.file : undefined,
         },
         {
           onSuccess: () => {
@@ -118,6 +235,12 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
         classroomId: mode.kid.classroom_id,
         name: trimmedName,
         bookCount: Number(bookCount),
+        profileImage:
+          imageDraft.type === "UPLOAD"
+            ? imageDraft.file
+            : imageDraft.type === "DELETE"
+              ? null
+              : undefined,
       },
       {
         onSuccess: () => {
@@ -152,6 +275,57 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
             handleSubmit();
           }}
         >
+          {/* 프로필 이미지 */}
+          <div className="flex justify-center py-3">
+            <div className="relative">
+              {/* 숨겨진 파일 입력 */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+                disabled={isPending}
+              />
+
+              {/* 이미지 추가 / 변경 */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isPending}
+                aria-label={
+                  hasProfileImg ? "프로필 사진 변경" : "프로필 사진 추가"
+                }
+                className="bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-80 disabled:opacity-50"
+              >
+                {isOptimizing ? (
+                  <Loader2 className="size-7 animate-spin" />
+                ) : previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="프로필 이미지"
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <UserRound className="size-12" />
+                )}
+              </button>
+
+              {/* 이미지 삭제 */}
+              {hasProfileImg && (
+                <button
+                  type="button"
+                  onClick={handleImageDelete}
+                  disabled={isPending}
+                  aria-label="프로필 사진 삭제"
+                  className="border-background text-background absolute top-0 right-0 flex size-8 items-center justify-center rounded-full border-4 bg-gray-500"
+                >
+                  <X className="size-3.5" strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
+          </div>
+
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="kid-name">이름</FieldLabel>

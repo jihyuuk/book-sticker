@@ -1,4 +1,4 @@
-import { getKidProfileUrl } from "@/lib/storage";
+import { getKidProfileUrl } from "@/lib/storage-path-to-url";
 import { supabase } from "@/lib/supabse";
 import type { PublicChart } from "@/types/dto/public-dto";
 

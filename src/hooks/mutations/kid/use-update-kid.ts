@@ -11,11 +11,17 @@ export function useUpdateKid() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ kidId, name, bookCount }: UpdateKidMutationParam) =>
+    mutationFn: ({
+      kidId,
+      name,
+      bookCount,
+      profileImage,
+    }: UpdateKidMutationParam) =>
       updateKid({
         kidId,
         name,
         bookCount,
+        profileImage,
       }),
 
     onSuccess: (updatedKid, variables) => {
