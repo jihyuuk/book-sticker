@@ -33,3 +33,5 @@ out
 
 # Supabase Edge Functions
 /supabase/functions/
+# Local Netlify folder
+.netlify

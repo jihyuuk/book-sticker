@@ -433,3 +433,12 @@ entrypoint = "./functions/create-kid/index.ts"
 
 [functions.update-kid]
 verify_jwt = true
+
+[functions.og-image]
+enabled = true
+verify_jwt = false
+import_map = "./functions/og-image/deno.json"
+entrypoint = "./functions/og-image/index.ts"
+
+[functions.get-og-classroom]
+verify_jwt = false
