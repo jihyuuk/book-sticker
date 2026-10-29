@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import FALLBACK_IMAGE from "@/assets/no-book-cover.png";
+import FALLBACK_IMAGE from "@/assets/fallback-book.svg";
 import { useOpenImageViewer } from "@/store/image-viewer-store";
 import type { PublicBook } from "@/types/dto/public-dto";
 
@@ -47,7 +47,11 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
         alt={title}
         onLoad={() => setIsLoaded(true)}
         onError={handleError}
-        className={cn("h-full w-full object-cover", !isLoaded && "opacity-0")}
+        className={cn(
+          "h-full w-full",
+          imageSrc === FALLBACK_IMAGE ? "object-contain" : "object-cover",
+          !isLoaded && "opacity-0",
+        )}
       />
     </button>
   );

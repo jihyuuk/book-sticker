@@ -80,12 +80,12 @@ export default function SignInPage() {
     <main className="px-page-x mx-auto mt-5 w-full max-w-md py-5">
       <form onSubmit={handleSubmit} className="w-full space-y-5">
         {/* 로고 */}
-        <div className="flex items-center justify-center p-4">
+        <div className="flex items-center justify-center p-4 pb-0">
           <img
             src={logo}
             width={400}
             height={143}
-            className="w-full max-w-50"
+            className="w-full max-w-55"
           />
         </div>
 
