@@ -1,16 +1,34 @@
-import { LoaderCircle } from "lucide-react";
-import loadingImage from "@/assets/bear-min.webp?inline";
+import { useState } from "react";
+import { DotPulse } from "ldrs/react";
+import "ldrs/react/DotPulse.css";
 
-export default function GlobalLoading() {
+// 로딩 이미지 자동 불러오기
+const modules = import.meta.glob("@/assets/loading/*.{png,webp,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const LOADING_IMAGES = Object.values(modules) as string[];
+
+// 이미지 개수
+const LOADING_IMAGE_COUNT = LOADING_IMAGES.length;
+
+export default function LoadingPage() {
+  // 컴포넌트가 생성될 때 랜덤 이미지 선택
+  const [image] = useState(() => {
+    const index = Math.floor(Math.random() * LOADING_IMAGE_COUNT);
+    return LOADING_IMAGES[index];
+  });
+
   return (
-    <div className="flex h-dvh items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <img src={loadingImage} className="w-55 object-contain md:w-65" />
+    <div className="flex min-h-dvh items-center justify-center">
+      <div className="mb-20 flex flex-col items-center gap-6">
+        {image && (
+          <img src={image} alt="로딩 중" className="size-40 object-contain" />
+        )}
 
-        <div className="flex items-center gap-2">
-          <p className="font-medium text-gray-500">불러오는 중...</p>
-          <LoaderCircle className="size-4 animate-spin text-gray-500" />
-        </div>
+        <DotPulse size={40} speed={1.3} color="var(--primary)" />
       </div>
     </div>
   );
