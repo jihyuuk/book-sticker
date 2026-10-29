@@ -174,7 +174,7 @@ export default function AdminPostListPage() {
         ) : (
           // 게시글 목록 + 무한스크롤 UI
           <>
-            <section className="space-y-20">
+            <section className="space-y-15">
               {posts.map((post) => (
                 <PostCard
                   key={post.id}
@@ -205,7 +205,7 @@ export default function AdminPostListPage() {
             {isFetchNextPageError && (
               <div className="py-10 text-center">
                 <button
-                  className="inline-flex items-center gap-2 text-sm text-gray-500"
+                  className="inline-flex items-center gap-2 text-sm text-gray-400"
                   onClick={() => void fetchNextPage()}
                 >
                   <RotateCw className="size-4" />
@@ -216,7 +216,7 @@ export default function AdminPostListPage() {
 
             {/* 마지막 게시글 */}
             {posts.length > 0 && !hasNextPage && !isFetching && (
-              <div className="pt-3 pb-20 text-center">
+              <div className="pt-10 pb-20 text-center">
                 <p className="text-sm text-gray-400">- 마지막 게시물 -</p>
               </div>
             )}

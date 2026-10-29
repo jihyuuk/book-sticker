@@ -38,7 +38,7 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
       }
       aria-label={`${title} 표지 크게 보기`}
       className={cn(
-        "aspect-20/29 h-18 shrink-0 overflow-hidden rounded-sm bg-gray-100",
+        "aspect-20/29 h-18 shrink-0 overflow-hidden rounded-xs bg-gray-100",
       )}
     >
       {/* 로딩 중에는 회색 배경만 표시 */}
