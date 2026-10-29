@@ -5,94 +5,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import PostPasswordModal from "../modal/post-password-modal";
 import { useState } from "react";
-import { useOpenAlertModal } from "@/store/alert-modal";
-import { useNavigate, useParams } from "react-router";
-import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
-import { toast } from "sonner";
 import type { PublicPost } from "@/types/dto/public-dto";
-import PostDeleteDrawer from "../drawers/post-delete-drawer";
 import DropdownMenuBackdrop from "./dropdown-menu-backdrop";
+import {
+  useOpenPostPasswordDrawer,
+  type PostActionType,
+} from "@/store/post-password-drawer-store";
+import { useParams } from "react-router";
 
 type Props = {
   post: PublicPost;
 };
 
-type ModalActionType = "EDIT" | "DELETE" | null;
-
 export default function PostDropdownMenu({ post }: Props) {
+  const { publicId } = useParams();
+
   //radix 버그용
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navigate = useNavigate();
-  const { publicId } = useParams();
-  const postId = post.id;
+  const openPostPasswordDrawer = useOpenPostPasswordDrawer();
 
-  const [modalAction, setModalAction] = useState<ModalActionType>(null);
-  const openAlertModal = useOpenAlertModal();
-
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const { mutate: deletePost } = useDeletePost(publicId);
-
-  const handleVerified = (password: string) => {
-    if (modalAction === "EDIT") {
-      handleEdit(password);
-    } else if (modalAction === "DELETE") {
-      handleDelete(password);
-    }
-  };
-
-  const handleEdit = (password: string) => {
+  const openDrawer = (type: PostActionType) => {
     if (!publicId) return;
 
-    navigate(`/classroom/${publicId}/posts/${postId}/edit`, {
-      state: {
-        post,
-        password,
-      },
+    openPostPasswordDrawer({
+      type,
+      post,
+      publicId,
     });
-  };
-
-  const handleDelete = (password: string) => {
-    // openAlertModal({
-    //   title: "게시물을 삭제할까요?",
-    //   description: "삭제한 게시물은 다시 복구할 수 없습니다.",
-    //   actionVariant: "destructive",
-    //   actionLabel: "삭제하기",
-    //   onAction: () => {
-    //     deletePost(
-    //       {
-    //         postId,
-    //         password,
-    //       },
-    //       {
-    //         onSuccess: () => {
-    //           toast.success("게시물이 삭제되었습니다.");
-    //         },
-    //         onError: () => {
-    //           toast.error("게시물 삭제에 실패했습니다.");
-    //         },
-    //       },
-    //     );
-    //   },
-    // });
-
-    deletePost(
-      {
-        postId,
-        password,
-      },
-      {
-        onSuccess: () => {
-          toast.success("게시물이 삭제되었습니다.");
-        },
-        onError: () => {
-          toast.error("게시물 삭제에 실패했습니다.");
-        },
-      },
-    );
   };
 
   return (
@@ -105,9 +46,11 @@ export default function PostDropdownMenu({ post }: Props) {
         )}
 
         <DropdownMenuTrigger asChild>
-          <button type="button" className="text-gray-500">
-            <EllipsisVertical className="size-6" />
-          </button>
+          <DropdownMenuTrigger asChild>
+            <button type="button" className="text-gray-500">
+              <EllipsisVertical className="size-6" />
+            </button>
+          </DropdownMenuTrigger>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
@@ -119,42 +62,24 @@ export default function PostDropdownMenu({ post }: Props) {
             event.preventDefault();
           }}
         >
-          <DropdownMenuItem
-            onClick={() => setModalAction("EDIT")}
-            className="py-2.5"
-          >
+          <DropdownMenuItem onSelect={() => openDrawer("EDIT")}>
             <div className="flex items-center gap-1.5 py-2 text-gray-700">
-              <Pencil size={4} />
+              <Pencil size={6} />
               <span>수정</span>
             </div>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onSelect={() => {
-              setDeleteOpen(true);
-            }}
             variant="destructive"
+            onSelect={() => openDrawer("DELETE")}
           >
             <div className="flex items-center gap-1.5 py-2">
-              <Trash2 size={4} />
+              <Trash2 size={6} />
               <span>삭제</span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <PostPasswordModal
-        postId={postId}
-        open={modalAction !== null}
-        onOpenChange={() => setModalAction(null)}
-        onVerified={handleVerified}
-      />
-
-      <PostDeleteDrawer
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onDelete={handleDelete}
-      />
     </>
   );
 }
