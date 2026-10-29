@@ -52,7 +52,7 @@ export default function PostBookField({
         <BookInfo
           book={{
             ...value,
-            cover_url: previewUrl ?? value.cover_url,
+            coverUrl: previewUrl ?? value.coverUrl,
           }}
         />
       ) : (

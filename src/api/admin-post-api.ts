@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabse";
+import type { PublicPost } from "@/types/dto/public-dto";
 import type { Classroom } from "@/types/entity-types";
-import type { PublicPost } from "@/types/public-types";
 
 export type AdminPost = PublicPost & {
   classroom: Pick<Classroom, "id" | "name">;
