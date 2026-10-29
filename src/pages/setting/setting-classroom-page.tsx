@@ -50,7 +50,7 @@ export default function SettingClassroomPage() {
 
             {/* 공개 주소 */}
             <SettingClassroomPublicLinkField
-              publicUrl={`${DOMAIN_URL}/classroom/${classroom.public_id}/posts`}
+              publicUrl={`${DOMAIN_URL}/classroom/${classroom.public_id}`}
             />
 
             {/* 원아 관리 */}
