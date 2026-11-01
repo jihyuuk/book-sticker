@@ -68,9 +68,12 @@ export default function PostNewForm({ data }: Props) {
   const isDailyLimitReached =
     !!selectedKid && selectedKid.todayPostCount >= dailyBookLimit;
 
+  // 작성 폼 비활성화 여부
+  const isFormDisabled = isPending || isDailyLimitReached;
+
   // 작성하기
   const handleSubmit = () => {
-    if (isPending || isImageProcessing || isDailyLimitReached) return;
+    if (isFormDisabled || isImageProcessing) return;
 
     // 에러 표시 활성화
     setShowErrors(true);
@@ -148,7 +151,7 @@ export default function PostNewForm({ data }: Props) {
         <PostBookField
           value={book}
           onValueChange={setBook}
-          disabled={isPending}
+          disabled={isFormDisabled}
           error={showErrors && errors.book}
         />
 
@@ -156,7 +159,7 @@ export default function PostNewForm({ data }: Props) {
         <PostCaptionField
           value={caption}
           onValueChange={setCaption}
-          disabled={isPending}
+          disabled={isFormDisabled}
           error={showErrors && errors.content}
         />
 
@@ -164,14 +167,14 @@ export default function PostNewForm({ data }: Props) {
         <PostImageField
           value={images}
           onValueChange={setImages}
-          disabled={isPending}
+          disabled={isFormDisabled}
         />
 
         {/* 비밀번호 */}
         <PostPasswordField
           value={password}
           onValueChange={setPassword}
-          disabled={isPending}
+          disabled={isFormDisabled}
           error={showErrors && errors.password}
         />
       </FieldGroup>
@@ -179,7 +182,7 @@ export default function PostNewForm({ data }: Props) {
       {/* 작성 버튼 */}
       <PostSubmitButton
         onClick={handleSubmit}
-        disabled={isPending || isImageProcessing || isDailyLimitReached}
+        disabled={isFormDisabled || isImageProcessing}
       >
         {isPending ? <Loader2 className="animate-spin" /> : "작성하기"}
       </PostSubmitButton>
