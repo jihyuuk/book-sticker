@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-
 import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
-
 import PostCaptionField from "../post-field/post-caption-field";
-import type { PublicPost } from "@/types/public-types";
 import PostSubmitButton from "../post-field/post-submit-button";
 import type { PostImageData } from "../post-field/post-image-field";
 import PostImageField from "../post-field/post-image-field";
@@ -16,6 +13,8 @@ import PostBookField from "../post-field/post-book-field";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { useClearPostEditSession } from "@/store/post-edit-session-store";
 import PostEditPasswordDrawer from "../drawers/post-edit-password-drawer";
+import type { PublicPost } from "@/types/dto/public-dto";
+import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
 
 type Props = {
   post: PublicPost;
@@ -25,6 +24,9 @@ type Props = {
 export default function PostEditForm({ post, password }: Props) {
   const { publicId } = useParams();
   const navigate = useNavigate();
+
+  //새로고침 방지
+  useBeforeUnload(true);
 
   // 비번 검증 drawer
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
@@ -89,6 +91,9 @@ export default function PostEditForm({ post, password }: Props) {
   // 독후감 변경 여부
   const contentChanged = trimmedCaption !== originalContent;
 
+  // 저장되지 않은 변경 사항 존재 여부
+  const isDirty = contentChanged || imageChanged;
+
   // ==================================================
   // 4. 이미지 최적화 상태
   // ==================================================
@@ -113,10 +118,7 @@ export default function PostEditForm({ post, password }: Props) {
   // 3. 서버 요청 중이 아니어야 함
   // 4. 이미지 최적화가 모두 완료되어야 함
   const canSubmit =
-    !!trimmedCaption &&
-    (contentChanged || imageChanged) &&
-    !isPending &&
-    !isImageProcessing;
+    !!trimmedCaption && isDirty && !isPending && !isImageProcessing;
 
   // ==================================================
   // 6. 게시글 수정 요청

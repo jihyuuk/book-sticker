@@ -17,6 +17,7 @@ import { FieldGroup } from "../ui/field";
 import type { CreatePostParam } from "@/api/post-api";
 import { requestScrollReset } from "@/lib/scroll";
 import type { PostCreateData } from "@/types/dto/public-dto";
+import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
 
 type Props = {
   data: PostCreateData;
@@ -24,6 +25,9 @@ type Props = {
 
 export default function PostNewForm({ data }: Props) {
   const navigate = useNavigate();
+
+  //새로고침 방지
+  useBeforeUnload(true);
 
   const { classroom, kids, dailyBookLimit } = data;
 
