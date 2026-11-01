@@ -11,19 +11,29 @@ import PasswordInput from "@/components/ui/password-input";
 import { useDeletePost } from "@/hooks/mutations/post/use-delete-post";
 import { usePostPasswordDrawer } from "@/store/post-password-drawer-store";
 import { FieldGroup, FieldLabel } from "../ui/field";
+import { useVerifyPostPassword } from "@/hooks/mutations/post/use-verify-post-password";
+import { useNavigate } from "react-router";
+import { useSetPostEditSession } from "@/store/post-edit-session-store";
 
 export default function PostPasswordDrawer() {
+  const navigate = useNavigate();
+  const setEditSession = useSetPostEditSession();
+
   const { isOpen, type, post, publicId, actions } = usePostPasswordDrawer();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const allowBlurRef = useRef(false);
 
-  const { mutate: deletePost, isPending } = useDeletePost(publicId);
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost(publicId);
+  const { mutate: verifyPassword, isPending: isVerifing } =
+    useVerifyPostPassword();
+
+  const isPending = isDeleting || isVerifing;
 
   const [password, setPassword] = useState("");
   const [bottomInset, setBottomInset] = useState(0);
 
-  // 768px 이상이면 Dialog
+  // 672px 이상이면 Dialog
   const [isDesktop, setIsDesktop] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -122,9 +132,33 @@ export default function PostPasswordDrawer() {
     );
   };
 
-  // 수정 (추후 구현)
+  // 수정
   const handleEdit = (postId: string) => {
-    console.log(postId);
+    verifyPassword(
+      { postId, password },
+      {
+        onSuccess: () => {
+          setEditSession(postId, password);
+          releaseFocus();
+          actions.close();
+          navigate(`/classroom/${publicId}/posts/${postId}/edit`, {
+            state: post,
+          });
+        },
+        onError: (error) => {
+          if (
+            error instanceof FunctionsHttpError &&
+            error.context.status === 401
+          ) {
+            setPassword("");
+            toast.error("비밀번호가 올바르지 않습니다.");
+            return;
+          }
+
+          toast.error("오류가 발생했습니다.");
+        },
+      },
+    );
   };
 
   // 제출

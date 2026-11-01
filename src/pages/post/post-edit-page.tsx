@@ -5,26 +5,20 @@ import { toast } from "sonner";
 import SubHeader from "@/components/header/sub-header";
 import type { PublicPost } from "@/types/public-types";
 import PostEditForm from "@/components/post-form/post-edit-form";
-
-export type PostEditState = {
-  post: PublicPost;
-  password: string;
-};
+import { usePostEditPassword } from "@/store/post-edit-session-store";
 
 export default function PostEditPage() {
   const { publicId, postId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const state = location.state as PostEditState | null;
+  const post = location.state as PublicPost | null;
+  const password = usePostEditPassword(postId);
 
-  const post = state?.post;
-  const password = state?.password;
-
-  const isValidState = !!post && !!password && post.id === postId;
+  const isValidPost = !!post && post.id === postId;
 
   useEffect(() => {
-    if (isValidState) return;
+    if (isValidPost) return;
 
     toast.error("수정 정보를 확인할 수 없습니다. 다시 시도해주세요.");
 
@@ -33,16 +27,14 @@ export default function PostEditPage() {
         replace: true,
       });
     }
-  }, [isValidState, publicId, navigate]);
+  }, [isValidPost, publicId, navigate]);
 
-  if (!isValidState) {
-    return null;
-  }
+  if (!isValidPost) return null;
 
   return (
     <div>
       {/* 헤더 */}
-      <SubHeader title="독후감 작성" />
+      <SubHeader title="독후감 수정" />
 
       {/* 입력 폼 */}
       <main className="mx-auto w-full max-w-2xl">

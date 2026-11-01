@@ -13,15 +13,23 @@ import { Loader2 } from "lucide-react";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import PostBookField from "../post-field/post-book-field";
+import { FunctionsHttpError } from "@supabase/supabase-js";
+import { useClearPostEditSession } from "@/store/post-edit-session-store";
+import PostEditPasswordDrawer from "../drawers/post-edit-password-drawer";
 
 type Props = {
   post: PublicPost;
-  password: string;
+  password: string | null;
 };
 
 export default function PostEditForm({ post, password }: Props) {
   const { publicId } = useParams();
   const navigate = useNavigate();
+
+  // 비번 검증 drawer
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [passwordResetKey, setPasswordResetKey] = useState(0);
+  const clearEditSession = useClearPostEditSession();
 
   // 게시글 수정 API
   const { mutate, isPending } = useUpdatePost(publicId);
@@ -115,36 +123,58 @@ export default function PostEditForm({ post, password }: Props) {
   // ==================================================
 
   const handleSubmit = () => {
-    // 필수 경로값이 없거나 처리 중이라면 중단
     if (!publicId || isPending || isImageProcessing) return;
 
-    // 빈칸 오류 표시 활성화
     setShowErrors(true);
 
-    // 독후감 필수 입력 확인
     if (!trimmedCaption) {
       toast.error("독후감을 작성해주세요.");
       return;
     }
 
-    // 게시글 수정 API 요청
+    // 변경된 내용이 없으면 중단
+    if (!contentChanged && !imageChanged) return;
+
+    // 저장된 비밀번호가 없으면 Drawer 열기
+    if (!password) {
+      setIsPasswordOpen(true);
+      return;
+    }
+
+    // 저장된 비밀번호가 있으면 바로 수정
+    submitUpdate(password);
+  };
+
+  const submitUpdate = (verifiedPassword: string) => {
+    if (!publicId || isPending || isImageProcessing) return;
+
     mutate(
       {
         postId: post.id,
-        password,
+        password: verifiedPassword,
         content: trimmedCaption,
-
-        // 기존 이미지 + 새 이미지를 함께 전달
-        // 실제 추가/유지/삭제는 수정 API에서 처리
         images,
       },
       {
         onSuccess: () => {
+          setIsPasswordOpen(false);
           toast.success("게시물이 수정되었습니다.");
           navigate(-1);
         },
 
-        onError: () => {
+        onError: (error) => {
+          if (
+            error instanceof FunctionsHttpError &&
+            error.context.status === 401
+          ) {
+            clearEditSession();
+            setPasswordResetKey((prev) => prev + 1);
+            setIsPasswordOpen(true);
+
+            toast.error("비밀번호가 올바르지 않습니다.");
+            return;
+          }
+
           toast.error("게시물 수정에 실패했습니다.");
         },
       },
@@ -163,7 +193,7 @@ export default function PostEditForm({ post, password }: Props) {
           <FieldLabel className="text-sm font-semibold">
             작성자{" "}
             <span className="text-muted-foreground text-xs font-normal">
-              수정불가
+              (수정 불가)
             </span>
           </FieldLabel>
 
@@ -201,6 +231,17 @@ export default function PostEditForm({ post, password }: Props) {
       <PostSubmitButton onClick={handleSubmit} disabled={!canSubmit}>
         {isPending ? <Loader2 className="animate-spin" /> : "수정하기"}
       </PostSubmitButton>
+
+      {/* 비번 입력 받는 drawer */}
+      <PostEditPasswordDrawer
+        open={isPasswordOpen}
+        onOpenChange={setIsPasswordOpen}
+        isPending={isPending}
+        resetKey={passwordResetKey}
+        onSubmit={(enteredPassword) => {
+          submitUpdate(enteredPassword);
+        }}
+      />
     </div>
   );
 }
