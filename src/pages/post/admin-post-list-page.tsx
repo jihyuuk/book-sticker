@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import GlobalLoading from "@/components/global-loading";
 import MainHeader from "@/components/header/main-header";
 import PostCard from "@/components/post-card/post-card";
 import {
@@ -76,7 +75,10 @@ export default function AdminPostListPage() {
   );
 
   // 페이지별 게시글을 하나의 배열로 합치기
-  const posts = data?.pages.flatMap((page) => page.posts) ?? [];
+  const posts = useMemo(
+    () => data?.pages.flatMap((page) => page?.posts ?? []) ?? [],
+    [data?.pages],
+  );
 
   // 다음 페이지 감지 요소
   const loadMoreRef = useRef<HTMLDivElement>(null);

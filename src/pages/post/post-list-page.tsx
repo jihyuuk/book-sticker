@@ -5,7 +5,7 @@ import { useParams } from "react-router";
 import MainHeader from "@/components/header/main-header";
 import GlobalError from "@/components/global-error";
 import { RotateCw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { INFINITE_SCROLL_ROOT_MARGIN } from "@/lib/constants";
 import NotFoundPage from "../not-found-page";
 import PublicPostListSkeleton from "@/components/skeletons/public-post-list-skeleton";
@@ -40,7 +40,10 @@ export default function PostListPage() {
   const classroom = data?.pages[0]?.classroom;
 
   // 페이지별 게시글을 하나의 배열로 합치기
-  const posts = data?.pages.flatMap((page) => page?.posts ?? []) ?? [];
+  const posts = useMemo(
+    () => data?.pages.flatMap((page) => page?.posts ?? []) ?? [],
+    [data?.pages],
+  );
 
   // 다음 페이지 감지 요소
   const loadMoreRef = useRef<HTMLDivElement>(null);

@@ -3,6 +3,7 @@ import BookInfo from "../book/book-info";
 import PostCaption from "./post-caption";
 import PostImageCarousel from "./post-image-carousel";
 import type { PublicPost } from "@/types/dto/public-dto";
+import { memo } from "react";
 
 type Props = {
   post: PublicPost;
@@ -28,7 +29,7 @@ type Props = {
 //   "https://picsum.photos/seed/mock-5/600/1000",
 // ];
 
-export default function PostCard({ post, classroomName, isAdmin }: Props) {
+function PostCard({ post, classroomName, isAdmin }: Props) {
   return (
     <article className="bg-white">
       {/* 헤더 */}
@@ -50,3 +51,5 @@ export default function PostCard({ post, classroomName, isAdmin }: Props) {
     </article>
   );
 }
+
+export default memo(PostCard);
