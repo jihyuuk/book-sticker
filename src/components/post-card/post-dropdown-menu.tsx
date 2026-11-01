@@ -46,11 +46,9 @@ export default function PostDropdownMenu({ post }: Props) {
         )}
 
         <DropdownMenuTrigger asChild>
-          <DropdownMenuTrigger asChild>
-            <button type="button" className="text-gray-500">
-              <EllipsisVertical className="size-6" />
-            </button>
-          </DropdownMenuTrigger>
+          <button type="button" className="text-gray-500">
+            <EllipsisVertical className="size-6" />
+          </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
