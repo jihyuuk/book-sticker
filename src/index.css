@@ -154,3 +154,8 @@ button,
 [role="button"] {
   cursor: pointer;
 }
+
+.ptr__pull-down {
+  z-index: 10;
+  pointer-events: none;
+}
