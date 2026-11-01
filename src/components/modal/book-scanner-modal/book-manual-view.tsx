@@ -164,9 +164,9 @@ export default function BookManualInputView({
         />
 
         <BookInputField
-          label="발행처"
+          label="출판사"
           value={book.publisher ?? ""}
-          placeholder="발행처를 입력해주세요"
+          placeholder="출판사를 입력해주세요"
           onValueChange={(value) =>
             onBookChange((prev) => ({
               ...prev,

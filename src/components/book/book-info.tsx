@@ -75,7 +75,7 @@ export default function BookInfo({ book, className }: Props) {
           <span className="text-gray-400">저자</span>
           <span className="truncate text-gray-600">{book.author ?? "-"}</span>
 
-          <span className="text-gray-400">발행처</span>
+          <span className="text-gray-400">출판사</span>
           <span className="truncate text-gray-600">
             {book.publisher ?? "-"}
           </span>
