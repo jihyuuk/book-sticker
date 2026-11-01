@@ -46,6 +46,8 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
             <img
               src={kid.profileImageUrl}
               alt={`${kid.name} 프로필`}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover"
             />
           ) : (

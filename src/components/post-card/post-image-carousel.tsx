@@ -58,6 +58,8 @@ export default function PostImageCarousel({ images }: Props) {
                 <img
                   src={src}
                   alt={`게시글 이미지 ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               </button>

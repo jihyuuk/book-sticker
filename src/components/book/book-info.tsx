@@ -47,6 +47,8 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
         alt={title}
         onLoad={() => setIsLoaded(true)}
         onError={handleError}
+        loading="lazy"
+        decoding="async"
         className={cn(
           "h-full w-full",
           imageSrc === FALLBACK_IMAGE ? "object-contain" : "object-cover",
