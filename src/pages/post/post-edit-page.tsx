@@ -3,9 +3,9 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 import SubHeader from "@/components/header/sub-header";
-import type { PublicPost } from "@/types/public-types";
 import PostEditForm from "@/components/post-form/post-edit-form";
 import { usePostEditPassword } from "@/store/post-edit-session-store";
+import type { PublicPost } from "@/types/dto/public-dto";
 
 export default function PostEditPage() {
   const { publicId, postId } = useParams();
@@ -32,7 +32,7 @@ export default function PostEditPage() {
   if (!isValidPost) return null;
 
   return (
-    <div>
+    <div className="animate-page-slide">
       {/* 헤더 */}
       <SubHeader title="독후감 수정" />
 

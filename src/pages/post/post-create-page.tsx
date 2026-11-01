@@ -32,7 +32,7 @@ export default function PostCreatePage() {
   }
 
   return (
-    <div>
+    <div className="animate-page-slide">
       {/* 헤더 */}
       <SubHeader title="독후감 작성" />
 

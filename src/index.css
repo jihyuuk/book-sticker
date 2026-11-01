@@ -159,3 +159,25 @@ button,
   z-index: 10;
   pointer-events: none;
 }
+
+/* 페이지 슬라이드 효과 */
+@keyframes page-slide {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-page-slide {
+  animation: page-slide 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-slide {
+    animation: none;
+  }
+}

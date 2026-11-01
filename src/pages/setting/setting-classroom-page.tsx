@@ -32,7 +32,7 @@ export default function SettingClassroomPage() {
   }
 
   return (
-    <div>
+    <div className="animate-page-slide">
       <SubHeader title="반 설정" />
 
       <main className="px-page-x mx-auto w-full max-w-2xl py-3">
