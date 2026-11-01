@@ -1,4 +1,4 @@
-//import GlobalLoading from "@/components/global-loading";
+import { hideInitialLoader } from "@/lib/Initial-loader";
 import { supabase } from "@/lib/supabse";
 import { useIsSessionLoaded, useSetSession } from "@/store/session";
 import { useEffect, type ReactNode } from "react";
@@ -17,7 +17,13 @@ export default function SessionProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [setSession]);
 
-  //if (!isSessionLoaded) return <GlobalLoading />;
+  // 세션 초기화 완료 후 HTML 로딩 화면 숨기기
+  useEffect(() => {
+    if (!isSessionLoaded) return;
+
+    hideInitialLoader();
+  }, [isSessionLoaded]);
+
   if (!isSessionLoaded) return null;
 
   return children;
