@@ -161,7 +161,9 @@ export default function PostEditForm({ post, password }: Props) {
         onSuccess: () => {
           setIsPasswordOpen(false);
           toast.success("게시물이 수정되었습니다.");
-          navigate(-1);
+          navigate(`/classroom/${publicId}/posts`, {
+            replace: true,
+          });
         },
 
         onError: (error) => {

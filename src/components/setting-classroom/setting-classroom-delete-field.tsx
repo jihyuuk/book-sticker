@@ -25,7 +25,9 @@ export default function SettingClassroomDeleteField({ classroomId }: Props) {
         await deleteClassroom(classroomId, {
           onSuccess: () => {
             toast.success("반이 삭제되었습니다.");
-            navigate(-1);
+            navigate("/setting", {
+              replace: true,
+            });
           },
           onError: () => {
             toast.error("반 삭제에 실패했습니다.");

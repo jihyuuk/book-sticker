@@ -118,7 +118,9 @@ export default function PostNewForm({ data }: Props) {
         onSuccess: () => {
           toast.success("성공");
           requestScrollReset();
-          navigate(-1);
+          navigate(`/classroom/${classroom.publicId}/posts`, {
+            replace: true,
+          });
         },
         // onError: (error) => {
         //   alert(error);
