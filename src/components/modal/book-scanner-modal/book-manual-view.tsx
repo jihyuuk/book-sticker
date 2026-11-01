@@ -7,6 +7,7 @@ import type { BookModalView } from "./book-scanner-modal";
 import type { BookInfoData } from "@/components/book/book-info";
 import { useCoverPreviewUrl } from "@/hooks/utils/use-cover-preview-url";
 import { useRef } from "react";
+import { useOpenImageViewer } from "@/store/image-viewer-store";
 
 type Props = {
   book: BookInfoData;
@@ -29,6 +30,8 @@ export default function BookManualInputView({
   onCoverRemove,
   isCoverOptimizing,
 }: Props) {
+  const openImageViewer = useOpenImageViewer();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const previewUrl = useCoverPreviewUrl(coverImageFile);
@@ -71,10 +74,13 @@ export default function BookManualInputView({
                 {/* 책 표지 */}
                 <button
                   type="button"
-                  disabled={isCoverOptimizing}
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() =>
+                    openImageViewer({
+                      images: [coverSrc],
+                    })
+                  }
                   className="size-full overflow-hidden rounded-md border bg-gray-100"
-                  aria-label="책 표지 변경"
+                  aria-label="책 표지 확대하기"
                 >
                   <img
                     src={coverSrc}

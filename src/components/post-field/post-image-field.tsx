@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { cn } from "cn";
 import { optimizeImage } from "@/lib/image-optimzie";
+import { useOpenImageViewer } from "@/store/image-viewer-store";
 
 type ImageStatus = "optimizing" | "ready" | "error";
 
@@ -35,6 +36,8 @@ export default function PostImageField({
   onValueChange,
   disabled,
 }: Props) {
+  const openImageViewer = useOpenImageViewer();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const imagesRef = useRef(value);
 
@@ -136,7 +139,7 @@ export default function PostImageField({
     <Field className="w-full">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <FieldLabel>사진 / 동영상</FieldLabel>
+        <FieldLabel>사진 </FieldLabel>
 
         <span className="text-xs text-gray-400">
           {value.length}/{MAX_IMAGES}
@@ -155,12 +158,22 @@ export default function PostImageField({
                 "border-destructive",
             )}
           >
-            {/* 이미지 미리보기 */}
-            <img
-              src={image.previewUrl}
-              alt=""
-              className="size-full object-cover"
-            />
+            <button
+              type="button"
+              className="size-full"
+              onClick={() =>
+                openImageViewer({
+                  images: [image.previewUrl],
+                })
+              }
+            >
+              {/* 이미지 미리보기 */}
+              <img
+                src={image.previewUrl}
+                alt=""
+                className="size-full object-cover"
+              />
+            </button>
 
             {/* 최적화 중 */}
             {image.type === "new" && image.status === "optimizing" && (
