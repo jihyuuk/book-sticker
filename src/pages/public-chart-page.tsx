@@ -1,5 +1,4 @@
 import { useParams } from "react-router";
-import GlobalLoading from "@/components/global-loading";
 import GlobalError from "@/components/global-error";
 import ChartList from "@/components/chart/chart-list";
 import PublicNotFound from "@/components/Public-not-found";
@@ -7,6 +6,7 @@ import { usePreloadImages } from "@/hooks/utils/use-preload-images";
 import FooterImage from "@/components/chart/footer-image";
 import ChartHeader from "@/components/header/chart-header";
 import { usePublicChart } from "@/hooks/queries/use-public-chart";
+import GlobalLoading from "@/components/global-loading";
 
 export default function PublicChartPage() {
   const { publicId } = useParams();

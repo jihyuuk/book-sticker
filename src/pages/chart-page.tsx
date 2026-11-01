@@ -1,7 +1,6 @@
 import ChartList from "@/components/chart/chart-list";
 import FooterImage from "@/components/chart/footer-image";
 import GlobalError from "@/components/global-error";
-import GlobalLoading from "@/components/global-loading";
 import { usePreloadImages } from "@/hooks/utils/use-preload-images";
 import ChartHeader from "@/components/header/chart-header";
 import { useAdminChart } from "@/hooks/queries/use-admin-chart";
@@ -9,6 +8,7 @@ import NotFoundPage from "./not-found-page";
 import { useEffect, useState } from "react";
 import { SELECTED_CHART_CLASSROOM_KEY } from "@/lib/constants";
 import { useClassrooms } from "@/hooks/queries/use-classrooms";
+import GlobalLoading from "@/components/global-loading";
 
 export default function ChartPage() {
   const [selectedClassroomId, setSelectedClassroomId] = useState<
