@@ -1,18 +1,40 @@
-import { Copy, Share2 } from "lucide-react";
+import { Check, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "../ui/button";
 import { Field, FieldDescription, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   publicUrl: string;
 };
 
 export default function SettingClassroomPublicLinkField({ publicUrl }: Props) {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(publicUrl);
-    toast.success("공유 링크를 복사했어요.");
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+
+      setCopied(true);
+
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+      timeoutRef.current = setTimeout(() => {
+        setCopied(false);
+        timeoutRef.current = null;
+      }, 3000);
+    } catch {
+      toast.error("링크 복사에 실패했어요.");
+    }
   };
 
   const handleShare = async () => {
@@ -51,11 +73,26 @@ export default function SettingClassroomPublicLinkField({ publicUrl }: Props) {
           <button
             type="button"
             onClick={handleCopy}
-            aria-label="링크 복사"
-            title="링크 복사"
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md transition-colors"
+            aria-label={copied ? "복사 완료" : "링크 복사"}
+            title={copied ? "복사 완료" : "링크 복사"}
+            className={`absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md transition-colors ${
+              copied
+                ? "text-green-600"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
-            <Copy className="size-4" />
+            <span className="relative size-4">
+              <Copy
+                className={`absolute inset-0 size-4 transition-all duration-200 ${
+                  copied ? "scale-50 opacity-0" : "scale-100 opacity-100"
+                }`}
+              />
+              <Check
+                className={`absolute inset-0 size-4 transition-all duration-200 ${
+                  copied ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                }`}
+              />
+            </span>
           </button>
         </div>
 
