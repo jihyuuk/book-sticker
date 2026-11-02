@@ -1,4 +1,4 @@
-import { hideInitialLoader } from "@/lib/Initial-loader";
+import { hideInitialLoader } from "@/lib/initial-loader";
 import { supabase } from "@/lib/supabse";
 import { useIsSessionLoaded, useSetSession } from "@/store/session";
 import { useEffect, type ReactNode } from "react";

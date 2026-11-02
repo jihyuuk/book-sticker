@@ -23,6 +23,7 @@ import { ADMIN_QUERY_KEYS } from "@/lib/query-keys/admin-query-keys";
 import TailSpinner from "@/components/pull-to-refresh/tail-spinner";
 import CustomPullToRefresh from "../../components/pull-to-refresh/custom-pull-to-refresh";
 import GlobalLoading from "@/components/global-loading";
+import EMPTY_IMG from "@/assets/empty-post.webp";
 
 const ALL_CLASSROOMS = "all";
 
@@ -239,9 +240,13 @@ export default function AdminPostListPage() {
             <GlobalError className="h-80" />
           ) : !posts.length ? (
             // 게시글 없을때
-            <p className="py-16 text-center text-gray-400">
-              아직 작성된 게시글이 없어요.
-            </p>
+            <div className="h-[calc(100dvh-152px)] overflow-hidden bg-white md:h-[calc(100dvh-160px)]">
+              <div className="flex h-full flex-col items-center justify-center gap-3">
+                <img src={EMPTY_IMG} width={144} height={144} />
+                <p className="text-gray-400">아직 작성된 게시글이 없어요</p>
+                <div className="h-20" />
+              </div>
+            </div>
           ) : (
             // 게시글 목록 + 무한스크롤 UI
             <>

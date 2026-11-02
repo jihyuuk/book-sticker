@@ -15,6 +15,7 @@ import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import type { PublicPostsPageData } from "@/types/dto/public-dto";
 import { PUBLIC_QUERY_KEYS } from "@/lib/query-keys/public-query-keys";
 import TailSpinner from "@/components/pull-to-refresh/tail-spinner";
+import EMPTY_IMG from "@/assets/empty-post.webp";
 
 export default function PostListPage() {
   const { publicId } = useParams();
@@ -145,13 +146,20 @@ export default function PostListPage() {
           ) : (
             <>
               {/* 선생님이 작성한 타이틀 */}
-              {/* <PostListIntro classroomName={classroom.name} /> */}
+              {/* <PostListIntro classroomName={classroom?.name ?? ""} /> */}
 
               {/* 게시글 목록 */}
               {!posts.length ? (
-                <p className="py-16 text-center text-gray-400">
-                  아직 작성된 게시글이 없어요.
-                </p>
+                // 게시글 없을때
+                <div className="h-[calc(100dvh-96px)] overflow-hidden bg-white md:h-[calc(100dvh-104px)]">
+                  <div className="flex h-full flex-col items-center justify-center gap-3">
+                    <img src={EMPTY_IMG} width={144} height={144} />
+                    <p className="text-gray-400">
+                      첫 이야기의 주인공이 되어보세요!
+                    </p>
+                    <div className="h-20" />
+                  </div>
+                </div>
               ) : (
                 <>
                   <section className="space-y-15">
