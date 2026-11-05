@@ -61,9 +61,10 @@ export default function SettingDailyBookLimitField({
           일일 게시글 작성 한도
         </FieldLabel>
 
-        <div className="flex gap-2">
+        <div className="flex min-w-0 gap-2">
           <NumberInput
             id="daily-book-limit"
+            className="min-w-0 flex-1"
             placeholder="일일 게시글 작성 한도를 입력해주세요"
             value={dailyBookLimit}
             onValueChange={setDailyBookLimit}
@@ -73,7 +74,7 @@ export default function SettingDailyBookLimitField({
             removeLeadingZeros
           />
 
-          <Button type="submit" disabled={!canSubmit}>
+          <Button type="submit" className="shrink-0" disabled={!canSubmit}>
             {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
           </Button>
         </div>

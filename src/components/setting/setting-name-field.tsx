@@ -46,9 +46,10 @@ export default function SettingNameField({ oriName }: Props) {
       <Field>
         <FieldLabel htmlFor="kindergarten-name">유치원명</FieldLabel>
 
-        <div className="flex gap-2">
+        <div className="flex min-w-0 gap-2">
           <Input
             id="kindergarten-name"
+            className="min-w-0 flex-1"
             placeholder="유치원명을 입력해주세요"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -56,7 +57,7 @@ export default function SettingNameField({ oriName }: Props) {
             aria-invalid={!trimmedName}
           />
 
-          <Button type="submit" disabled={!canSubmit}>
+          <Button type="submit" className="shrink-0" disabled={!canSubmit}>
             {isUpdating ? <Loader2 className="animate-spin" /> : "수정"}
           </Button>
         </div>
