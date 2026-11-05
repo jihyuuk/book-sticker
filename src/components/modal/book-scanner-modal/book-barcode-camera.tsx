@@ -45,20 +45,26 @@ function captureVideoFrame(video: HTMLVideoElement): Promise<Blob> {
 
 // 최소 FPS를 유지하면서 높은 해상도 요청
 async function configureCamera(track: MediaStreamTrack) {
-  const capabilities = track.getCapabilities?.();
+  //const capabilities = track.getCapabilities?.();
 
-  const maxWidth = capabilities?.width?.max;
-  const maxHeight = capabilities?.height?.max;
+  // const maxWidth = capabilities?.width?.max;
+  // const maxHeight = capabilities?.height?.max;
 
   // 1. 최대 해상도 우선 요청
   try {
+    // await track.applyConstraints({
+    //   ...(maxWidth && { width: { ideal: maxWidth } }),
+    //   ...(maxHeight && { height: { ideal: maxHeight } }),
+    //   frameRate: {
+    //     min: 24,
+    //     ideal: 30,
+    //   },
+    // });
+
     await track.applyConstraints({
-      ...(maxWidth && { width: { ideal: maxWidth } }),
-      ...(maxHeight && { height: { ideal: maxHeight } }),
-      frameRate: {
-        min: 24,
-        ideal: 30,
-      },
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      frameRate: { ideal: 30 },
     });
 
     return;
