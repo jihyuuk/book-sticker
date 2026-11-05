@@ -10,7 +10,6 @@ import PostSubmitButton from "../post-field/post-submit-button";
 import PostImageField, {
   type PostImageData,
 } from "../post-field/post-image-field";
-import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
 import { SELECTED_KID_KEY } from "@/lib/constants";
 import { FieldGroup } from "../ui/field";
@@ -18,6 +17,10 @@ import type { CreatePostParam } from "@/api/post-api";
 import { requestScrollReset } from "@/lib/scroll";
 import type { PostCreateData } from "@/types/dto/public-dto";
 import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
+import {
+  useCloseLoadingOverlay,
+  useOpenLoadingOverlay,
+} from "@/store/loading-overlay-store";
 
 type Props = {
   data: PostCreateData;
@@ -25,6 +28,8 @@ type Props = {
 
 export default function PostNewForm({ data }: Props) {
   const navigate = useNavigate();
+  const openLoading = useOpenLoadingOverlay();
+  const closeLoading = useCloseLoadingOverlay();
 
   //새로고침 방지
   useBeforeUnload(true);
@@ -103,6 +108,7 @@ export default function PostNewForm({ data }: Props) {
     // TypeScript 타입 좁히기용
     if (!book) return;
 
+    openLoading("저장 중...");
     mutate(
       {
         publicId: classroom.publicId,
@@ -116,7 +122,8 @@ export default function PostNewForm({ data }: Props) {
       },
       {
         onSuccess: () => {
-          toast.success("성공");
+          closeLoading();
+          //toast.success("성공");
           requestScrollReset();
           navigate(`/classroom/${classroom.publicId}/posts`, {
             replace: true,
@@ -126,13 +133,14 @@ export default function PostNewForm({ data }: Props) {
         //   alert(error);
         //   toast.error("실패");
         // },
-        onError: async (error) => {
-          if (error instanceof FunctionsHttpError) {
-            const body = await error.context.json();
-            alert(JSON.stringify(body));
-          } else {
-            alert(error instanceof Error ? error.message : String(error));
-          }
+        onError: async () => {
+          closeLoading();
+          // if (error instanceof FunctionsHttpError) {
+          //   const body = await error.context.json();
+          //   alert(JSON.stringify(body));
+          // } else {
+          //   alert(error instanceof Error ? error.message : String(error));
+          // }
 
           toast.error("실패");
         },

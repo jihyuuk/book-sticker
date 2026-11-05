@@ -15,6 +15,10 @@ import { useClearPostEditSession } from "@/store/post-edit-session-store";
 import PostEditPasswordDrawer from "../drawers/post-edit-password-drawer";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
+import {
+  useCloseLoadingOverlay,
+  useOpenLoadingOverlay,
+} from "@/store/loading-overlay-store";
 
 type Props = {
   post: PublicPost;
@@ -24,6 +28,8 @@ type Props = {
 export default function PostEditForm({ post, password }: Props) {
   const { publicId } = useParams();
   const navigate = useNavigate();
+  const openLoading = useOpenLoadingOverlay();
+  const closeLoading = useCloseLoadingOverlay();
 
   //새로고침 방지
   useBeforeUnload(true);
@@ -150,6 +156,7 @@ export default function PostEditForm({ post, password }: Props) {
   const submitUpdate = (verifiedPassword: string) => {
     if (!publicId || isPending || isImageProcessing) return;
 
+    openLoading("수정 중...");
     mutate(
       {
         postId: post.id,
@@ -159,6 +166,7 @@ export default function PostEditForm({ post, password }: Props) {
       },
       {
         onSuccess: () => {
+          closeLoading();
           setIsPasswordOpen(false);
           toast.success("게시물이 수정되었습니다.");
           navigate(`/classroom/${publicId}/posts`, {
@@ -167,6 +175,7 @@ export default function PostEditForm({ post, password }: Props) {
         },
 
         onError: (error) => {
+          closeLoading();
           if (
             error instanceof FunctionsHttpError &&
             error.context.status === 401

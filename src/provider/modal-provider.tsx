@@ -1,4 +1,5 @@
 import PostPasswordDrawer from "@/components/drawers/post-password-drawer";
+import LoadingOverlay from "@/components/loading-overlay";
 import AlertModal from "@/components/modal/alert-modal";
 import ImageViewer from "@/components/modal/image-viewer";
 import type { ReactNode } from "react";
@@ -12,6 +13,7 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
           <AlertModal />
           <ImageViewer />
           <PostPasswordDrawer />
+          <LoadingOverlay />
         </>,
         document.getElementById("modal-root")!,
       )}
