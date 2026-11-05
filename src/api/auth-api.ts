@@ -46,7 +46,9 @@ export async function signIn({ email, password }: SignInParam) {
 
 // 로그아웃
 export async function signOut() {
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({
+    scope: "local", //기본값은 global로 다른 곳의 리프레쉬 토큰도 무효화 시킴
+  });
 
   if (error) throw error;
 }
