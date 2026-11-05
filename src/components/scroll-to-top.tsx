@@ -23,7 +23,9 @@ export default function ScrollToTop() {
     }
 
     // 뒤로가기 / 앞으로가기는 브라우저에 맡김
-    if (navigationType === "POP") return;
+    if (navigationType === "POP") {
+      return;
+    }
 
     // 일반 페이지 이동 시 초기화
     window.scrollTo(0, 0);

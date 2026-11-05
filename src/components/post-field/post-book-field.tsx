@@ -32,7 +32,7 @@ export default function PostBookField({
           책{" "}
           {isUpdate && (
             <span className="text-muted-foreground text-xs font-normal">
-              수정불가
+              (수정 불가)
             </span>
           )}
         </FieldLabel>

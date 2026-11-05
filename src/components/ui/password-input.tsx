@@ -18,6 +18,7 @@ export default function PasswordInput({ value, ...props }: PasswordInputProps) {
       {...props}
       value={value}
       type={isVisible ? "text" : "password"}
+      autoComplete="off"
       endIcon={
         hasValue ? (
           <button
