@@ -1,5 +1,7 @@
-import type { BookInfoData } from "@/components/book/book-info";
 import { supabase } from "@/lib/supabse";
+import type { PublicBook } from "@/types/dto/public-dto";
+
+type BookInfoData = Omit<PublicBook, "id">;
 
 export type BookByIsbnResponse =
   | {

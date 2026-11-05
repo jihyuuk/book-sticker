@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 
-import type { BookInfoData } from "@/components/book/book-info";
 import { useBookByIsbn } from "@/hooks/mutations/book/use-book-by-isbn";
 import BookBarcodeCamera from "./book-barcode-camera";
 import BookBarcodeHeader from "./book-barcode-header";
 import { CircleAlert, LoaderCircle, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { BookInfoData } from "./book-scanner-modal";
 
 type Props = {
   onBookChange: React.Dispatch<React.SetStateAction<BookInfoData>>;

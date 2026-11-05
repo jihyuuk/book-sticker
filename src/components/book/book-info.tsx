@@ -5,7 +5,7 @@ import { useOpenImageViewer } from "@/store/image-viewer-store";
 import type { PublicBook } from "@/types/dto/public-dto";
 
 type Props = {
-  book: PublicBook;
+  book: Omit<PublicBook, "id">;
   className?: string;
 };
 

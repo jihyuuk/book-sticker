@@ -1,10 +1,9 @@
-import { LoaderCircle, Plus, ScanBarcode, X } from "lucide-react";
+import { LoaderCircle, Plus, X } from "lucide-react";
 
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "cn";
-import type { BookModalView } from "./book-scanner-modal";
-import type { BookInfoData } from "@/components/book/book-info";
+import type { BookInfoData, BookModalView } from "./book-scanner-modal";
 import { useCoverPreviewUrl } from "@/hooks/utils/use-cover-preview-url";
 import { useRef } from "react";
 import { useOpenImageViewer } from "@/store/image-viewer-store";
@@ -35,13 +34,13 @@ export default function BookManualInputView({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const previewUrl = useCoverPreviewUrl(coverImageFile);
-  const coverSrc = previewUrl ?? book.cover_url;
+  const coverSrc = previewUrl ?? book.coverUrl;
 
   return (
     <section className="flex min-h-0 flex-1 flex-col bg-white">
       {/* 헤더 */}
       <header className="z-50 flex h-14 shrink-0 items-center justify-center bg-white md:h-16">
-        <div className="px-page-x grid w-full max-w-2xl grid-cols-[24px_1fr_24px] items-center">
+        <div className="px-page-x grid w-full max-w-2xl grid-cols-[1fr_auto_1fr] items-center">
           <button type="button" onClick={onBack} aria-label="모달 닫기">
             <X className="size-6" strokeWidth={1.5} />
           </button>
@@ -54,8 +53,10 @@ export default function BookManualInputView({
             type="button"
             onClick={() => onChangeView("SCANNER")}
             aria-label="바코드 검색"
+            className="text-end text-sky-600"
           >
-            <ScanBarcode className="size-6 text-sky-600" strokeWidth={1.5} />
+            바코드 촬영
+            {/* <ScanBarcode className="size-6 text-sky-600" strokeWidth={1.5} /> */}
           </button>
         </div>
       </header>

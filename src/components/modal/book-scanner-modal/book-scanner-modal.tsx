@@ -1,5 +1,4 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import type { BookInfoData } from "@/components/book/book-info";
 import BookManualInputView from "./book-manual-view";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
@@ -12,8 +11,10 @@ import { optimizeImage } from "@/lib/image-optimzie";
 
 type PostBook = CreatePostParam["book"];
 
+export type BookInfoData = Omit<PostBook, "coverImageFile">;
+
 const EMPTY_BOOK: BookInfoData = {
-  cover_url: null,
+  coverUrl: null,
   title: "",
   author: null,
   publisher: null,
@@ -65,7 +66,7 @@ export default function BookScannerModal({
     (book?.author ?? "") !== (tempBook.author ?? "") ||
     (book?.publisher ?? "") !== (tempBook.publisher ?? "") ||
     (book?.isbn ?? "") !== (tempBook.isbn ?? "") ||
-    (book?.cover_url ?? "") !== (tempBook.cover_url ?? "") ||
+    (book?.coverUrl ?? "") !== (tempBook.coverUrl ?? "") ||
     (book?.coverImageFile ?? null) !== tempCoverImageFile;
 
   // 책 등록 필수 조건
@@ -73,7 +74,7 @@ export default function BookScannerModal({
   const isValidBook =
     !!tempBook.title.trim() &&
     !!tempBook.author?.trim() &&
-    (!!tempBook.cover_url?.trim() || !!tempCoverImageFile);
+    (!!tempBook.coverUrl?.trim() || !!tempCoverImageFile);
 
   // 모달 열기/닫기 시 임시 데이터 초기화
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function BookScannerModal({
             title: book.title,
             author: book.author,
             publisher: book.publisher,
-            cover_url: book.cover_url,
+            coverUrl: book.coverUrl,
           }
         : EMPTY_BOOK,
     );
@@ -127,7 +128,7 @@ export default function BookScannerModal({
       // 직접 업로드한 표지를 사용하므로 외부 URL 제거
       setTempBook((prev) => ({
         ...prev,
-        cover_url: null,
+        coverUrl: null,
       }));
     } catch (error) {
       // 최적화 실패 시 기존 데이터는 변경하지 않음
@@ -150,7 +151,7 @@ export default function BookScannerModal({
     // 외부 URL과 직접 업로드한 파일 모두 제거
     setTempBook((prev) => ({
       ...prev,
-      cover_url: null,
+      coverUrl: null,
     }));
 
     setTempCoverImageFile(null);
@@ -171,7 +172,7 @@ export default function BookScannerModal({
       isbn: tempBook.isbn?.trim() || null,
 
       // 직접 업로드한 파일이 있다면 외부 URL은 사용하지 않음
-      cover_url: tempCoverImageFile ? null : tempBook.cover_url?.trim() || null,
+      coverUrl: tempCoverImageFile ? null : tempBook.coverUrl?.trim() || null,
 
       // 최적화된 JPEG 파일 또는 null
       coverImageFile: tempCoverImageFile,

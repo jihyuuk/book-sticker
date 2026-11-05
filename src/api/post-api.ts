@@ -1,3 +1,4 @@
+import { getKidProfileUrl } from "@/lib/storage-path-to-url";
 import { supabase } from "@/lib/supabse";
 import type {
   PostCreateData,
@@ -19,7 +20,7 @@ type FetchPublicPostParams = {
 export type CreatePostParam = {
   publicId: string;
   kidId: string;
-  book: PublicBook & {
+  book: Omit<PublicBook, "id"> & {
     coverImageFile: File | null;
   };
   content: string;
@@ -101,7 +102,15 @@ export async function fetchPostCreateData(
     throw new Error("존재하지 않거나 공개되지 않은 반입니다.");
   }
 
-  return data as PostCreateData;
+  const response = data as PostCreateData;
+
+  return {
+    ...response,
+    kids: response.kids.map((kid) => ({
+      ...kid,
+      profileImageUrl: getKidProfileUrl(kid.profileImageUrl),
+    })),
+  };
 }
 
 // ============================================================
