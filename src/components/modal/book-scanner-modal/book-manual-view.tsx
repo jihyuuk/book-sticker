@@ -69,7 +69,7 @@ export default function BookManualInputView({
             책 표지 <span className="text-destructive">*</span>
           </FieldLabel>
 
-          <div className="relative aspect-20/29 w-16!">
+          <div className="relative aspect-20/29 w-16! shrink-0">
             {coverSrc ? (
               <>
                 {/* 책 표지 */}
@@ -80,13 +80,13 @@ export default function BookManualInputView({
                       images: [coverSrc],
                     })
                   }
-                  className="size-full overflow-hidden rounded-md border bg-gray-100"
+                  className="absolute inset-0 overflow-hidden rounded-md border bg-gray-100"
                   aria-label="책 표지 확대하기"
                 >
                   <img
                     src={coverSrc}
                     alt={book.title || "책 표지"}
-                    className="size-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </button>
 
