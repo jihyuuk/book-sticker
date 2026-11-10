@@ -32,9 +32,9 @@ export default function SettingClassroomsField({ classrooms }: Props) {
               size="xl"
               variant="outline"
               onClick={() => navigate(`/setting/classroom/${classroom.id}`)}
-              className="font-medium"
+              className="min-w-0 font-medium"
             >
-              {classroom.name}
+              <span className="min-w-0 truncate">{classroom.name}</span>
             </Button>
           ))}
 
