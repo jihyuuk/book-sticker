@@ -65,9 +65,7 @@ export default function BookManualInputView({
       <div className="px-page-x min-h-0 flex-1 space-y-4 overflow-y-auto pb-24">
         {/* 책 표지 */}
         <Field>
-          <FieldLabel>
-            책 표지 <span className="text-destructive">*</span>
-          </FieldLabel>
+          <FieldLabel>책 표지</FieldLabel>
 
           <div className="relative aspect-20/29 w-16! shrink-0">
             {coverSrc ? (

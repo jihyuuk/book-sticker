@@ -71,10 +71,7 @@ export default function BookScannerModal({
 
   // 책 등록 필수 조건
   // 제목 + 저자 + (외부 표지 URL 또는 업로드한 표지)
-  const isValidBook =
-    !!tempBook.title.trim() &&
-    !!tempBook.author?.trim() &&
-    (!!tempBook.coverUrl?.trim() || !!tempCoverImageFile);
+  const isValidBook = !!tempBook.title.trim() && !!tempBook.author?.trim();
 
   // 모달 열기/닫기 시 임시 데이터 초기화
   useEffect(() => {
