@@ -184,7 +184,7 @@ export default function BookManualInputView({
           label="ISBN"
           value={book.isbn ?? ""}
           placeholder="ISBN을 입력해주세요"
-          inputMode="text"
+          inputMode="numeric"
           onValueChange={(value) =>
             onBookChange((prev) => ({
               ...prev,
