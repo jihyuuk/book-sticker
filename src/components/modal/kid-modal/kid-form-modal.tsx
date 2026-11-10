@@ -8,12 +8,12 @@ import { useCreateKid } from "@/hooks/mutations/kid/use-create-kid";
 import { useUpdateKid } from "@/hooks/mutations/kid/use-update-kid";
 import { useOpenAlertModal } from "@/store/alert-modal";
 
-import { Dialog, DialogContent } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Field, FieldGroup, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
-import NumberInput from "../ui/number-input";
+import { Dialog, DialogContent } from "../../ui/dialog";
+import { Button } from "../../ui/button";
+import { Field, FieldGroup, FieldLabel } from "../../ui/field";
+import { Input } from "../../ui/input";
 import { optimizeKidProfileImage } from "@/lib/profile-image-optimize";
+import StepperNumberInput from "./stepper-number-input";
 
 // 모달 상태
 export type KidModalState =
@@ -262,12 +262,14 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
       }}
     >
       <DialogContent
-        className="rounded-lg p-5! pb-4.5! sm:max-w-sm"
+        className="max-w-[min(24rem,calc(100%-4rem))] rounded-lg p-5! pb-4.5! sm:max-w-sm"
         onOpenAutoFocus={(event) => {
           if (window.matchMedia("(pointer: coarse)").matches) {
             event.preventDefault();
           }
         }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <form
           onSubmit={(e) => {
@@ -341,18 +343,18 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
 
             <Field>
               <FieldLabel htmlFor="kid-book-count">패들렛 게시글 수</FieldLabel>
-              <NumberInput
+              <StepperNumberInput
+                id="kid-book-count"
                 value={bookCount}
                 onValueChange={setBookCount}
                 disabled={isPending}
-                removeLeadingZeros
               />
             </Field>
           </FieldGroup>
 
           <Button
             type="submit"
-            className="mt-3 w-full"
+            className="mt-8 w-full"
             disabled={
               isPending ||
               !name.trim() ||

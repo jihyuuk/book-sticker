@@ -6,8 +6,8 @@ import { useOpenAlertModal } from "@/store/alert-modal";
 import { toast } from "sonner";
 import { useDeleteKid } from "@/hooks/mutations/kid/use-delete-kid";
 import { useState } from "react";
-import type { KidModalState } from "../modal/kid-form-modal";
-import KidFormModal from "../modal/kid-form-modal";
+import type { KidModalState } from "../modal/kid-modal/kid-form-modal";
+import KidFormModal from "../modal/kid-modal/kid-form-modal";
 
 type KidWithPostCount = Kid & {
   post_count: number;

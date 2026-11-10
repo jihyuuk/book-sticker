@@ -72,6 +72,8 @@ export default function CreateClassroomModal({ open, setOpen }: Props) {
             event.preventDefault();
           }
         }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <form
           onSubmit={(e) => {
