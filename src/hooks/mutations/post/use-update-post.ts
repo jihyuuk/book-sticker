@@ -32,7 +32,7 @@ export function useUpdatePost(publicId?: string) {
                     ...post,
                     content: updatedPost.content,
                     images: updatedPost.images,
-                    updated_at: updatedAt,
+                    updatedAt: updatedAt,
                   }
                 : post,
             ),
