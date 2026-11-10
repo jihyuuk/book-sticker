@@ -19,6 +19,7 @@ import {
   useCloseLoadingOverlay,
   useOpenLoadingOverlay,
 } from "@/store/loading-overlay-store";
+import { isPostEditable } from "@/lib/post-edit-date-limit";
 
 type Props = {
   post: PublicPost;
@@ -133,6 +134,12 @@ export default function PostEditForm({ post, password }: Props) {
   const handleSubmit = () => {
     if (!publicId || isPending || isImageProcessing) return;
 
+    // 작성 당일에만 수정 가능
+    if (!isPostEditable(post.createdAt)) {
+      toast.error("게시글은 작성 당일에만 수정할 수 있습니다.");
+      return;
+    }
+
     setShowErrors(true);
 
     if (!trimmedCaption) {
@@ -155,6 +162,13 @@ export default function PostEditForm({ post, password }: Props) {
 
   const submitUpdate = (verifiedPassword: string) => {
     if (!publicId || isPending || isImageProcessing) return;
+
+    // 실제 API 요청 직전에 다시 검사
+    if (!isPostEditable(post.createdAt)) {
+      setIsPasswordOpen(false);
+      toast.error("게시글은 작성 당일에만 수정할 수 있습니다.");
+      return;
+    }
 
     openLoading("수정 중...");
     mutate(

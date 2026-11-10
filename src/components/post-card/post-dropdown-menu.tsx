@@ -13,6 +13,8 @@ import {
   type PostActionType,
 } from "@/store/post-password-drawer-store";
 import { useParams } from "react-router";
+import { isPostEditable } from "@/lib/post-edit-date-limit";
+import { useOpenAlertModal } from "@/store/alert-modal";
 
 type Props = {
   post: PublicPost;
@@ -20,6 +22,7 @@ type Props = {
 
 export default function PostDropdownMenu({ post }: Props) {
   const { publicId } = useParams();
+  const openAlertModal = useOpenAlertModal();
 
   //radix 버그용
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,6 +31,19 @@ export default function PostDropdownMenu({ post }: Props) {
 
   const openDrawer = (type: PostActionType) => {
     if (!publicId) return;
+
+    // 수정은 작성 당일만 허용
+    if (type === "EDIT" && !isPostEditable(post.createdAt)) {
+      //toast.error("게시글은 당일에만 수정할 수 있습니다.");
+      openAlertModal({
+        title: "게시글 수정 불가",
+        description: "게시글은 당일에만 수정할 수 있습니다.",
+        actionLabel: "확인",
+        showCancel: false,
+        onAction: () => {},
+      });
+      return;
+    }
 
     openPostPasswordDrawer({
       type,
