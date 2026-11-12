@@ -218,3 +218,9 @@ button,
 :root {
   color-scheme: only light;
 }
+
+video:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: contain !important;
+}
