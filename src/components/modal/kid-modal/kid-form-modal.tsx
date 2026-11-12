@@ -54,9 +54,18 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
   const isUpdate = mode?.type === "UPDATE";
   const isPending = createKid.isPending || updateKid.isPending;
 
+  // 닫힘 애니메이션 동안 마지막 모달 정보 유지
+  const [lastMode, setLastMode] = useState<KidModalState>(mode);
+
+  if (mode && mode !== lastMode) {
+    setLastMode(mode);
+  }
+
+  const displayMode = mode ?? lastMode;
+
   // 기존 프로필 이미지
   const originalImageUrl =
-    mode?.type === "UPDATE" ? mode.kid.profile_image_url : null;
+    displayMode?.type === "UPDATE" ? displayMode.kid.profile_image_url : null;
 
   // 현재 표시할 이미지
   const previewUrl =
@@ -88,10 +97,12 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
 
   // 초기값 설정
   useEffect(() => {
+    // 닫힐 때는 초기화하지 않음
+    if (!mode) return;
+
+    // 새로 열 때만 초기화
     revokePreviewUrl();
     setImageDraft({ type: "KEEP" });
-
-    if (!mode) return;
 
     const isUpdate = mode.type === "UPDATE";
 
