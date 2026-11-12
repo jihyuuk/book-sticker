@@ -9,19 +9,19 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+
 import { useImageViewer } from "@/store/image-viewer-store";
+import VideoPlayer from "../post-card/video-player";
 
 export default function ImageViewer() {
-  const { isOpen, images, initialIndex, actions } = useImageViewer();
+  const { isOpen, media, initialIndex, actions } = useImageViewer();
 
   const [api, setApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 캐러셀의 현재 인덱스 관리
   useEffect(() => {
     if (!api || !isOpen) return;
 
-    // 클릭한 이미지부터 시작
     api.scrollTo(initialIndex, true);
 
     const updateIndex = () => {
@@ -57,15 +57,14 @@ export default function ImageViewer() {
             <X className="size-6" />
           </button>
 
-          {/* 이미지가 2장 이상일 때만 표시 */}
-          {images.length > 1 && (
+          {media.length > 1 && (
             <div className="rounded-full bg-[#333333] px-3 py-1.5 text-sm font-medium text-white tabular-nums">
-              {currentIndex + 1} / {images.length}
+              {currentIndex + 1} / {media.length}
             </div>
           )}
         </div>
 
-        {/* 이미지 캐러셀 */}
+        {/* 미디어 캐러셀 */}
         <Carousel
           setApi={setApi}
           opts={{
@@ -76,17 +75,26 @@ export default function ImageViewer() {
           className="h-full w-full"
         >
           <CarouselContent className="ml-0">
-            {images.map((src, index) => (
-              <CarouselItem key={`${src}-${index}`} className="basis-full pl-0">
-                <div className="flex h-dvh w-full items-center justify-center">
-                  <img
-                    src={src}
-                    alt={`이미지 ${index + 1}`}
-                    loading={index === initialIndex ? "eager" : "lazy"}
-                    decoding="async"
-                    draggable={false}
-                    className="h-full w-full object-contain select-none"
-                  />
+            {media.map((item, index) => (
+              <CarouselItem key={item.id} className="basis-full pl-0">
+                <div className="box-border flex h-dvh w-full items-center justify-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+                  {item.type === "IMAGE" ? (
+                    <img
+                      src={item.url}
+                      alt={`이미지 ${index + 1}`}
+                      loading={index === initialIndex ? "eager" : "lazy"}
+                      decoding="async"
+                      draggable={false}
+                      className="h-full w-full object-contain select-none"
+                    />
+                  ) : (
+                    <VideoPlayer
+                      url={item.url}
+                      posterUrl={item.posterUrl}
+                      isActive={isOpen && currentIndex === index}
+                      fit="contain"
+                    />
+                  )}
                 </div>
               </CarouselItem>
             ))}
