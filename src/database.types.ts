@@ -119,6 +119,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          profile_image_id: string | null
           profile_image_url: string | null
           updated_at: string
         }
@@ -128,6 +129,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          profile_image_id?: string | null
           profile_image_url?: string | null
           updated_at?: string
         }
@@ -137,6 +139,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          profile_image_id?: string | null
           profile_image_url?: string | null
           updated_at?: string
         }
@@ -263,6 +266,33 @@ export type Database = {
         }
         Relationships: []
       }
+      temp_media: {
+        Row: {
+          created_at: string
+          id: string
+          media_id: string
+          media_type: string
+          purpose: string
+          upload_session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_id: string
+          media_type: string
+          purpose: string
+          upload_session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_id?: string
+          media_type?: string
+          purpose?: string
+          upload_session_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -286,6 +316,32 @@ export type Database = {
           to: "storage_cleanup_queue"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      create_kid_v2: {
+        Args: {
+          p_book_count: number
+          p_classroom_id: string
+          p_name: string
+          p_profile_media_id?: string
+          p_upload_session_id?: string
+          p_user_id: string
+        }
+        Returns: {
+          book_count: number
+          classroom_id: string
+          created_at: string
+          id: string
+          name: string
+          profile_image_id: string | null
+          profile_image_url: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "kid"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       create_post: {

@@ -12,7 +12,6 @@ import { Dialog, DialogContent } from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { Field, FieldGroup, FieldLabel } from "../../ui/field";
 import { Input } from "../../ui/input";
-import { optimizeKidProfileImage } from "@/lib/profile-image-optimize";
 import StepperNumberInput from "./stepper-number-input";
 
 // 모달 상태
@@ -42,9 +41,6 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
   const [name, setName] = useState("");
   const [bookCount, setBookCount] = useState("0");
 
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const imageRequestIdRef = useRef(0);
-
   // 프로필 이미지
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -56,7 +52,7 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
   // 모달 상태
   const isOpen = mode !== null;
   const isUpdate = mode?.type === "UPDATE";
-  const isPending = createKid.isPending || updateKid.isPending || isOptimizing;
+  const isPending = createKid.isPending || updateKid.isPending;
 
   // 기존 프로필 이미지
   const originalImageUrl =
@@ -92,9 +88,6 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
 
   // 초기값 설정
   useEffect(() => {
-    imageRequestIdRef.current += 1;
-    setIsOptimizing(false);
-
     revokePreviewUrl();
     setImageDraft({ type: "KEEP" });
 
@@ -109,15 +102,13 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
   // 컴포넌트 언마운트 시 URL 정리
   useEffect(() => {
     return () => {
-      imageRequestIdRef.current += 1;
       revokePreviewUrl();
     };
   }, [revokePreviewUrl]);
 
   // 이미지 선택
-  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-
     event.target.value = "";
 
     if (!file) return;
@@ -127,42 +118,25 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
       return;
     }
 
-    const requestId = ++imageRequestIdRef.current;
-
-    setIsOptimizing(true);
-
-    try {
-      // 이미지 최적화
-      const optimizedFile = await optimizeKidProfileImage(file);
-
-      // 모달이 닫히거나 작업이 취소됐다면 무시
-      if (requestId !== imageRequestIdRef.current) return;
-
-      // 최적화 성공 후에만 기존 URL 정리
-      const url = URL.createObjectURL(optimizedFile);
-
-      revokePreviewUrl();
-      objectUrlRef.current = url;
-
-      setImageDraft({
-        type: "UPLOAD",
-        file: optimizedFile,
-        previewUrl: url,
-      });
-    } catch (error) {
-      if (requestId !== imageRequestIdRef.current) return;
-
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "이미지를 처리하지 못했습니다.",
-      );
-    } finally {
-      if (requestId === imageRequestIdRef.current) {
-        setIsOptimizing(false);
-      }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.warning("이미지는 10MB 이하만 등록할 수 있습니다.");
+      return;
     }
+
+    // 기존 미리보기 URL 정리
+    revokePreviewUrl();
+
+    // 원본 파일 미리보기
+    const url = URL.createObjectURL(file);
+    objectUrlRef.current = url;
+
+    setImageDraft({
+      type: "UPLOAD",
+      file,
+      previewUrl: url,
+    });
   };
+
   // 이미지 삭제
   const handleImageDelete = () => {
     revokePreviewUrl();
@@ -300,9 +274,7 @@ export default function KidFormModal({ classroomId, mode, onClose }: Props) {
                 }
                 className="bg-muted text-muted-foreground flex size-24 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-80 disabled:opacity-50"
               >
-                {isOptimizing ? (
-                  <Loader2 className="size-7 animate-spin" />
-                ) : previewUrl ? (
+                {previewUrl ? (
                   <img
                     src={previewUrl}
                     alt="프로필 이미지"
