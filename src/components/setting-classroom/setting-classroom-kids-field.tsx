@@ -8,6 +8,7 @@ import { useDeleteKid } from "@/hooks/mutations/kid/use-delete-kid";
 import { useState } from "react";
 import type { KidModalState } from "../modal/kid-modal/kid-form-modal";
 import KidFormModal from "../modal/kid-modal/kid-form-modal";
+import { cn } from "@/lib/utils";
 
 type KidWithPostCount = Kid & {
   post_count: number;
@@ -104,7 +105,12 @@ export default function SettingClassroomKidsField({
                   className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-0 text-left"
                 >
                   {/* 프로필 이미지 */}
-                  <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
+                  <div
+                    className={cn(
+                      "size-10 shrink-0 overflow-hidden rounded-full",
+                      kid.profile_image_url ? "bg-gray-100" : "bg-sky-100",
+                    )}
+                  >
                     {kid.profile_image_url ? (
                       <img
                         src={kid.profile_image_url}

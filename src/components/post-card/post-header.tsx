@@ -2,7 +2,7 @@ import PostDropdownMenu from "./post-dropdown-menu";
 import PostDropdownAdminMenu from "./post-dropdown-admin-menu";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { useMemo, useState } from "react";
-import { formatRelativeTimeKST } from "@/lib/utils";
+import { cn, formatRelativeTimeKST } from "@/lib/utils";
 
 type Props = {
   post: PublicPost;
@@ -41,7 +41,12 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
     <div className="px-page-x flex items-center justify-between">
       <div className="flex min-w-0 items-center gap-3">
         {/* 프로필 이미지 */}
-        <div className="size-10 shrink-0 overflow-hidden rounded-full bg-sky-100">
+        <div
+          className={cn(
+            "size-10 shrink-0 overflow-hidden rounded-full",
+            kid.profileImageUrl ? "bg-gray-100" : "bg-sky-100",
+          )}
+        >
           {kid.profileImageUrl ? (
             <img
               src={kid.profileImageUrl}
