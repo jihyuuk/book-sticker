@@ -1,11 +1,11 @@
-import { LoaderCircle, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { useRef } from "react";
 
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "cn";
 import type { BookInfoData, BookModalView } from "./book-scanner-modal";
 import { useCoverPreviewUrl } from "@/hooks/utils/use-cover-preview-url";
-import { useRef } from "react";
 import { useOpenImageViewer } from "@/store/image-viewer-store";
 
 type Props = {
@@ -16,7 +16,6 @@ type Props = {
   coverImageFile: File | null;
   onCoverSelect: (file: File) => void;
   onCoverRemove: () => void;
-  isCoverOptimizing: boolean;
 };
 
 export default function BookManualInputView({
@@ -27,12 +26,12 @@ export default function BookManualInputView({
   coverImageFile,
   onCoverSelect,
   onCoverRemove,
-  isCoverOptimizing,
 }: Props) {
   const openImageViewer = useOpenImageViewer();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 책 표지 로컬 미리보기
   const previewUrl = useCoverPreviewUrl(coverImageFile);
   const coverSrc = previewUrl ?? book.coverUrl;
 
@@ -56,7 +55,6 @@ export default function BookManualInputView({
             className="text-end text-sky-600"
           >
             바코드 촬영
-            {/* <ScanBarcode className="size-6 text-sky-600" strokeWidth={1.5} /> */}
           </button>
         </div>
       </header>
@@ -70,7 +68,7 @@ export default function BookManualInputView({
           <div className="relative aspect-20/29 w-16! shrink-0">
             {coverSrc ? (
               <>
-                {/* 책 표지 */}
+                {/* 책 표지 미리보기 */}
                 <button
                   type="button"
                   onClick={() =>
@@ -88,22 +86,20 @@ export default function BookManualInputView({
                   />
                 </button>
 
-                {/* 표지 삭제 */}
+                {/* 책 표지 삭제 */}
                 <button
                   type="button"
-                  disabled={isCoverOptimizing}
                   onClick={onCoverRemove}
                   aria-label="책 표지 삭제"
-                  className="absolute -top-2 -right-2 z-20 flex size-6 items-center justify-center rounded-full bg-black text-white disabled:opacity-50"
+                  className="absolute -top-2 -right-2 z-20 flex size-6 items-center justify-center rounded-full bg-black text-white"
                 >
                   <X className="size-4" strokeWidth={1.5} />
                 </button>
               </>
             ) : (
-              /* 표지 추가 */
+              /* 책 표지 추가 */
               <button
                 type="button"
-                disabled={isCoverOptimizing}
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   "text-muted-foreground flex size-full flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-gray-100",
@@ -115,20 +111,13 @@ export default function BookManualInputView({
                 <Plus className="size-5" strokeWidth={1.5} />
               </button>
             )}
-
-            {/* 이미지 최적화 중 로딩 오버레이 */}
-            {isCoverOptimizing && (
-              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-md bg-black/30">
-                <LoaderCircle className="size-6 animate-spin text-white" />
-              </div>
-            )}
           </div>
 
           {/* 실제 파일 선택 input */}
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.heic,.heif"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -142,6 +131,7 @@ export default function BookManualInputView({
           />
         </Field>
 
+        {/* 책 이름 */}
         <BookInputField
           label="책 이름"
           value={book.title}
@@ -155,6 +145,7 @@ export default function BookManualInputView({
           isRequired
         />
 
+        {/* 저자 */}
         <BookInputField
           label="저자"
           value={book.author ?? ""}
@@ -168,6 +159,7 @@ export default function BookManualInputView({
           isRequired
         />
 
+        {/* 출판사 */}
         <BookInputField
           label="출판사"
           value={book.publisher ?? ""}
@@ -180,6 +172,7 @@ export default function BookManualInputView({
           }
         />
 
+        {/* ISBN */}
         <BookInputField
           label="ISBN"
           value={book.isbn ?? ""}

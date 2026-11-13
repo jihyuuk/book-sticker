@@ -1,3 +1,7 @@
+import {
+  uploadPostMedia,
+  type UploadPhase,
+} from "@/lib/media/upload-post-media";
 import { getKidProfileUrl } from "@/lib/storage-path-to-url";
 import { supabase } from "@/lib/supabse";
 import type {
@@ -17,6 +21,13 @@ type FetchPublicPostParams = {
 };
 
 // 게시글 생성
+export type CreatePostMedia = {
+  id: string;
+  type: "IMAGE" | "VIDEO";
+  file: File;
+  durationSeconds?: number;
+};
+
 export type CreatePostParam = {
   publicId: string;
   kidId: string;
@@ -25,7 +36,13 @@ export type CreatePostParam = {
   };
   content: string;
   password: string;
-  images: File[];
+  media: CreatePostMedia[];
+};
+
+export type CreatePostOptions = {
+  onPhaseChange?: (phase: UploadPhase | "SAVING" | "COMPLETED") => void;
+
+  onFileProgress?: (clientId: string, loaded: number, total: number) => void;
 };
 
 // 게시글 비번 인증
@@ -119,45 +136,92 @@ export async function fetchPostCreateData(
 
 export async function createPost(
   params: CreatePostParam,
+  options: CreatePostOptions = {},
 ): Promise<{ postId: string }> {
-  const { publicId, kidId, book, content, password, images } = params;
+  const { publicId, kidId, book, content, password, media } = params;
 
-  // 파일과 책 정보 분리
   const { coverImageFile, ...bookData } = book;
 
-  const formData = new FormData();
+  // 1. Cloudflare 업로드 대상 구성
+  const files = [
+    ...(coverImageFile
+      ? [
+          {
+            clientId: "book-cover",
+            file: coverImageFile,
+            purpose: "BOOK_COVER" as const,
+          },
+        ]
+      : []),
 
-  // JSON 데이터
-  formData.append(
-    "payload",
-    JSON.stringify({
+    ...media.map((item) => ({
+      clientId: item.id,
+      file: item.file,
+      purpose:
+        item.type === "VIDEO"
+          ? ("POST_VIDEO" as const)
+          : ("POST_IMAGE" as const),
+      durationSeconds: item.durationSeconds,
+    })),
+  ];
+
+  // 2. 업로드 준비 → 표지 → 사진·영상 업로드
+  const uploaded = await uploadPostMedia(files, {
+    onPhaseChange: options.onPhaseChange,
+    onFileProgress: options.onFileProgress,
+  });
+
+  // 3. 업로드 결과 매핑
+  const uploadedMap = new Map(
+    uploaded.uploads.map((item) => [item.clientId, item]),
+  );
+
+  const coverMediaId = coverImageFile
+    ? uploadedMap.get("book-cover")?.mediaId
+    : null;
+
+  if (coverImageFile && !coverMediaId) {
+    throw new Error("책 표지 업로드 결과가 없습니다.");
+  }
+
+  const postMedia = media.map((item, index) => {
+    const uploadedItem = uploadedMap.get(item.id);
+
+    if (!uploadedItem) {
+      throw new Error("게시글 첨부 업로드 결과가 없습니다.");
+    }
+
+    return {
+      mediaId: uploadedItem.mediaId,
+      mediaType: item.type,
+      sortOrder: index,
+    };
+  });
+
+  // 4. 게시글 DB 저장
+  options.onPhaseChange?.("SAVING");
+
+  const { data, error } = await supabase.functions.invoke<{
+    postId: string;
+  }>("create-post-v2", {
+    body: {
       publicId,
       kidId,
       book: bookData,
       content,
       password,
-    }),
-  );
-
-  // 책 표지 파일
-  if (coverImageFile) {
-    formData.append("cover_image_file", coverImageFile);
-  }
-
-  // 게시글 이미지
-  images.forEach((image) => {
-    formData.append("images", image);
+      uploadSessionId: uploaded.uploadSessionId,
+      coverMediaId,
+      media: postMedia,
+    },
   });
 
-  const { data, error } = await supabase.functions.invoke<{ postId: string }>(
-    "create-post",
-    {
-      body: formData,
-    },
-  );
-
   if (error) throw error;
-  if (!data) throw new Error("게시글 생성 응답이 없습니다.");
+  if (!data) {
+    throw new Error("게시글 생성 응답이 없습니다.");
+  }
+
+  options.onPhaseChange?.("COMPLETED");
 
   return data;
 }
