@@ -1,4 +1,5 @@
 import { getCloudflareProfileUrl } from "@/lib/cloudflare-image";
+import { getKidProfileUrl } from "@/lib/storage-path-to-url";
 import { supabase } from "@/lib/supabse";
 import type { Kid } from "@/types/entity-types";
 
@@ -33,7 +34,11 @@ export async function fetchKidsByClassroom(classroomId: string) {
 
   return data.map(({ posts, ...kid }) => ({
     ...kid,
-    profile_image_url: getCloudflareProfileUrl(kid.profile_image_id),
+    profile_image_url: kid.profile_image_id
+      ? getCloudflareProfileUrl(kid.profile_image_id)
+      : kid.profile_image_url
+        ? getKidProfileUrl(kid.profile_image_url)
+        : null,
     post_count: posts?.[0]?.count ?? 0,
   }));
 }
