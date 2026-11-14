@@ -8,7 +8,8 @@ type Props = {
   fit?: "cover" | "contain";
 };
 
-type VideoReadyStatus = "IDLE" | "PROCESSING" | "READY" | "TIMEOUT" | "ERROR";
+type VideoReadyStatus =
+  "IDLE" | "PROCESSING" | "READY" | "TIMEOUT" | "ERROR" | "UNSUPPORTED";
 
 const RETRY_INTERVAL_MS = 5_000;
 const MAX_RETRY_TICKS = 12; // 5초 * 12 = 약 1분
@@ -101,38 +102,18 @@ export default function VideoPlayer({
         video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
         !video.error
       ) {
-        console.log("[VideoPlayer] 재생 준비 확인", {
-          url,
-          retryCount: retryCountRef.current,
-          readyState: video.readyState,
-        });
         setReadyStatus("READY");
         return;
       }
 
       retryTicksRef.current += 1;
       if (retryTicksRef.current >= MAX_RETRY_TICKS) {
-        console.warn("[VideoPlayer] 1분 확인 종료", {
-          url,
-          retryCount: retryCountRef.current,
-          checkedSeconds: (retryTicksRef.current * RETRY_INTERVAL_MS) / 1000,
-        });
         setReadyStatus("TIMEOUT");
         return;
       }
 
       retryCountRef.current += 1;
       const attempt = retryCountRef.current;
-
-      console.log("[VideoPlayer] 인코딩 확인 재시도", {
-        url,
-        attempt,
-        checkedSeconds: (retryTicksRef.current * RETRY_INTERVAL_MS) / 1000,
-        readyState: video.readyState,
-        networkState: video.networkState,
-        errorCode: video.error?.code ?? null,
-        errorMessage: video.error?.message ?? null,
-      });
 
       // 동일 URL의 실패 응답이 캐시될 수 있어 manifest 주소를 갱신
       video.src = makeReloadUrl(url, `${Date.now()}-${attempt}`);
@@ -141,54 +122,6 @@ export default function VideoPlayer({
 
     return () => window.clearInterval(timer);
   }, [readyStatus, isActive, isInView, isPageVisible, url]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const events = [
-      "loadstart",
-      "loadedmetadata",
-      "loadeddata",
-      "canplay",
-      "canplaythrough",
-      "waiting",
-      "stalled",
-      "suspend",
-      "playing",
-      "error",
-      "emptied",
-    ];
-
-    const logVideoState = (event: Event) => {
-      console.log(`[VideoPlayer] ${event.type}`, {
-        url,
-        currentSrc: video.currentSrc,
-        readyState: video.readyState,
-        networkState: video.networkState,
-        paused: video.paused,
-        errorCode: video.error?.code ?? null,
-        errorMessage: video.error?.message ?? null,
-      });
-    };
-
-    // 최초 상태 확인
-    console.log("[VideoPlayer] 마운트", {
-      url,
-      readyState: video.readyState,
-      networkState: video.networkState,
-    });
-
-    events.forEach((event) => {
-      video.addEventListener(event, logVideoState);
-    });
-
-    return () => {
-      events.forEach((event) => {
-        video.removeEventListener(event, logVideoState);
-      });
-    };
-  }, [url]);
 
   // 로딩이 200ms 이상 지속될 때만 스피너 표시
   useEffect(() => {
@@ -318,17 +251,8 @@ export default function VideoPlayer({
 
     // 기본 플레이어에서는 브라우저가 재생 제어
     if (nativeFullscreenRef.current) return;
-    if (["PROCESSING", "TIMEOUT", "ERROR"].includes(readyStatus)) return;
-
-    // 재생 버튼 클릭 시 현재 상태 출력
-    console.log("[VideoPlayer] 버튼 클릭", {
-      url,
-      paused: video.paused,
-      readyState: video.readyState,
-      networkState: video.networkState,
-      errorCode: video.error?.code ?? null,
-      errorMessage: video.error?.message ?? null,
-    });
+    if (["PROCESSING", "TIMEOUT", "ERROR", "UNSUPPORTED"].includes(readyStatus))
+      return;
 
     if (video.paused) {
       if (video.ended) {
@@ -430,17 +354,6 @@ export default function VideoPlayer({
     video.controls = false;
   };
 
-  // 재생을 시작할 수 있는 상태가 되었을 때 자동 확인 종료
-  const markReady = () => {
-    if (readyStatus !== "READY") {
-      console.log("[VideoPlayer] 재생 준비 완료", {
-        url,
-        retryCount: retryCountRef.current,
-      });
-      setReadyStatus("READY");
-    }
-  };
-
   // 처음 로딩할 때 소스를 해석하지 못한 경우 자동 재확인
   const handleVideoError = () => {
     stopLoading();
@@ -451,25 +364,22 @@ export default function VideoPlayer({
     if (readyStatus === "PROCESSING" || readyStatus === "TIMEOUT") return;
 
     if (!hasStarted && video.error?.code === 4) {
+      const supportsHls =
+        video.canPlayType("application/vnd.apple.mpegurl") !== "";
+
+      if (!supportsHls) {
+        setReadyStatus("UNSUPPORTED");
+        return;
+      }
+
       retryTicksRef.current = 0;
       retryCountRef.current = 0;
-
-      console.warn("[VideoPlayer] 소스 오류 → 1분 자동 확인 시작", {
-        url,
-        errorCode: video.error?.code,
-        errorMessage: video.error?.message,
-      });
 
       setReadyStatus("PROCESSING");
       return;
     }
-
     // 인코딩 여부를 판단할 수 없는 다른 오류
-    console.error("[VideoPlayer] 동영상 오류", {
-      url,
-      errorCode: video.error?.code ?? null,
-      errorMessage: video.error?.message ?? null,
-    });
+
     setReadyStatus("ERROR");
   };
 
@@ -482,7 +392,6 @@ export default function VideoPlayer({
     retryCountRef.current = 0;
     stopLoading();
 
-    console.log("[VideoPlayer] 수동 재시도 시작 (새 1분)", { url });
     setReadyStatus("PROCESSING");
 
     // 바로 한 번 불러오고, 이후 5초마다 확인
@@ -498,7 +407,7 @@ export default function VideoPlayer({
       {/* 영상 */}
       <video
         ref={videoRef}
-        src={`${url}#t=0.001`}
+        src={url}
         poster={posterUrl}
         playsInline
         preload="metadata"
@@ -523,7 +432,6 @@ export default function VideoPlayer({
 
           activeVideo = video;
 
-          markReady();
           setHasStarted(true);
           setIsPlaying(true);
           setIsEnded(false);
@@ -564,7 +472,6 @@ export default function VideoPlayer({
           stopLoading();
         }}
         onCanPlay={(e) => {
-          markReady();
           if (!e.currentTarget.seeking) {
             stopLoading();
           }
@@ -579,6 +486,14 @@ export default function VideoPlayer({
         }}
         onError={handleVideoError}
       />
+
+      {readyStatus === "UNSUPPORTED" && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 text-white">
+          <span className="text-sm font-medium">
+            이 브라우저에서는 동영상을 재생할 수 없습니다.
+          </span>
+        </div>
+      )}
 
       {/* 아직 재생할 수 없는 영상: 준비 중 화면 */}
       {readyStatus === "PROCESSING" && (
@@ -641,7 +556,8 @@ export default function VideoPlayer({
         !showSpinner &&
         readyStatus !== "PROCESSING" &&
         readyStatus !== "TIMEOUT" &&
-        readyStatus !== "ERROR" && (
+        readyStatus !== "ERROR" &&
+        readyStatus !== "UNSUPPORTED" && (
           <button
             type="button"
             onClick={togglePlay}
