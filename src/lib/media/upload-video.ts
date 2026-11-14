@@ -10,7 +10,7 @@ export function uploadVideo(
     const upload = new tus.Upload(file, {
       uploadUrl,
 
-      chunkSize: 5 * 1024 * 1024,
+      chunkSize: 50 * 1024 * 1024,
       retryDelays: [0, 1000, 3000, 5000],
 
       onProgress(uploaded, total) {
