@@ -4,6 +4,7 @@ import PostCaption from "./post-caption";
 import PostImageCarousel from "./post-image-carousel";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { memo } from "react";
+import PostMediaCarousel from "./post-media-carousel";
 
 type Props = {
   post: PublicPost;
@@ -39,7 +40,8 @@ function PostCard({ post, classroomName, isAdmin }: Props) {
       <PostCaption caption={post.content} />
 
       {/* 피드 이미지 */}
-      <PostImageCarousel images={post.images.map((image) => image.imageUrl)} />
+      <PostMediaCarousel media={post.media} />
+      {/* <PostImageCarousel images={post.images.map((image) => image.imageUrl)} /> */}
 
       {/* 책 정보 */}
       <div className="px-page-x">

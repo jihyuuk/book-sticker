@@ -34,7 +34,7 @@ type UploadResponse = {
 };
 
 // 업로드 단계
-export type UploadPhase = "PREPARING" | "COVER" | "MEDIA";
+export type UploadPhase = "PREPARING" | "MEDIA";
 
 // 진행률 콜백
 export type UploadOptions = {
@@ -124,31 +124,23 @@ export async function uploadPostMedia(
     }
   };
 
-  // 4. 책 표지 먼저 업로드
-  const cover = files.find((item) => item.purpose === "BOOK_COVER");
-
-  if (cover) {
-    options.onPhaseChange?.("COVER");
-    await send(cover);
-  }
-
-  // 5. 게시글 이미지와 동영상 분류
-  const images = files.filter((item) => item.purpose === "POST_IMAGE");
+  // 4. 책 표지를 포함한 이미지와 동영상 분류
+  const images = files.filter(
+    (item) => item.purpose === "BOOK_COVER" || item.purpose === "POST_IMAGE",
+  );
 
   const videos = files.filter((item) => item.purpose === "POST_VIDEO");
 
-  // 6. 사진 2개 + 영상 1개 병렬 업로드
-  if (images.length > 0 || videos.length > 0) {
-    options.onPhaseChange?.("MEDIA");
+  // 5. 이미지 최대 3개 + 동영상 최대 1개 병렬 업로드
+  options.onPhaseChange?.("MEDIA");
 
-    await runUploadQueue({
-      images,
-      videos,
-      upload: send,
-    });
-  }
+  await runUploadQueue({
+    images,
+    videos,
+    upload: send,
+  });
 
-  // 7. 모든 업로드 성공
+  // 6. 모든 업로드 성공
   return {
     uploadSessionId: data.uploadSessionId,
     uploads: data.uploads,

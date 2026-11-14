@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabse";
 import type {
   PostCreateData,
   PublicBook,
+  PublicPost,
   PublicPostsPageData,
 } from "@/types/dto/public-dto";
 
@@ -51,30 +52,26 @@ export type PostPasswordParam = {
   password: string;
 };
 
-// 게시글 수정
-export type UpdatePostImage =
-  | {
-      type: "existing";
-      id: string;
-    }
+// 게시글 수정: 기존 첨부는 DB ID만 전송하고 신규 첨부만 업로드합니다.
+export type UpdatePostMedia =
+  | { type: "existing"; id: string }
   | {
       type: "new";
-      id: string;
+      id: string; // UI 임시 ID / 업로드 진행률 key
+      mediaType: "IMAGE" | "VIDEO";
       file: File;
+      durationSeconds?: number;
     };
 
 export type UpdatePostParam = PostPasswordParam & {
   content: string;
-  images: UpdatePostImage[];
+  media: UpdatePostMedia[]; // 배열 순서 그대로 sort_order 적용
 };
 
+export type UpdatePostOptions = CreatePostOptions;
+
 export type UpdatePostResponse = {
-  postId: string;
-  content: string;
-  images: {
-    id: string;
-    imageUrl: string;
-  }[];
+  post: PublicPost;
 };
 
 // ============================================================
@@ -87,7 +84,7 @@ export async function fetchPublicPosts({
   cursor,
 }: FetchPublicPostParams): Promise<PublicPostsPageData> {
   const { data, error } = await supabase.functions.invoke<PublicPostsPageData>(
-    "fetch-public-posts",
+    "fetch-public-posts-v2",
     {
       body: {
         publicId,
@@ -248,43 +245,90 @@ export async function verifyPostPassword({
 // 수정
 // ============================================================
 
-export async function updatePost({
-  postId,
-  password,
-  content,
-  images,
-}: UpdatePostParam): Promise<UpdatePostResponse> {
-  const formData = new FormData();
+export async function updatePost(
+  { postId, password, content, media }: UpdatePostParam,
+  options: UpdatePostOptions = {},
+): Promise<UpdatePostResponse> {
+  if (media.length > 5) {
+    throw new Error("사진과 동영상은 합계 5개까지 등록할 수 있습니다.");
+  }
 
-  formData.append(
-    "payload",
-    JSON.stringify({
-      postId,
-      password,
-      content,
-      images: images.map((image) => ({
-        type: image.type,
-        id: image.id,
-      })),
-    }),
+  const newMedia = media.filter(
+    (item): item is Extract<UpdatePostMedia, { type: "new" }> =>
+      item.type === "new",
   );
 
-  images.forEach((image) => {
-    if (image.type === "new") {
-      formData.append("images", image.file);
+  let uploadSessionId: string | null = null;
+  const uploadedMap = new Map<string, string>();
+
+  if (newMedia.length > 0) {
+    // 비밀번호가 틀리면 대용량 파일을 먼저 업로드하지 않도록 사전 확인.
+    // update-post-v2에서도 반드시 비밀번호를 재검증합니다.
+    await verifyPostPassword({ postId, password });
+
+    const uploaded = await uploadPostMedia(
+      newMedia.map((item) => ({
+        clientId: item.id,
+        file: item.file,
+        purpose:
+          item.mediaType === "VIDEO"
+            ? ("POST_VIDEO" as const)
+            : ("POST_IMAGE" as const),
+        durationSeconds: item.durationSeconds,
+      })),
+      {
+        onPhaseChange: options.onPhaseChange,
+        onFileProgress: options.onFileProgress,
+      },
+    );
+
+    uploadSessionId = uploaded.uploadSessionId;
+    for (const item of uploaded.uploads) {
+      uploadedMap.set(item.clientId, item.mediaId);
     }
+  }
+
+  // 기존 DB 행 ID와 새로운 Cloudflare ID를 최종 순서대로 전달.
+  const finalMedia = media.map((item) => {
+    if (item.type === "existing") {
+      return { type: "existing" as const, id: item.id };
+    }
+
+    const mediaId = uploadedMap.get(item.id);
+    if (!mediaId) {
+      throw new Error("새 첨부파일의 업로드 결과가 없습니다.");
+    }
+    return {
+      type: "new" as const,
+      mediaId,
+      mediaType: item.mediaType,
+    };
   });
 
+  options.onPhaseChange?.("SAVING");
+
+  // 업로드를 한 번이라도 시작했다면 실패 시에도 temp_media에서 자동 정리됩니다.
+  // RPC 커밋 여부가 불확실한 오류에는 같은 요청을 자동 재시도하지 마세요.
   const { data, error } = await supabase.functions.invoke<UpdatePostResponse>(
-    "update-post",
+    "update-post-v2",
     {
-      body: formData,
+      body: {
+        postId,
+        password,
+        content,
+        uploadSessionId,
+        media: finalMedia,
+      },
     },
   );
 
   if (error) throw error;
-  if (!data) throw new Error("수정 응답이 없습니다.");
 
+  if (!data?.post || data.post.id !== postId) {
+    throw new Error("게시글 수정 응답이 올바르지 않습니다.");
+  }
+
+  options.onPhaseChange?.("COMPLETED");
   return data;
 }
 
@@ -296,7 +340,7 @@ export async function deletePost({
   postId,
   password,
 }: PostPasswordParam): Promise<void> {
-  const { error } = await supabase.functions.invoke("delete-post", {
+  const { error } = await supabase.functions.invoke("delete-post-v2", {
     body: {
       postId,
       password,

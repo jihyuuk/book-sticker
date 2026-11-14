@@ -14,11 +14,24 @@ export type PublicKid = {
   profileImageUrl: string | null;
 };
 
-// Post
+export type PostMedia =
+  | {
+      id: string;
+      type: "IMAGE";
+      url: string;
+    }
+  | {
+      id: string;
+      type: "VIDEO";
+      url: string;
+      posterUrl: string;
+    };
+
 export type PublicPost = {
   id: string;
-  content: string | null; // not null 설정 해야함
-  images: Image[];
+  content: string | null;
+  images: Image[]; // 기존 호환용
+  media: PostMedia[]; // Cloudflare 사진·동영상
   kid: PublicKid;
   book: PublicBook;
   createdAt: string;

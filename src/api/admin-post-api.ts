@@ -23,7 +23,7 @@ export async function fetchAdminPosts({
 }: FetchAdminPostsParams): Promise<fetchAdminPostsResponse> {
   const { data, error } =
     await supabase.functions.invoke<fetchAdminPostsResponse>(
-      "fetch-admin-posts",
+      "fetch-admin-posts-v2",
       {
         body: {
           classroomId,
@@ -43,7 +43,7 @@ export async function fetchAdminPosts({
 
 //어드민 - 게시글 삭제
 export async function deletePostAsAdmin(postId: string): Promise<void> {
-  const { error } = await supabase.functions.invoke("delete-post-by-admin", {
+  const { error } = await supabase.functions.invoke("delete-post-by-admin-v2", {
     body: {
       postId,
     },

@@ -7,6 +7,9 @@ import { useNavigate } from "react-router";
 import PostKidField from "../post-field/post-kid-field";
 import PostPasswordField from "../post-field/post-password-field";
 import PostSubmitButton from "../post-field/post-submit-button";
+import PostMediaField, {
+  type PostMediaData,
+} from "../post-field/post-media-field";
 import { Loader2 } from "lucide-react";
 import { SELECTED_KID_KEY } from "@/lib/constants";
 import { FieldGroup } from "../ui/field";
@@ -15,28 +18,15 @@ import { requestScrollReset } from "@/lib/scroll";
 import type { PostCreateData } from "@/types/dto/public-dto";
 import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
 import type { UploadPhase } from "@/lib/media/upload-post-media";
-import type { PostMediaData } from "../post-field/post-media-field";
-import PostMediaField from "../post-field/post-media-field";
+import PostUploadModal, {
+  type UploadingFile,
+} from "../modal/post-upload-modal";
 
 type Props = {
   data: PostCreateData;
 };
 
 type Phase = UploadPhase | "SAVING" | "COMPLETED";
-
-type UploadingFile = {
-  id: string;
-  name: string;
-  size: number;
-};
-
-const phaseLabels: Record<Phase, string> = {
-  PREPARING: "업로드 준비 중...",
-  COVER: "책 표지 업로드 중...",
-  MEDIA: "사진·동영상 업로드 중...",
-  SAVING: "게시글 저장 중...",
-  COMPLETED: "게시글 등록 완료",
-};
 
 export default function PostNewForm({ data }: Props) {
   const navigate = useNavigate();
@@ -61,6 +51,7 @@ export default function PostNewForm({ data }: Props) {
   const [phase, setPhase] = useState<Phase | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [fileProgress, setFileProgress] = useState<Record<string, number>>({});
+  const [uploadFailed, setUploadFailed] = useState(false);
 
   // 콜백은 Edge Function으로 전송되는 게 아니라
   // post-api.ts → upload-post-media.ts에서 이 컴포넌트로 호출됩니다.
@@ -101,19 +92,6 @@ export default function PostNewForm({ data }: Props) {
 
   const isFormDisabled = isPending || isDailyLimitReached;
 
-  // 파일 크기 가중 전체 진행률. 100% 전송과 DB 저장 완료는 별개.
-  const totalBytes = uploadingFiles.reduce((sum, file) => sum + file.size, 0);
-  const sentBytes = uploadingFiles.reduce(
-    (sum, file) => sum + file.size * ((fileProgress[file.id] ?? 0) / 100),
-    0,
-  );
-  const overallProgress =
-    phase === "SAVING" || phase === "COMPLETED"
-      ? 100
-      : totalBytes > 0
-        ? Math.min(100, Math.floor((sentBytes / totalBytes) * 100))
-        : 0;
-
   const handleSubmit = () => {
     if (isFormDisabled || isMediaChecking) return;
 
@@ -151,23 +129,17 @@ export default function PostNewForm({ data }: Props) {
 
     const files: UploadingFile[] = [
       ...(book.coverImageFile
-        ? [
-            {
-              id: "book-cover",
-              name: "책 표지",
-              size: book.coverImageFile.size,
-            },
-          ]
+        ? [{ id: "book-cover", label: "1. 책 표지" }]
         : []),
       ...media.map((item, index) => ({
         id: item.id,
-        name: `${item.type === "VIDEO" ? "영상" : "사진"} ${index + 1}`,
-        size: item.file.size,
+        label: `${index + (book.coverImageFile ? 2 : 1)}. ${item.type === "VIDEO" ? "동영상" : "사진"}`,
       })),
     ];
 
     setUploadingFiles(files);
     setFileProgress({});
+    setUploadFailed(false);
     setPhase("PREPARING");
 
     mutate(
@@ -185,7 +157,7 @@ export default function PostNewForm({ data }: Props) {
           navigate(`/classroom/${classroom.publicId}/posts`, { replace: true });
         },
         onError: (error) => {
-          setPhase(null);
+          setUploadFailed(true);
           toast.error(
             error instanceof Error
               ? error.message
@@ -236,92 +208,17 @@ export default function PostNewForm({ data }: Props) {
         />
       </FieldGroup>
 
-      {/* 기존 전역 로딩 오버레이 대신 업로드 진행률 표시 */}
-      {isPending && phase && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div
-            className="bg-background w-full max-w-md space-y-4 rounded-2xl border p-5 shadow-xl"
-            role="status"
-          >
-            <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="font-semibold" aria-live="polite">
-                {phaseLabels[phase]}
-              </span>
-              <span className="text-muted-foreground tabular-nums">
-                {overallProgress}%
-              </span>
-            </div>
-
-            <div className="space-y-2 text-sm">
-              {(
-                [
-                  ["PREPARING", "업로드 준비"],
-                  ...(book?.coverImageFile
-                    ? [["COVER", "책 표지 업로드"]]
-                    : []),
-                  ...(uploadingFiles.some((file) => file.id !== "book-cover")
-                    ? [["MEDIA", "사진·동영상 업로드"]]
-                    : []),
-                  ["SAVING", "게시글 저장"],
-                ] as [Exclude<Phase, "COMPLETED">, string][]
-              ).map(([step, label], index, stages) => {
-                const activeIndex =
-                  phase === "COMPLETED"
-                    ? stages.length
-                    : stages.findIndex(([key]) => key === phase);
-                const done = index < activeIndex;
-                return (
-                  <div key={step} className="flex items-center gap-2">
-                    <div
-                      className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs ${
-                        done
-                          ? "bg-primary text-primary-foreground"
-                          : index === activeIndex
-                            ? "bg-muted text-foreground"
-                            : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {done ? "✓" : index + 1}
-                    </div>
-                    <span
-                      className={
-                        index > activeIndex ? "text-muted-foreground" : ""
-                      }
-                    >
-                      {label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="space-y-2">
-              <div className="bg-muted h-2 overflow-hidden rounded-full">
-                <div
-                  className="bg-primary h-full rounded-full transition-[width]"
-                  style={{ width: `${overallProgress}%` }}
-                />
-              </div>
-              {uploadingFiles.length > 0 && phase !== "SAVING" && (
-                <div className="text-muted-foreground max-h-32 space-y-1 overflow-y-auto text-xs">
-                  {uploadingFiles.map((file) => (
-                    <div key={file.id} className="flex justify-between gap-2">
-                      <span className="truncate">{file.name}</span>
-                      <span className="tabular-nums">
-                        {fileProgress[file.id] ?? 0}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {phase === "SAVING" && (
-                <p className="text-muted-foreground text-xs">
-                  파일 전송이 끝났습니다. DB 저장 완료를 확인하는 중입니다.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+      {phase && (
+        <PostUploadModal
+          open={isPending || uploadFailed}
+          phase={phase}
+          files={uploadingFiles}
+          progress={fileProgress}
+          failed={uploadFailed}
+          onDismissError={() => {
+            setPhase(null);
+          }}
+        />
       )}
 
       <PostSubmitButton

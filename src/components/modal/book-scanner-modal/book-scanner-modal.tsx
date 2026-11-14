@@ -94,20 +94,36 @@ export default function BookScannerModal({
   // 책 표지 선택
   // --------------------------------------------------
   const handleCoverSelect = (file: File) => {
-    const isImage =
-      file.type.startsWith("image/") || /\.(heic|heif)$/i.test(file.name);
+    const name = file.name.toLowerCase();
+    const type = file.type.toLowerCase();
+
+    // GIF 차단
+    if (type === "image/gif" || name.endsWith(".gif")) {
+      toast.error("GIF 이미지는 업로드할 수 없습니다.");
+      return;
+    }
+
+    // 이미지 형식 확인
+    const isImage = type.startsWith("image/") || /\.(heic|heif)$/i.test(name);
 
     if (!isImage) {
       toast.error("이미지 파일만 등록할 수 있습니다.");
       return;
     }
 
-    if (file.size === 0 || file.size > MAX_COVER_SIZE) {
+    // 빈 파일 차단
+    if (file.size === 0) {
+      toast.error("비어 있는 이미지 파일입니다.");
+      return;
+    }
+
+    // 10MB 초과 차단
+    if (file.size > MAX_COVER_SIZE) {
       toast.error("책 표지는 최대 10MB까지 등록할 수 있습니다.");
       return;
     }
 
-    // 이미지 최적화 없이 원본 File 저장
+    // 검증 완료된 원본 파일 저장
     setTempCoverImageFile(file);
 
     // 직접 선택한 표지를 사용하므로 외부 URL 제거

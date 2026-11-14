@@ -1,221 +1,211 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
+import { FunctionsHttpError } from "@supabase/supabase-js";
+import { Loader2 } from "lucide-react";
+
 import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
+import { useClearPostEditSession } from "@/store/post-edit-session-store";
+import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
+import { isPostEditable } from "@/lib/post-edit-date-limit";
+import type { PublicPost } from "@/types/dto/public-dto";
+import type { UploadPhase } from "@/lib/media/upload-post-media";
+
 import PostCaptionField from "../post-field/post-caption-field";
 import PostSubmitButton from "../post-field/post-submit-button";
-import type { PostImageData } from "../post-field/post-image-field";
-import PostImageField from "../post-field/post-image-field";
-import { Loader2 } from "lucide-react";
+import PostMediaField, {
+  type PostMediaData,
+} from "../post-field/post-media-field";
+import PostBookField from "../post-field/post-book-field";
+import PostEditPasswordDrawer from "../drawers/post-edit-password-drawer";
+import PostUploadModal, {
+  type UploadingFile,
+} from "../modal/post-upload-modal";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import PostBookField from "../post-field/post-book-field";
-import { FunctionsHttpError } from "@supabase/supabase-js";
-import { useClearPostEditSession } from "@/store/post-edit-session-store";
-import PostEditPasswordDrawer from "../drawers/post-edit-password-drawer";
-import type { PublicPost } from "@/types/dto/public-dto";
-import { useBeforeUnload } from "@/hooks/utils/use-before-unload";
-import {
-  useCloseLoadingOverlay,
-  useOpenLoadingOverlay,
-} from "@/store/loading-overlay-store";
-import { isPostEditable } from "@/lib/post-edit-date-limit";
+
+type PostMediaItem =
+  | { id: string; type: "IMAGE"; url: string }
+  | { id: string; type: "VIDEO"; url: string; posterUrl: string };
 
 type Props = {
+  // 조회 V2가 내려주는 media. 이전 photos-only 데이터도 마이그레이션 과정에서 표시합니다.
   post: PublicPost;
   password: string | null;
 };
 
+type Phase = UploadPhase | "SAVING" | "COMPLETED";
+
+function getInitialMedia(post: Props["post"]): PostMediaData[] {
+  const postMedia = (post as PublicPost & { media?: PostMediaItem[] }).media;
+  const items: PostMediaItem[] =
+    postMedia ??
+    post.images.map((image) => ({
+      id: image.id,
+      type: "IMAGE" as const,
+      url: image.imageUrl,
+    }));
+
+  return items.map((item) =>
+    item.type === "IMAGE"
+      ? {
+          type: "existing" as const,
+          id: item.id,
+          mediaType: "IMAGE" as const,
+          previewUrl: item.url,
+        }
+      : {
+          type: "existing" as const,
+          id: item.id,
+          mediaType: "VIDEO" as const,
+          previewUrl: item.posterUrl,
+          videoUrl: item.url,
+        },
+  );
+}
+
 export default function PostEditForm({ post, password }: Props) {
   const { publicId } = useParams();
   const navigate = useNavigate();
-  const openLoading = useOpenLoadingOverlay();
-  const closeLoading = useCloseLoadingOverlay();
-
-  //새로고침 방지
-  useBeforeUnload(true);
-
-  // 비번 검증 drawer
-  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
-  const [passwordResetKey, setPasswordResetKey] = useState(0);
   const clearEditSession = useClearPostEditSession();
 
-  // 게시글 수정 API
-  const { mutate, isPending } = useUpdatePost(publicId);
+  useBeforeUnload(true);
 
-  // ==================================================
-  // 1. 원본 데이터 (변경 여부 비교용)
-  // ==================================================
-
-  // 기존 독후감 내용
-  const originalContent = post.content?.trim() ?? "";
-
-  // 기존 게시글 이미지 ID 목록 (순서 유지)
-  const originalImageIds = post.images.map((image) => image.id);
-
-  // ==================================================
-  // 2. 수정 가능한 데이터
-  // ==================================================
-
-  // 독후감
-  const [caption, setCaption] = useState(post.content ?? "");
-
-  // 이미지
-  // 기존 이미지는 type: "existing"으로 관리
-  // 새로 추가한 이미지는 PostImageField에서 type: "new"로 관리
-  const [images, setImages] = useState<PostImageData[]>(
-    post.images.map((image) => ({
-      type: "existing",
-      id: image.id,
-      previewUrl: image.imageUrl,
-    })),
-  );
-
-  // 빈칸 오류 표시 여부
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [passwordResetKey, setPasswordResetKey] = useState(0);
   const [showErrors, setShowErrors] = useState(false);
 
-  // ==================================================
-  // 3. 변경 여부 확인
-  // ==================================================
-
-  // 독후감 앞뒤 공백 제거
-  const trimmedCaption = caption.trim();
-
-  // 현재 남아 있는 기존 이미지 ID 목록
-  const currentExistingIds = images
-    .filter((image) => image.type === "existing")
-    .map((image) => image.id);
-
-  // 이미지 변경 여부
-  // 1. 새로운 이미지가 추가됐거나
-  // 2. 기존 이미지 개수가 달라졌거나
-  // 3. 기존 이미지 순서가 달라졌다면 변경된 것으로 판단
-  const imageChanged =
-    images.some((image) => image.type === "new") ||
-    currentExistingIds.length !== originalImageIds.length ||
-    currentExistingIds.some((id, index) => id !== originalImageIds[index]);
-
-  // 독후감 변경 여부
-  const contentChanged = trimmedCaption !== originalContent;
-
-  // 저장되지 않은 변경 사항 존재 여부
-  const isDirty = contentChanged || imageChanged;
-
-  // ==================================================
-  // 4. 이미지 최적화 상태
-  // ==================================================
-
-  // 새 이미지 중 최적화 중이거나 실패한 이미지가 있는지
-  // 모든 새 이미지가 ready 상태여야 서버 전송 가능
-  const isImageProcessing = images.some(
-    (image) => image.type === "new" && image.status !== "ready",
+  const [caption, setCaption] = useState(post.content ?? "");
+  const [mediaItems, setMediaItems] = useState<PostMediaData[]>(() =>
+    getInitialMedia(post),
   );
 
-  // ==================================================
-  // 5. 유효성 검사 및 수정 버튼 활성화
-  // ==================================================
+  const [phase, setPhase] = useState<Phase | null>(null);
+  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
+  const [fileProgress, setFileProgress] = useState<Record<string, number>>({});
+  const [uploadFailed, setUploadFailed] = useState(false);
 
-  const errors = {
-    content: !trimmedCaption,
-  };
+  const { mutate, isPending } = useUpdatePost(publicId, {
+    onPhaseChange: setPhase,
+    onFileProgress: (id, loaded, total) => {
+      if (total <= 0) return;
+      setFileProgress((prev) => ({
+        ...prev,
+        [id]: Math.min(100, Math.floor((loaded / total) * 100)),
+      }));
+    },
+  });
 
-  // 수정 가능 조건
-  // 1. 독후감이 비어 있지 않아야 함
-  // 2. 독후감 또는 이미지가 변경되어야 함
-  // 3. 서버 요청 중이 아니어야 함
-  // 4. 이미지 최적화가 모두 완료되어야 함
+  const originalContent = post.content?.trim() ?? "";
+  const originalIds = getInitialMedia(post).map((item) => item.id);
+  const trimmedCaption = caption.trim();
+
+  const existingIds = mediaItems
+    .filter((item) => item.type === "existing")
+    .map((item) => item.id);
+
+  const mediaChanged =
+    mediaItems.some((item) => item.type === "new") ||
+    existingIds.length !== originalIds.length ||
+    existingIds.some((id, index) => id !== originalIds[index]);
+  const isDirty = trimmedCaption !== originalContent || mediaChanged;
+
+  const isMediaChecking = mediaItems.some(
+    (item) => item.type === "new" && item.status !== "ready",
+  );
   const canSubmit =
-    !!trimmedCaption && isDirty && !isPending && !isImageProcessing;
-
-  // ==================================================
-  // 6. 게시글 수정 요청
-  // ==================================================
-
-  const handleSubmit = () => {
-    if (!publicId || isPending || isImageProcessing) return;
-
-    // 작성 당일에만 수정 가능
-    if (!isPostEditable(post.createdAt)) {
-      toast.error("게시글은 작성 당일에만 수정할 수 있습니다.");
-      return;
-    }
-
-    setShowErrors(true);
-
-    if (!trimmedCaption) {
-      toast.error("독후감을 작성해주세요.");
-      return;
-    }
-
-    // 변경된 내용이 없으면 중단
-    if (!contentChanged && !imageChanged) return;
-
-    // 저장된 비밀번호가 없으면 Drawer 열기
-    if (!password) {
-      setIsPasswordOpen(true);
-      return;
-    }
-
-    // 저장된 비밀번호가 있으면 바로 수정
-    submitUpdate(password);
-  };
+    !!trimmedCaption && isDirty && !isPending && !isMediaChecking;
 
   const submitUpdate = (verifiedPassword: string) => {
-    if (!publicId || isPending || isImageProcessing) return;
-
-    // 실제 API 요청 직전에 다시 검사
+    if (!publicId || !canSubmit) return;
     if (!isPostEditable(post.createdAt)) {
       setIsPasswordOpen(false);
       toast.error("게시글은 작성 당일에만 수정할 수 있습니다.");
       return;
     }
 
-    openLoading("수정 중...");
+    const files: UploadingFile[] = mediaItems
+      .filter((item) => item.type === "new")
+      .map((item, index) => ({
+        id: item.id,
+        label: `${index + 1}. ${item.mediaType === "VIDEO" ? "동영상" : "사진"}`,
+      }));
+
+    setUploadingFiles(files);
+    setFileProgress({});
+    setUploadFailed(false);
+    setPhase(files.length > 0 ? "PREPARING" : "SAVING");
+    setIsPasswordOpen(false);
+
     mutate(
       {
         postId: post.id,
         password: verifiedPassword,
         content: trimmedCaption,
-        images,
+        media: mediaItems,
       },
       {
         onSuccess: () => {
-          closeLoading();
-          setIsPasswordOpen(false);
           toast.success("게시물이 수정되었습니다.");
-          navigate(`/classroom/${publicId}/posts`, {
-            replace: true,
-          });
+          navigate(`/classroom/${publicId}/posts`, { replace: true });
         },
-
         onError: (error) => {
-          closeLoading();
           if (
             error instanceof FunctionsHttpError &&
             error.context.status === 401
           ) {
+            // 비밀번호 실패는 업로드 실패가 아닙니다.
+            setUploadFailed(false);
+            setPhase(null);
             clearEditSession();
             setPasswordResetKey((prev) => prev + 1);
             setIsPasswordOpen(true);
-
             toast.error("비밀번호가 올바르지 않습니다.");
             return;
           }
 
-          toast.error("게시물 수정에 실패했습니다.");
+          setUploadFailed(true);
+          if (
+            error instanceof FunctionsHttpError &&
+            error.context.status === 503
+          ) {
+            toast.error(
+              "수정 상태를 확인할 수 없습니다. 목록을 다시 조회해주세요.",
+            );
+            return;
+          }
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "게시물 수정에 실패했습니다.",
+          );
         },
       },
     );
   };
 
-  // ==================================================
-  // 7. UI
-  // ==================================================
+  const handleSubmit = () => {
+    if (!publicId || isPending || isMediaChecking) return;
+    if (!isPostEditable(post.createdAt)) {
+      toast.error("게시글은 작성 당일에만 수정할 수 있습니다.");
+      return;
+    }
+    setShowErrors(true);
+    if (!trimmedCaption) {
+      toast.error("독후감을 작성해주세요.");
+      return;
+    }
+    if (!isDirty) return;
+    if (!password) {
+      setIsPasswordOpen(true);
+      return;
+    }
+    submitUpdate(password);
+  };
 
   return (
     <div>
       <FieldGroup className="px-page-x gap-6! py-3 pb-60">
-        {/* 작성자 - 수정 불가 */}
         <Field className="w-full">
           <FieldLabel className="text-sm font-semibold">
             작성자{" "}
@@ -223,51 +213,54 @@ export default function PostEditForm({ post, password }: Props) {
               (수정 불가)
             </span>
           </FieldLabel>
-
           <Input className="h-12 px-4 text-sm" value={post.kid.name} readOnly />
         </Field>
 
-        {/* 책 - 수정 불가 */}
         <PostBookField
-          value={{
-            ...post.book,
-            coverImageFile: null,
-          }}
+          value={{ ...post.book, coverImageFile: null }}
           onValueChange={() => {}}
           disabled
           isUpdate
         />
 
-        {/* 독후감 - 수정 가능 */}
         <PostCaptionField
           value={caption}
           onValueChange={setCaption}
           disabled={isPending}
-          error={showErrors && errors.content}
+          error={showErrors && !trimmedCaption}
         />
 
-        {/* 사진 - 추가 및 삭제 가능 */}
-        <PostImageField
-          value={images}
-          onValueChange={setImages}
+        <PostMediaField
+          value={mediaItems}
+          onValueChange={setMediaItems}
           disabled={isPending}
         />
       </FieldGroup>
 
-      {/* 수정 버튼 */}
+      {phase && (
+        <PostUploadModal
+          mode="UPDATE"
+          open={isPending || uploadFailed}
+          phase={phase}
+          files={uploadingFiles}
+          progress={fileProgress}
+          failed={uploadFailed}
+          onDismissError={() => {
+            setPhase(null);
+          }}
+        />
+      )}
+
       <PostSubmitButton onClick={handleSubmit} disabled={!canSubmit}>
         {isPending ? <Loader2 className="animate-spin" /> : "수정하기"}
       </PostSubmitButton>
 
-      {/* 비번 입력 받는 drawer */}
       <PostEditPasswordDrawer
         open={isPasswordOpen}
         onOpenChange={setIsPasswordOpen}
         isPending={isPending}
         resetKey={passwordResetKey}
-        onSubmit={(enteredPassword) => {
-          submitUpdate(enteredPassword);
-        }}
+        onSubmit={submitUpdate}
       />
     </div>
   );

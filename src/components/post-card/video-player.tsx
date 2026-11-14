@@ -8,6 +8,20 @@ type Props = {
   fit?: "cover" | "contain";
 };
 
+type VideoReadyStatus = "IDLE" | "PROCESSING" | "READY" | "TIMEOUT" | "ERROR";
+
+const RETRY_INTERVAL_MS = 5_000;
+const MAX_RETRY_TICKS = 12; // 5초 * 12 = 약 1분
+
+// 재시도할 때 이전 실패 응답이 브라우저 캐시에 남지 않도록 URL 변경
+// Cloudflare의 공개 HLS manifest 주소에만 사용하는 전제
+function makeReloadUrl(url: string, attempt: string) {
+  const nextUrl = new URL(url, window.location.href);
+  nextUrl.searchParams.set("_retry", attempt);
+  nextUrl.hash = "t=0.001";
+  return nextUrl.toString();
+}
+
 let activeVideo: HTMLVideoElement | null = null;
 
 export default function VideoPlayer({
@@ -19,6 +33,8 @@ export default function VideoPlayer({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const retryTicksRef = useRef(0);
+  const retryCountRef = useRef(0);
 
   // 기본 전체화면 사용 여부
   const nativeFullscreenRef = useRef(false);
@@ -32,6 +48,147 @@ export default function VideoPlayer({
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
+
+  // 최초 재생 준비 / 변환 추정 오류 / 시간 초과
+  const [readyStatus, setReadyStatus] = useState<VideoReadyStatus>("IDLE");
+  const [isInView, setIsInView] = useState(true);
+  const [isPageVisible, setIsPageVisible] = useState(
+    () => document.visibilityState === "visible",
+  );
+
+  // 다른 동영상 URL로 전환되면 상태 초기화
+  useEffect(() => {
+    retryTicksRef.current = 0;
+    retryCountRef.current = 0;
+    setReadyStatus("IDLE");
+    setHasStarted(false);
+    setIsPlaying(false);
+    setIsEnded(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setIsLoading(false);
+    setShowSpinner(false);
+  }, [url]);
+
+  // 백그라운드 탭에서는 재시도 중지
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      setIsPageVisible(document.visibilityState === "visible");
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  // 변환 중으로 추정되는 영상만 5초마다 재로딩
+  // 화면 밖/다른 슬라이드/백그라운드에서는 시간 카운트도 일시정지
+  useEffect(() => {
+    if (
+      readyStatus !== "PROCESSING" ||
+      !isActive ||
+      !isInView ||
+      !isPageVisible
+    )
+      return;
+
+    const timer = window.setInterval(() => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      // 재시도 사이 이미 재생 준비가 되었다면 종료
+      if (
+        video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
+        !video.error
+      ) {
+        console.log("[VideoPlayer] 재생 준비 확인", {
+          url,
+          retryCount: retryCountRef.current,
+          readyState: video.readyState,
+        });
+        setReadyStatus("READY");
+        return;
+      }
+
+      retryTicksRef.current += 1;
+      if (retryTicksRef.current >= MAX_RETRY_TICKS) {
+        console.warn("[VideoPlayer] 1분 확인 종료", {
+          url,
+          retryCount: retryCountRef.current,
+          checkedSeconds: (retryTicksRef.current * RETRY_INTERVAL_MS) / 1000,
+        });
+        setReadyStatus("TIMEOUT");
+        return;
+      }
+
+      retryCountRef.current += 1;
+      const attempt = retryCountRef.current;
+
+      console.log("[VideoPlayer] 인코딩 확인 재시도", {
+        url,
+        attempt,
+        checkedSeconds: (retryTicksRef.current * RETRY_INTERVAL_MS) / 1000,
+        readyState: video.readyState,
+        networkState: video.networkState,
+        errorCode: video.error?.code ?? null,
+        errorMessage: video.error?.message ?? null,
+      });
+
+      // 동일 URL의 실패 응답이 캐시될 수 있어 manifest 주소를 갱신
+      video.src = makeReloadUrl(url, `${Date.now()}-${attempt}`);
+      video.load();
+    }, RETRY_INTERVAL_MS);
+
+    return () => window.clearInterval(timer);
+  }, [readyStatus, isActive, isInView, isPageVisible, url]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const events = [
+      "loadstart",
+      "loadedmetadata",
+      "loadeddata",
+      "canplay",
+      "canplaythrough",
+      "waiting",
+      "stalled",
+      "suspend",
+      "playing",
+      "error",
+      "emptied",
+    ];
+
+    const logVideoState = (event: Event) => {
+      console.log(`[VideoPlayer] ${event.type}`, {
+        url,
+        currentSrc: video.currentSrc,
+        readyState: video.readyState,
+        networkState: video.networkState,
+        paused: video.paused,
+        errorCode: video.error?.code ?? null,
+        errorMessage: video.error?.message ?? null,
+      });
+    };
+
+    // 최초 상태 확인
+    console.log("[VideoPlayer] 마운트", {
+      url,
+      readyState: video.readyState,
+      networkState: video.networkState,
+    });
+
+    events.forEach((event) => {
+      video.addEventListener(event, logVideoState);
+    });
+
+    return () => {
+      events.forEach((event) => {
+        video.removeEventListener(event, logVideoState);
+      });
+    };
+  }, [url]);
 
   // 로딩이 200ms 이상 지속될 때만 스피너 표시
   useEffect(() => {
@@ -72,7 +229,9 @@ export default function VideoPlayer({
         // 전체화면에서는 가시성 감지 무시
         if (nativeFullscreenRef.current) return;
 
-        if (entry.intersectionRatio < 0.5) {
+        const visible = entry.intersectionRatio >= 0.5;
+        setIsInView(visible);
+        if (!visible) {
           video.pause();
         }
       },
@@ -159,6 +318,17 @@ export default function VideoPlayer({
 
     // 기본 플레이어에서는 브라우저가 재생 제어
     if (nativeFullscreenRef.current) return;
+    if (["PROCESSING", "TIMEOUT", "ERROR"].includes(readyStatus)) return;
+
+    // 재생 버튼 클릭 시 현재 상태 출력
+    console.log("[VideoPlayer] 버튼 클릭", {
+      url,
+      paused: video.paused,
+      readyState: video.readyState,
+      networkState: video.networkState,
+      errorCode: video.error?.code ?? null,
+      errorMessage: video.error?.message ?? null,
+    });
 
     if (video.paused) {
       if (video.ended) {
@@ -260,6 +430,66 @@ export default function VideoPlayer({
     video.controls = false;
   };
 
+  // 재생을 시작할 수 있는 상태가 되었을 때 자동 확인 종료
+  const markReady = () => {
+    if (readyStatus !== "READY") {
+      console.log("[VideoPlayer] 재생 준비 완료", {
+        url,
+        retryCount: retryCountRef.current,
+      });
+      setReadyStatus("READY");
+    }
+  };
+
+  // 처음 로딩할 때 소스를 해석하지 못한 경우 자동 재확인
+  const handleVideoError = () => {
+    stopLoading();
+    const video = videoRef.current;
+    if (!video) return;
+
+    // 이미 폴링 중이면 다음 5초 재시도를 기다림
+    if (readyStatus === "PROCESSING" || readyStatus === "TIMEOUT") return;
+
+    if (!hasStarted && video.error?.code === 4) {
+      retryTicksRef.current = 0;
+      retryCountRef.current = 0;
+
+      console.warn("[VideoPlayer] 소스 오류 → 1분 자동 확인 시작", {
+        url,
+        errorCode: video.error?.code,
+        errorMessage: video.error?.message,
+      });
+
+      setReadyStatus("PROCESSING");
+      return;
+    }
+
+    // 인코딩 여부를 판단할 수 없는 다른 오류
+    console.error("[VideoPlayer] 동영상 오류", {
+      url,
+      errorCode: video.error?.code ?? null,
+      errorMessage: video.error?.message ?? null,
+    });
+    setReadyStatus("ERROR");
+  };
+
+  // 1분 종료 후 사용자가 누르면 새 1분 확인 시작
+  const handleManualRetry = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    retryTicksRef.current = 0;
+    retryCountRef.current = 0;
+    stopLoading();
+
+    console.log("[VideoPlayer] 수동 재시도 시작 (새 1분)", { url });
+    setReadyStatus("PROCESSING");
+
+    // 바로 한 번 불러오고, 이후 5초마다 확인
+    video.src = makeReloadUrl(url, `manual-${Date.now()}`);
+    video.load();
+  };
+
   return (
     <div
       ref={containerRef}
@@ -293,6 +523,7 @@ export default function VideoPlayer({
 
           activeVideo = video;
 
+          markReady();
           setHasStarted(true);
           setIsPlaying(true);
           setIsEnded(false);
@@ -333,6 +564,7 @@ export default function VideoPlayer({
           stopLoading();
         }}
         onCanPlay={(e) => {
+          markReady();
           if (!e.currentTarget.seeking) {
             stopLoading();
           }
@@ -345,35 +577,88 @@ export default function VideoPlayer({
         onTimeUpdate={(e) => {
           setCurrentTime(e.currentTarget.currentTime);
         }}
-        onError={stopLoading}
+        onError={handleVideoError}
       />
 
-      {/* 중앙 로딩 스피너 */}
-      {showSpinner && (
+      {/* 아직 재생할 수 없는 영상: 준비 중 화면 */}
+      {readyStatus === "PROCESSING" && (
+        <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/50 text-white">
+          <LoaderCircle className="size-6 animate-spin" />
+          <span className="text-sm font-medium">동영상 변환 중...</span>
+          <span className="text-xs text-white/70">
+            잠시 후 재생할 수 있습니다
+          </span>
+        </div>
+      )}
+
+      {/* 1분 자동 확인 종료: 사용자 선택으로 새 1분 재시도 */}
+      {readyStatus === "TIMEOUT" && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/60 text-white">
+          <span className="text-sm font-medium">
+            동영상 변환이 지연되고 있습니다.
+          </span>
+          <button
+            type="button"
+            onClick={handleManualRetry}
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            className="flex items-center gap-2 rounded-md bg-white/15 px-4 py-2 text-sm hover:bg-white/25"
+          >
+            <RotateCcw className="size-4" />
+            다시 확인하기
+          </button>
+        </div>
+      )}
+
+      {/* 인코딩 중이라고 판단할 수 없는 일반 오류 */}
+      {readyStatus === "ERROR" && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/60 text-white">
+          <span className="text-sm font-medium">
+            동영상을 불러올 수 없습니다.
+          </span>
+          <button
+            type="button"
+            onClick={handleManualRetry}
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            className="flex items-center gap-2 rounded-md bg-white/15 px-4 py-2 text-sm hover:bg-white/25"
+          >
+            <RotateCcw className="size-4" />
+            다시 확인하기
+          </button>
+        </div>
+      )}
+
+      {/* 기존 재생 중 로딩 스피너 */}
+      {readyStatus !== "PROCESSING" && showSpinner && (
         <div className="pointer-events-none absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
           <LoaderCircle className="size-6 animate-spin text-white drop-shadow-md" />
         </div>
       )}
 
       {/* 최초 재생 / 일시정지 / 재생 종료 */}
-      {!isPlaying && !showSpinner && (
-        <button
-          type="button"
-          onClick={togglePlay}
-          onPointerDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          aria-label={
-            isEnded ? "다시 재생" : !hasStarted ? "동영상 재생" : "재생 재개"
-          }
-          className="absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/60"
-        >
-          {isEnded ? (
-            <RotateCcw className="size-7" />
-          ) : (
-            <Play className="size-7 fill-current" />
-          )}
-        </button>
-      )}
+      {!isPlaying &&
+        !showSpinner &&
+        readyStatus !== "PROCESSING" &&
+        readyStatus !== "TIMEOUT" &&
+        readyStatus !== "ERROR" && (
+          <button
+            type="button"
+            onClick={togglePlay}
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            aria-label={
+              isEnded ? "다시 재생" : !hasStarted ? "동영상 재생" : "재생 재개"
+            }
+            className="absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/60"
+          >
+            {isEnded ? (
+              <RotateCcw className="size-7" />
+            ) : (
+              <Play className="size-7 fill-current" />
+            )}
+          </button>
+        )}
 
       {/* 최초 재생 이후 컨트롤 유지 */}
       {hasStarted && (
