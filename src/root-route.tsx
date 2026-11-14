@@ -13,6 +13,7 @@ import SettingPage from "./pages/setting/setting-page";
 import SettingClassroomPage from "./pages/setting/setting-classroom-page";
 import AdminPostListPage from "./pages/post/admin-post-list-page";
 import ChartPage from "./pages/chart-page";
+import PostUploadPreview from "./pages/post-upload-preview";
 
 export default function RootRoute() {
   return (
@@ -53,6 +54,8 @@ export default function RootRoute() {
         {/* 잘 못 된 경로 */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+
+      <Route path="/test/upload" element={<PostUploadPreview />} />
 
       {/* 잘 못 된 경로 */}
       <Route path="*" element={<NotFoundPage />} />
