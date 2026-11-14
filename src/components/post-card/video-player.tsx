@@ -41,6 +41,8 @@ export default function VideoPlayer({
   const retryCountRef = useRef(0);
   const hasStartedRef = useRef(false);
   const hlsRetryPendingRef = useRef(false);
+  const hlsSourceRequestedRef = useRef(false);
+  const hasPlayedSuccessfullyRef = useRef(false);
 
   // HLS 재생 엔진 및 요청 정리
   const hlsRef = useRef<Hls | null>(null);
@@ -152,6 +154,8 @@ export default function VideoPlayer({
     retryCountRef.current = 0;
     hasStartedRef.current = false;
     hlsRetryPendingRef.current = false;
+    hlsSourceRequestedRef.current = false;
+    hasPlayedSuccessfullyRef.current = false;
     changeReadyStatus("IDLE");
     setHasStarted(false);
     setIsPlaying(false);
@@ -224,8 +228,12 @@ export default function VideoPlayer({
         if (
           isPlaylistError &&
           data.response?.code === 404 &&
-          !hasStartedRef.current
+          !hasPlayedSuccessfullyRef.current
         ) {
+          video.pause();
+          setIsPlaying(false);
+          stopLoading();
+
           hls.stopLoad();
           changeReadyStatus("PROCESSING");
           return;
@@ -237,13 +245,11 @@ export default function VideoPlayer({
         changeReadyStatus("ERROR");
       });
 
+      // 재생 버튼을 누르기 전에는 Cloudflare HLS 요청을 보내지 않음
       hls.attachMedia(video);
-      hls.loadSource(url);
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      // hls.js 미지원(iOS 등): 네이티브 HLS 사용
+      // hls.js 미지원(iOS 등): 최초 재생 클릭 시 소스 연결
       engineRef.current = "NATIVE_HLS";
-      video.src = url;
-      video.load();
     } else {
       engineRef.current = "UNSUPPORTED";
       changeReadyStatus("UNSUPPORTED");
@@ -466,6 +472,17 @@ export default function VideoPlayer({
 
       startLoading();
 
+      if (engineRef.current === "HLS_JS" && !hlsSourceRequestedRef.current) {
+        hlsSourceRequestedRef.current = true;
+        hlsRef.current?.loadSource(url);
+      } else if (
+        engineRef.current === "NATIVE_HLS" &&
+        !video.hasAttribute("src")
+      ) {
+        video.src = url;
+        video.load();
+      }
+
       void video.play().catch(() => {
         stopLoading();
       });
@@ -574,7 +591,7 @@ export default function VideoPlayer({
 
     if (
       engineRef.current === "NATIVE_HLS" &&
-      !hasStarted &&
+      !hasPlayedSuccessfullyRef.current &&
       video.error?.code === 4
     ) {
       // 네이티브 HLS에서는 video.error만으로 404인지 확인 불가
@@ -623,7 +640,7 @@ export default function VideoPlayer({
         ref={videoRef}
         poster={posterUrl}
         playsInline
-        preload="metadata"
+        preload={isHls ? "none" : "metadata"}
         disablePictureInPicture
         disableRemotePlayback
         controlsList="noremoteplayback"
@@ -651,6 +668,7 @@ export default function VideoPlayer({
           setIsEnded(false);
         }}
         onPlaying={() => {
+          hasPlayedSuccessfullyRef.current = true;
           changeReadyStatus("READY");
           stopLoading();
         }}
