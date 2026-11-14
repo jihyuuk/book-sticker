@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Hls from "hls.js";
 import { Play, Maximize, RotateCcw, LoaderCircle } from "lucide-react";
 
 type Props = {
@@ -7,6 +8,8 @@ type Props = {
   isActive?: boolean;
   fit?: "cover" | "contain";
 };
+
+type VideoEngine = "HLS_JS" | "NATIVE_HLS" | "DIRECT" | "UNSUPPORTED";
 
 type VideoReadyStatus =
   "IDLE" | "PROCESSING" | "READY" | "TIMEOUT" | "ERROR" | "UNSUPPORTED";
@@ -36,6 +39,16 @@ export default function VideoPlayer({
   const progressRef = useRef<HTMLDivElement>(null);
   const retryTicksRef = useRef(0);
   const retryCountRef = useRef(0);
+  const hasStartedRef = useRef(false);
+  const hlsRetryPendingRef = useRef(false);
+
+  // HLS 재생 엔진 및 요청 정리
+  const hlsRef = useRef<Hls | null>(null);
+  const engineRef = useRef<VideoEngine>("DIRECT");
+  const sourceGenerationRef = useRef(0);
+  const nativeCheckRef = useRef<AbortController | null>(null);
+  const readyStatusRef = useRef<VideoReadyStatus>("IDLE");
+  const isHls = /\.m3u8(?:[?#]|$)/i.test(url);
 
   // 기본 전체화면 사용 여부
   const nativeFullscreenRef = useRef(false);
@@ -57,11 +70,89 @@ export default function VideoPlayer({
     () => document.visibilityState === "visible",
   );
 
-  // 다른 동영상 URL로 전환되면 상태 초기화
+  const changeReadyStatus = useCallback((status: VideoReadyStatus) => {
+    readyStatusRef.current = status;
+    setReadyStatus(status);
+  }, []);
+
+  const startLoading = () => {
+    setIsLoading(true);
+  };
+
+  const stopLoading = () => {
+    setIsLoading(false);
+    setShowSpinner(false);
+  };
+
+  // 네이티브 HLS: video.error에는 HTTP 코드가 없으므로 실패했을 때만 manifest 조회
+  // CORS로 조회할 수 없다면 404라고 추정하지 않고 일반 오류로 처리
+  const checkNativeManifest = useCallback(
+    async (requestUrl: string, reloadWhenReady: boolean) => {
+      if (nativeCheckRef.current) return;
+
+      const controller = new AbortController();
+      const generation = sourceGenerationRef.current;
+      nativeCheckRef.current = controller;
+
+      try {
+        const response = await fetch(requestUrl, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+
+        if (
+          controller.signal.aborted ||
+          generation !== sourceGenerationRef.current ||
+          readyStatusRef.current === "TIMEOUT"
+        )
+          return;
+
+        if (response.status === 404) {
+          changeReadyStatus("PROCESSING");
+          return;
+        }
+
+        if (!response.ok || !reloadWhenReady) {
+          // manifest가 200인데 네이티브 재생 오류라면 인코딩 중으로 보지 않음
+          changeReadyStatus("ERROR");
+          return;
+        }
+
+        const video = videoRef.current;
+        if (!video || engineRef.current !== "NATIVE_HLS") return;
+
+        changeReadyStatus("IDLE");
+        video.src = requestUrl;
+        video.load();
+      } catch {
+        if (
+          !controller.signal.aborted &&
+          generation === sourceGenerationRef.current &&
+          readyStatusRef.current !== "TIMEOUT"
+        ) {
+          changeReadyStatus("ERROR");
+        }
+      } finally {
+        if (nativeCheckRef.current === controller) {
+          nativeCheckRef.current = null;
+        }
+      }
+    },
+    [changeReadyStatus],
+  );
+
+  // 다른 동영상 URL로 전환되면 상태 초기화 및 재생 엔진 교체
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    sourceGenerationRef.current += 1;
+    const generation = sourceGenerationRef.current;
     retryTicksRef.current = 0;
     retryCountRef.current = 0;
-    setReadyStatus("IDLE");
+    hasStartedRef.current = false;
+    hlsRetryPendingRef.current = false;
+    changeReadyStatus("IDLE");
     setHasStarted(false);
     setIsPlaying(false);
     setIsEnded(false);
@@ -69,7 +160,110 @@ export default function VideoPlayer({
     setDuration(0);
     setIsLoading(false);
     setShowSpinner(false);
-  }, [url]);
+    nativeFullscreenRef.current = false;
+    video.controls = false;
+
+    nativeCheckRef.current?.abort();
+    nativeCheckRef.current = null;
+    hlsRef.current?.destroy();
+    hlsRef.current = null;
+    video.pause();
+    if (activeVideo === video) activeVideo = null;
+    video.removeAttribute("src");
+    video.load();
+
+    if (!isHls) {
+      // Object URL 및 일반 MP4: 기존 네이티브 video 재생 유지
+      engineRef.current = "DIRECT";
+      video.src = url;
+      video.load();
+    } else if (Hls.isSupported()) {
+      engineRef.current = "HLS_JS";
+
+      // manifest 404는 기존 5초 재시도에서 처리하므로 hls.js 자체 재시도는 제거
+      const noRetryPolicy = {
+        default: {
+          maxTimeToFirstByteMs: 10_000,
+          maxLoadTimeMs: 20_000,
+          timeoutRetry: null,
+          errorRetry: null,
+        },
+      };
+      const hls = new Hls({
+        manifestLoadPolicy: noRetryPolicy,
+        playlistLoadPolicy: noRetryPolicy,
+      });
+      hlsRef.current = hls;
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        if (
+          sourceGenerationRef.current !== generation ||
+          hlsRef.current !== hls
+        )
+          return;
+        hlsRetryPendingRef.current = false;
+        // 목록 파싱 성공은 재생 성공과 다름. 실제 READY는 video.canplay에서 변경
+        if (readyStatusRef.current === "PROCESSING") {
+          changeReadyStatus("IDLE");
+        }
+      });
+
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (
+          sourceGenerationRef.current !== generation ||
+          hlsRef.current !== hls ||
+          readyStatusRef.current === "TIMEOUT"
+        )
+          return;
+
+        const isPlaylistError =
+          data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR ||
+          data.details === Hls.ErrorDetails.LEVEL_LOAD_ERROR;
+        if (isPlaylistError) hlsRetryPendingRef.current = false;
+
+        if (
+          isPlaylistError &&
+          data.response?.code === 404 &&
+          !hasStartedRef.current
+        ) {
+          hls.stopLoad();
+          changeReadyStatus("PROCESSING");
+          return;
+        }
+
+        // manifest/level 오류는 자체 중복 재시도 없이 직접 처리
+        if (!isPlaylistError && !data.fatal) return;
+        hls.stopLoad();
+        changeReadyStatus("ERROR");
+      });
+
+      hls.attachMedia(video);
+      hls.loadSource(url);
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      // hls.js 미지원(iOS 등): 네이티브 HLS 사용
+      engineRef.current = "NATIVE_HLS";
+      video.src = url;
+      video.load();
+    } else {
+      engineRef.current = "UNSUPPORTED";
+      changeReadyStatus("UNSUPPORTED");
+    }
+
+    return () => {
+      // 언마운트 및 URL 변경 시 오래된 비동기 이벤트가 상태를 변경하지 못하도록 함
+      sourceGenerationRef.current += 1;
+      nativeCheckRef.current?.abort();
+      nativeCheckRef.current = null;
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      video.pause();
+      if (activeVideo === video) activeVideo = null;
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, [url, isHls, changeReadyStatus]);
 
   // 백그라운드 탭에서는 재시도 중지
   useEffect(() => {
@@ -102,26 +296,45 @@ export default function VideoPlayer({
         video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
         !video.error
       ) {
-        setReadyStatus("READY");
+        changeReadyStatus("READY");
         return;
       }
 
       retryTicksRef.current += 1;
       if (retryTicksRef.current >= MAX_RETRY_TICKS) {
-        setReadyStatus("TIMEOUT");
+        hlsRef.current?.stopLoad();
+        nativeCheckRef.current?.abort();
+        changeReadyStatus("TIMEOUT");
         return;
       }
 
       retryCountRef.current += 1;
       const attempt = retryCountRef.current;
+      const reloadUrl = makeReloadUrl(url, `${Date.now()}-${attempt}`);
 
       // 동일 URL의 실패 응답이 캐시될 수 있어 manifest 주소를 갱신
-      video.src = makeReloadUrl(url, `${Date.now()}-${attempt}`);
-      video.load();
+      if (engineRef.current === "HLS_JS") {
+        // hls.js가 video의 src(MediaSource)를 관리하므로 직접 변경하지 않음
+        if (!hlsRetryPendingRef.current && hlsRef.current) {
+          hlsRetryPendingRef.current = true;
+          hlsRef.current.loadSource(reloadUrl);
+        }
+      } else if (engineRef.current === "NATIVE_HLS") {
+        // HTTP 응답을 확인하고 200일 때만 네이티브 video를 재로딩
+        void checkNativeManifest(reloadUrl, true);
+      }
     }, RETRY_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [readyStatus, isActive, isInView, isPageVisible, url]);
+  }, [
+    readyStatus,
+    isActive,
+    isInView,
+    isPageVisible,
+    url,
+    changeReadyStatus,
+    checkNativeManifest,
+  ]);
 
   // 로딩이 200ms 이상 지속될 때만 스피너 표시
   useEffect(() => {
@@ -133,15 +346,6 @@ export default function VideoPlayer({
 
     return () => window.clearTimeout(timer);
   }, [isLoading]);
-
-  const startLoading = () => {
-    setIsLoading(true);
-  };
-
-  const stopLoading = () => {
-    setIsLoading(false);
-    setShowSpinner(false);
-  };
 
   // 캐러셀에서 다른 슬라이드로 이동하면 일시정지
   useEffect(() => {
@@ -360,27 +564,26 @@ export default function VideoPlayer({
     const video = videoRef.current;
     if (!video) return;
 
-    // 이미 폴링 중이면 다음 5초 재시도를 기다림
-    if (readyStatus === "PROCESSING" || readyStatus === "TIMEOUT") return;
+    // hls.js가 오류와 HTTP 응답을 직접 판별함
+    if (engineRef.current === "HLS_JS") return;
+    if (
+      readyStatusRef.current === "PROCESSING" ||
+      readyStatusRef.current === "TIMEOUT"
+    )
+      return;
 
-    if (!hasStarted && video.error?.code === 4) {
-      const supportsHls =
-        video.canPlayType("application/vnd.apple.mpegurl") !== "";
-
-      if (!supportsHls) {
-        setReadyStatus("UNSUPPORTED");
-        return;
-      }
-
-      retryTicksRef.current = 0;
-      retryCountRef.current = 0;
-
-      setReadyStatus("PROCESSING");
+    if (
+      engineRef.current === "NATIVE_HLS" &&
+      !hasStarted &&
+      video.error?.code === 4
+    ) {
+      // 네이티브 HLS에서는 video.error만으로 404인지 확인 불가
+      void checkNativeManifest(url, false);
       return;
     }
-    // 인코딩 여부를 판단할 수 없는 다른 오류
 
-    setReadyStatus("ERROR");
+    // Object URL/MP4 및 그 외 영상 오류는 인코딩 중으로 간주하지 않음
+    changeReadyStatus("ERROR");
   };
 
   // 1분 종료 후 사용자가 누르면 새 1분 확인 시작
@@ -390,13 +593,24 @@ export default function VideoPlayer({
 
     retryTicksRef.current = 0;
     retryCountRef.current = 0;
+    hlsRetryPendingRef.current = false;
+    nativeCheckRef.current?.abort();
+    nativeCheckRef.current = null;
     stopLoading();
+    changeReadyStatus("IDLE");
 
-    setReadyStatus("PROCESSING");
+    const reloadUrl = makeReloadUrl(url, `manual-${Date.now()}`);
 
-    // 바로 한 번 불러오고, 이후 5초마다 확인
-    video.src = makeReloadUrl(url, `manual-${Date.now()}`);
-    video.load();
+    // 바로 한 번 불러오고, 이후 404가 확인된 경우에만 5초마다 재확인
+    if (engineRef.current === "HLS_JS") {
+      hlsRetryPendingRef.current = true;
+      hlsRef.current?.loadSource(reloadUrl);
+    } else if (engineRef.current === "NATIVE_HLS") {
+      void checkNativeManifest(reloadUrl, true);
+    } else if (engineRef.current === "DIRECT") {
+      video.src = url;
+      video.load();
+    }
   };
 
   return (
@@ -407,7 +621,6 @@ export default function VideoPlayer({
       {/* 영상 */}
       <video
         ref={videoRef}
-        src={url}
         poster={posterUrl}
         playsInline
         preload="metadata"
@@ -432,11 +645,13 @@ export default function VideoPlayer({
 
           activeVideo = video;
 
+          hasStartedRef.current = true;
           setHasStarted(true);
           setIsPlaying(true);
           setIsEnded(false);
         }}
         onPlaying={() => {
+          changeReadyStatus("READY");
           stopLoading();
         }}
         onPause={(e) => {
@@ -472,6 +687,9 @@ export default function VideoPlayer({
           stopLoading();
         }}
         onCanPlay={(e) => {
+          if (!e.currentTarget.error) {
+            changeReadyStatus("READY");
+          }
           if (!e.currentTarget.seeking) {
             stopLoading();
           }
@@ -499,7 +717,7 @@ export default function VideoPlayer({
       {readyStatus === "PROCESSING" && (
         <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/50 text-white">
           <LoaderCircle className="size-6 animate-spin" />
-          <span className="text-sm font-medium">동영상 변환 중...</span>
+          <span className="text-sm font-medium">동영상 준비 중...</span>
           <span className="text-xs text-white/70">
             잠시 후 재생할 수 있습니다
           </span>
@@ -510,7 +728,7 @@ export default function VideoPlayer({
       {readyStatus === "TIMEOUT" && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/60 text-white">
           <span className="text-sm font-medium">
-            동영상 변환이 지연되고 있습니다.
+            동영상 준비가 지연되고 있습니다.
           </span>
           <button
             type="button"
