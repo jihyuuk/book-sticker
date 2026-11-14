@@ -5,7 +5,7 @@ type UploadQueueOptions<T> = {
 };
 
 // 동시 업로드 제한
-const IMAGE_CONCURRENCY = 2;
+const IMAGE_CONCURRENCY = 3;
 const VIDEO_CONCURRENCY = 1;
 
 // 지정된 개수만큼 병렬 실행
