@@ -64,6 +64,8 @@ export default function VideoPlayer({
   // 로딩 상태
   const [isLoading, setIsLoading] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
+  // Safari에서 첫 프레임 전 poster가 사라지는 현상 방지
+  const [hasRenderedFirstFrame, setHasRenderedFirstFrame] = useState(false);
 
   // 최초 재생 준비 / 변환 추정 오류 / 시간 초과
   const [readyStatus, setReadyStatus] = useState<VideoReadyStatus>("IDLE");
@@ -164,6 +166,7 @@ export default function VideoPlayer({
     setDuration(0);
     setIsLoading(false);
     setShowSpinner(false);
+    setHasRenderedFirstFrame(false);
     nativeFullscreenRef.current = false;
     video.controls = false;
 
@@ -270,6 +273,20 @@ export default function VideoPlayer({
       video.load();
     };
   }, [url, isHls, changeReadyStatus]);
+
+  // 첫 영상 프레임이 렌더링될 때까지 썸네일 오버레이 유지
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !posterUrl || !video.requestVideoFrameCallback) return;
+
+    const callbackId = video.requestVideoFrameCallback(() => {
+      setHasRenderedFirstFrame(true);
+    });
+
+    return () => {
+      video.cancelVideoFrameCallback?.(callbackId);
+    };
+  }, [url, posterUrl]);
 
   // 백그라운드 탭에서는 재시도 중지
   useEffect(() => {
@@ -644,7 +661,7 @@ export default function VideoPlayer({
         disablePictureInPicture
         disableRemotePlayback
         controlsList="noremoteplayback"
-        className={`h-full w-full ${
+        className={`relative z-0 h-full w-full ${
           fit === "contain" ? "object-contain" : "object-cover"
         } fullscreen:!h-screen fullscreen:!w-screen fullscreen:!object-contain`}
         onClick={togglePlay}
@@ -718,10 +735,29 @@ export default function VideoPlayer({
           setDuration(Number.isFinite(value) ? value : 0);
         }}
         onTimeUpdate={(e) => {
-          setCurrentTime(e.currentTarget.currentTime);
+          const video = e.currentTarget;
+          setCurrentTime(video.currentTime);
+
+          // 구형 브라우저: 프레임 콜백 미지원 시 재생 시간 진행으로 대체 확인
+          if (!video.requestVideoFrameCallback && video.currentTime > 0) {
+            setHasRenderedFirstFrame(true);
+          }
         }}
         onError={handleVideoError}
       />
+
+      {/* 첫 프레임 전까지 poster를 유지하되, 스피너/버튼 위로는 올라오지 않게 함 */}
+      {posterUrl && !hasRenderedFirstFrame && (
+        <img
+          src={posterUrl}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className={`pointer-events-none absolute inset-0 z-[1] h-full w-full ${
+            fit === "contain" ? "object-contain" : "object-cover"
+          }`}
+        />
+      )}
 
       {readyStatus === "UNSUPPORTED" && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 text-white">
@@ -802,7 +838,7 @@ export default function VideoPlayer({
             aria-label={
               isEnded ? "다시 재생" : !hasStarted ? "동영상 재생" : "재생 재개"
             }
-            className="absolute top-1/2 left-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/60"
+            className="absolute top-1/2 left-1/2 z-10 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/60"
           >
             {isEnded ? (
               <RotateCcw className="size-7" />
