@@ -169,7 +169,7 @@ export default function PostMediaCarousel({ media }: Props) {
               )}
 
               {media.length > 1 && (
-                <div className="pointer-events-none absolute top-3 right-3 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white tabular-nums">
+                <div className="pointer-events-none absolute top-3 right-3 z-30 rounded-full bg-black/50 px-2 py-1 text-xs font-medium text-white tabular-nums">
                   {index + 1}/{media.length}
                 </div>
               )}
