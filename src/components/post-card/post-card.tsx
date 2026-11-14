@@ -1,7 +1,6 @@
 import PostHeader from "./post-header";
 import BookInfo from "../book/book-info";
 import PostCaption from "./post-caption";
-import PostImageCarousel from "./post-image-carousel";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { memo } from "react";
 import PostMediaCarousel from "./post-media-carousel";
