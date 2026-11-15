@@ -22,6 +22,8 @@ export default function PostListPage() {
 
   const [isPullRefreshing, setIsPullRefreshing] = useState(false);
 
+  const [refreshVersion, setRefreshVersion] = useState(0);
+
   const queryClient = useQueryClient();
 
   const {
@@ -110,6 +112,7 @@ export default function PostListPage() {
       });
 
       await refetch();
+      setRefreshVersion((prev) => prev + 1);
     } finally {
       setIsPullRefreshing(false);
     }
@@ -162,7 +165,7 @@ export default function PostListPage() {
                 </div>
               ) : (
                 <>
-                  <section className="space-y-15">
+                  <section key={refreshVersion} className="space-y-15">
                     {posts.map((post) => (
                       <PostCard key={post.id} post={post} />
                     ))}

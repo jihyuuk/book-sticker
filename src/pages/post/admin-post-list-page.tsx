@@ -32,6 +32,8 @@ export default function AdminPostListPage() {
 
   const [isPullRefreshing, setIsPullRefreshing] = useState(false);
 
+  const [refreshVersion, setRefreshVersion] = useState(0);
+
   // 반 목록 조회
   const {
     data: classrooms,
@@ -150,6 +152,7 @@ export default function AdminPostListPage() {
 
       // 첫 페이지 다시 조회
       await refetch();
+      setRefreshVersion((prev) => prev + 1);
     } finally {
       setIsPullRefreshing(false);
     }
@@ -250,7 +253,7 @@ export default function AdminPostListPage() {
           ) : (
             // 게시글 목록 + 무한스크롤 UI
             <>
-              <section className="space-y-15">
+              <section key={refreshVersion} className="space-y-15">
                 {posts.map((post) => (
                   <PostCard
                     key={post.id}
