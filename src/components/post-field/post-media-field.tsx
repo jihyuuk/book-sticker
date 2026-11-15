@@ -259,7 +259,7 @@ export default function PostMediaField({
             url:
               current.type === "existing"
                 ? (current.videoUrl ?? "")
-                : `${current.previewUrl}#t=0.001`,
+                : `${current.previewUrl}`,
             ...(current.type === "existing"
               ? { posterUrl: current.previewUrl }
               : {}),
