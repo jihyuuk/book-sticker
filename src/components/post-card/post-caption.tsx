@@ -1,8 +1,10 @@
 import { useTruncatedCaption } from "@/hooks/utils/use-truncated-caption";
 import type { CSSProperties } from "react";
+import HighlightText from "../ui/highlight-text";
 
 type Props = {
   caption: string | null;
+  highlightKeyword?: string;
 };
 
 // 최대 표시 줄 수
@@ -23,7 +25,7 @@ const CLAMP_STYLE: CSSProperties = {
   overflow: "hidden",
 };
 
-export default function PostCaption({ caption }: Props) {
+export default function PostCaption({ caption, highlightKeyword }: Props) {
   const {
     measureRef,
     candidateRef,
@@ -71,11 +73,14 @@ export default function PostCaption({ caption }: Props) {
           <span className={`${TEXT_CLASS} block`}>
             {isOverflowing && !expanded ? (
               <>
-                {truncatedCaption}
+                <HighlightText
+                  text={truncatedCaption}
+                  keyword={highlightKeyword}
+                />
                 <span className={MORE_CLASS}> ... 더보기</span>
               </>
             ) : (
-              caption
+              <HighlightText text={caption} keyword={highlightKeyword} />
             )}
           </span>
         </button>

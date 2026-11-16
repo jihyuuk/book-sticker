@@ -10,33 +10,22 @@ type Props = {
   //리팩토링- classroom name = not null
   classroomName?: string | null;
   isAdmin?: boolean;
+  highlightKeyword?: string;
 };
 
-// const mockImages = [
-//   // 가로 4:3
-//   "https://picsum.photos/seed/mock-1/800/600",
-
-//   // 세로 3:4
-//   "https://picsum.photos/seed/mock-2/600/800",
-
-//   // 정사각형
-//   "https://picsum.photos/seed/mock-3/700/700",
-
-//   // 가로 16:9
-//   "https://picsum.photos/seed/mock-4/960/540",
-
-//   // 세로형 긴 사진
-//   "https://picsum.photos/seed/mock-5/600/1000",
-// ];
-
-function PostCard({ post, classroomName, isAdmin }: Props) {
+function PostCard({ post, classroomName, isAdmin, highlightKeyword }: Props) {
   return (
     <article className="bg-white">
       {/* 헤더 */}
-      <PostHeader post={post} classroomName={classroomName} isAdmin={isAdmin} />
+      <PostHeader
+        post={post}
+        classroomName={classroomName}
+        isAdmin={isAdmin}
+        highlightKeyword={highlightKeyword}
+      />
 
       {/* 독서록 */}
-      <PostCaption caption={post.content} />
+      <PostCaption caption={post.content} highlightKeyword={highlightKeyword} />
 
       {/* 피드 이미지 */}
       <PostMediaCarousel media={post.media} />
@@ -46,6 +35,7 @@ function PostCard({ post, classroomName, isAdmin }: Props) {
       <div className="px-page-x">
         <BookInfo
           book={post.book}
+          highlightKeyword={highlightKeyword}
           className="border-primary border-l-2 bg-slate-50 p-2"
         />
       </div>

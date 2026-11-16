@@ -3,10 +3,12 @@ import { useState } from "react";
 import FALLBACK_IMAGE from "@/assets/fallback-book.svg";
 import { useOpenImageViewer } from "@/store/image-viewer-store";
 import type { PublicBook } from "@/types/dto/public-dto";
+import HighlightText from "../ui/highlight-text";
 
 type Props = {
   book: Omit<PublicBook, "id">;
   className?: string;
+  highlightKeyword?: string;
 };
 
 // 책 표지 이미지 전용 컴포넌트
@@ -59,7 +61,7 @@ function BookCover({ src, title }: { src: string | null; title: string }) {
   );
 }
 
-export default function BookInfo({ book, className }: Props) {
+export default function BookInfo({ book, className, highlightKeyword }: Props) {
   return (
     <div className={cn("flex gap-3", className)}>
       <BookCover
@@ -71,7 +73,7 @@ export default function BookInfo({ book, className }: Props) {
       <div className="min-w-0 flex-1">
         <div className="grid grid-cols-[48px_1fr] text-xs">
           <span className="col-span-2 mb-1 truncate text-sm font-semibold text-gray-600">
-            {book.title}
+            <HighlightText text={book.title} keyword={highlightKeyword} />
           </span>
 
           <span className="text-gray-400">저자</span>

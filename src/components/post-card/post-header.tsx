@@ -3,15 +3,22 @@ import PostDropdownAdminMenu from "./post-dropdown-admin-menu";
 import type { PublicPost } from "@/types/dto/public-dto";
 import { useMemo, useState } from "react";
 import { cn, formatRelativeTimeKST } from "@/lib/utils";
+import HighlightText from "../ui/highlight-text";
 
 type Props = {
   post: PublicPost;
   //리팩토링-null 제거
   classroomName?: string | null;
   isAdmin?: boolean;
+  highlightKeyword?: string;
 };
 
-export default function PostHeader({ post, classroomName, isAdmin }: Props) {
+export default function PostHeader({
+  post,
+  classroomName,
+  isAdmin,
+  highlightKeyword,
+}: Props) {
   const kid = post.kid;
 
   const [showAbsoluteTime, setShowAbsoluteTime] = useState(false);
@@ -65,7 +72,7 @@ export default function PostHeader({ post, classroomName, isAdmin }: Props) {
         {/* 이름 / 작성 시간 */}
         <div className="min-w-0">
           <p className="truncate text-base font-semibold text-gray-900">
-            {post.kid.name}
+            <HighlightText text={post.kid.name} keyword={highlightKeyword} />
           </p>
 
           <p className="flex gap-1 truncate text-xs text-gray-400">
