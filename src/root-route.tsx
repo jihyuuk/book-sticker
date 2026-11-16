@@ -14,8 +14,8 @@ import SettingClassroomPage from "./pages/setting/setting-classroom-page";
 import AdminPostListPage from "./pages/post/admin-post-list-page";
 import ChartPage from "./pages/chart-page";
 import PostUploadPreview from "./pages/post-upload-preview";
-import SearchPostPageMock from "./pages/search-post-page-mock";
-import SearchPostPage from "./pages/search-post-page";
+import SearchPostPageMock from "./pages/search/search-post-page-mock";
+import SearchPostPage from "./pages/search/search-post-page";
 
 export default function RootRoute() {
   return (
