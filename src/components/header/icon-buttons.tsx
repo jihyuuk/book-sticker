@@ -1,3 +1,4 @@
+import { isIOS } from "@/lib/is-ios";
 import {
   ChartColumn,
   CircleQuestionMark,
@@ -25,6 +26,32 @@ export default function IconButtons({ isAdmin = false }: Props) {
       label: "검색",
       icon: Search,
       onClick: () => {
+        if (isIOS()) {
+          // 기존 임시 Input 중복 방지
+          document.getElementById("temp-search-input")?.remove();
+
+          const temp = document.createElement("input");
+          temp.id = "temp-search-input";
+          temp.type = "text";
+
+          Object.assign(temp.style, {
+            position: "fixed",
+            top: "0",
+            left: "0",
+            zIndex: "99999",
+            width: "1px",
+            height: "1px",
+            padding: "0",
+            fontSize: "16px",
+            border: "none",
+            opacity: "0.01",
+            pointerEvents: "none",
+          });
+
+          document.body.appendChild(temp);
+          temp.focus();
+        }
+
         navigate("../search", { relative: "path" });
       },
     },

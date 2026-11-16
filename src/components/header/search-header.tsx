@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import ClearableInput from "../ui/clearable-input";
 import { useEffect, useRef } from "react";
+import { isIOS } from "@/lib/is-ios";
 
 type Props = {
   value: string;
@@ -18,9 +19,49 @@ export default function SearchHeader({ value, onChangeValue }: Props) {
     inputRef.current?.querySelector("input")?.focus();
   };
 
-  // 페이지 진입 시 자동 포커스
+  // iOS: 임시 Input에서 실제 검색 Input으로 포커스 이전
   useEffect(() => {
-    focusInput();
+    if (!isIOS()) return;
+
+    const temp = document.getElementById("temp-search-input");
+    if (!temp) return;
+
+    const input = inputRef.current?.querySelector("input");
+    if (!input) return;
+
+    const timer = window.setTimeout(() => {
+      // 실제 Input으로 포커스 이전
+      input.focus({ preventScroll: true });
+
+      // 포커스 이전에 성공하면 임시 Input 숨김
+      if (document.activeElement === input) {
+        temp.style.opacity = "0";
+        temp.style.pointerEvents = "none";
+        temp.setAttribute("aria-hidden", "true");
+        temp.tabIndex = -1;
+      }
+    }, 30);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  // 기존 자동 포커스 + 임시 Input 정리
+  useEffect(() => {
+    const temp = document.getElementById("temp-search-input");
+
+    if (!isIOS() || !temp) {
+      focusInput();
+    }
+
+    const container = inputRef.current;
+
+    return () => {
+      window.setTimeout(() => {
+        if (container && !container.isConnected) {
+          temp?.remove();
+        }
+      }, 0);
+    };
   }, []);
 
   const handleBack = () => {
