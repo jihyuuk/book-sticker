@@ -38,6 +38,10 @@ export type PublicPost = {
   updatedAt: string;
 };
 
+export type SearchPublicPostsPageData = PublicPostsPageData & {
+  totalCount: number | null;
+};
+
 // Post Page
 export type PublicPostsPageData = {
   classroom: PublicClassroom;

@@ -14,6 +14,8 @@ import SettingClassroomPage from "./pages/setting/setting-classroom-page";
 import AdminPostListPage from "./pages/post/admin-post-list-page";
 import ChartPage from "./pages/chart-page";
 import PostUploadPreview from "./pages/post-upload-preview";
+import SearchPostPageMock from "./pages/search-post-page-mock";
+import SearchPostPage from "./pages/search-post-page";
 
 export default function RootRoute() {
   return (
@@ -28,6 +30,7 @@ export default function RootRoute() {
       {/* 유저 (로그인 O) */}
       <Route element={<UserOnlyRoute />}>
         <Route path="/" element={<AdminPostListPage />} />
+        <Route path="search" element={<SearchPostPage isAdmin />} />
         <Route path="/chart" element={<ChartPage />} />
         <Route path="/setting" element={<SettingPage />} />
         <Route
@@ -49,6 +52,9 @@ export default function RootRoute() {
         </Route>
 
         {/* 독서 현황 차트 */}
+        <Route path="search" element={<SearchPostPage />} />
+
+        {/* 독서 현황 차트 */}
         <Route path="chart" element={<PublicChartPage />} />
 
         {/* 잘 못 된 경로 */}
@@ -56,6 +62,7 @@ export default function RootRoute() {
       </Route>
 
       <Route path="/test/upload" element={<PostUploadPreview />} />
+      <Route path="/test/search" element={<SearchPostPageMock />} />
 
       {/* 잘 못 된 경로 */}
       <Route path="*" element={<NotFoundPage />} />

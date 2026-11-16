@@ -1,3 +1,5 @@
+import type { AdminSearchSort } from "@/api/admin-search-api";
+
 export const ADMIN_QUERY_KEYS = {
   classrooms: {
     all: ["admin", "classrooms"] as const,
@@ -10,6 +12,11 @@ export const ADMIN_QUERY_KEYS = {
     all: ["admin", "posts"] as const,
     byClassroom: (classroomId: string | null) =>
       ["admin", "posts", "byClassroom", classroomId] as const,
+    search: (
+      classroomId: string | null,
+      keyword: string,
+      sort: AdminSearchSort,
+    ) => ["admin", "posts", "search", classroomId, keyword, sort] as const,
   },
 
   kids: {
