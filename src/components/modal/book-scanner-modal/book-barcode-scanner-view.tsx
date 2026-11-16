@@ -96,7 +96,7 @@ export default function BookBarcodeScannerView({
     // 3. ISBN 검증
     const isIsbn =
       /^\d{13}$/.test(isbn) &&
-      (isbn.startsWith("978") || isbn.startsWith("979"));
+      ["977", "978", "979"].some((prefix) => isbn.startsWith(prefix));
 
     if (!isIsbn) {
       setStatus("INVALID_BARCODE");
